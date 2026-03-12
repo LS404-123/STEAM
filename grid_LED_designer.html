@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix LED Designer | 5x5</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --panel-bg: #0f172a;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-color: #6366f1;
+            --text-color: #f8fafc;
+            --led-off: #334155;
+            --board-wood: #1e293b; /* Dark board for better glow visibility */
+            --led-size: 14px;
+            --grid-gap: 45px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: fit-content;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        /* LED Grid */
+        .grid-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .led-grid {
+            display: grid;
+            grid-template-columns: repeat(5, var(--led-size));
+            grid-template-rows: repeat(5, var(--led-size));
+            gap: 32px;
+            background: var(--board-wood);
+            padding: 50px 30px 30px 30px;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            /* Tabbed board shape matching reference image */
+            clip-path: polygon(0% 12%,
+                    60% 12%,
+                    60% 0%,
+                    100% 0%,
+                    100% 100%,
+                    0% 100%);
+            transition: all 0.3s ease;
+        }
+
+        .led-grid::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            z-index: -1;
+        }
+
+        .led {
+            width: var(--led-size);
+            height: var(--led-size);
+            background-color: var(--led-off);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        /* LED leg holes decoration */
+        .led::before,
+        .led::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .led::before {
+            top: -8px;
+        }
+
+        .led::after {
+            bottom: -8px;
+        }
+
+        .led.active {
+            box-shadow:
+                0 0 15px var(--glow-color),
+                0 0 30px var(--glow-color),
+                0 0 45px var(--glow-color),
+                0 0 60px var(--glow-color); /* Extra layer for volume */
+            background-color: var(--glow-color);
+            z-index: 5;
+            filter: brightness(1.2); /* Make it pop more */
+        }
+
+        /* Wiring Overlay */
+        .wiring-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .led-grid.show-wiring .wiring-svg {
+            opacity: 1;
+        }
+
+        .terminal-label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .pos-label {
+            color: #ff4444;
+            left: 10px;
+            bottom: 10px;
+        }
+
+        .neg-label {
+            color: #888;
+            right: 10px;
+            bottom: 10px;
+        }
+
+        /* Control Panel */
+        .controls-section {
+            flex: 1;
+            min-width: 200px;
+            /* More compact */
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            /* Reduced gap */
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            height: 38px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-swatch.selected {
+            border-color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            border: none;
+        }
+
+        .btn-active {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .tool-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #111827;
+            width: 90%;
+            max-width: 440px;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .sample-library {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .sample-item {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .sample-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.05);
+            border-color: #fff;
+        }
+
+        .sample-icon {
+            width: 50px;
+            height: 50px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+        }
+
+        .sample-pixel {
+            border-radius: 1px;
+            background: #333;
+        }
+
+        @media (max-width: 650px) {
+            .main-container {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .led-grid {
+                padding: 60px 30px 30px 30px;
+                gap: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>矩陣 5&times;5</h1>
+        <p class="subtitle">精準設計您的 LED 圖案</p>
+    </header>
+
+    <div class="main-container">
+        <section class="grid-section">
+            <div class="led-grid" id="ledGrid">
+                <!-- SVG Wiring Overlay -->
+                <svg class="wiring-svg" id="wiringSvg" viewBox="0 0 300 300">
+                    <!-- Positive Copper Branches (Shifted Left) -->
+                    <path d="M15,20 V280" stroke="#b87333" stroke-width="4" fill="none" /> <!-- Main vertical -->
+                    <path d="M15,55 H260 M15,105 H260 M15,155 H260 M15,205 H260 M15,255 H260" stroke="#b87333"
+                        stroke-width="2" fill="none" /> <!-- Horizontal rows -->
+
+                    <!-- Negative Silver Branches -->
+                    <path d="M60,40 V240 M110,40 V240 M160,40 V240 M210,40 V240 M260,40 V240" stroke="#c0c0c0"
+                        stroke-width="2" fill="none" /> <!-- Vertical silver for negative -->
+                </svg>
+                <div class="terminal-label pos-label" id="posLabel">+</div>
+                <div class="terminal-label neg-label" id="negLabel">-</div>
+                <!-- LEDs will be injected here -->
+            </div>
+        </section>
+
+        <section class="controls-section">
+            <div class="control-group">
+                <span class="label">顏色</span>
+                <div class="color-palette" id="palette">
+                    <div class="color-swatch selected" data-color="#ff0000" style="background: #ff0000;"></div>
+                    <div class="color-swatch" data-color="#0000ff" style="background: #0000ff;"></div>
+                    <div class="color-swatch" data-color="#ffa500" style="background: #ffa500;"></div>
+                    <div class="color-swatch" data-color="#00ff00" style="background: #00ff00;"></div>
+                    <div class="color-swatch" data-color="#ffffff" style="background: #ffffff;"></div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="libraryBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                    範例圖案庫
+                </button>
+                <button class="btn" id="wiringBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7" />
+                    </svg>
+                    顯示接線圖
+                </button>
+                <div class="tool-row">
+                    <button class="btn" id="eraserBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.9-9.9c1-1 2.5-1 3.4 0l4.4 4.4c1 1 1 2.5 0 3.4L10.5 21z" />
+                            <path d="m22 21-6 0" />
+                        </svg>
+                        橡皮
+                    </button>
+                    <button class="btn" id="clearBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18" />
+                            <path d="M19 6V4c0-1-1-2-2-2H7c-1 0-2 1-2 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                        </svg>
+                        清除
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Library Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">範例圖案庫</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="sample-library" id="sampleLibrary">
+                <!-- Samples will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const grid = document.getElementById('ledGrid');
+        const palette = document.getElementById('palette');
+        const clearBtn = document.getElementById('clearBtn');
+        const eraserBtn = document.getElementById('eraserBtn');
+        const libraryBtn = document.getElementById('libraryBtn');
+        const wiringBtn = document.getElementById('wiringBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeModal = document.getElementById('closeModal');
+        const sampleLibrary = document.getElementById('sampleLibrary');
+
+        let currentColor = '#ff0000';
+        let isEraser = false;
+        let isMouseDown = false;
+        let showWiring = false;
+
+        const RED = '#ff0000';
+        const BLUE = '#0000ff';
+        const ORANGE = '#ffa500';
+        const GREEN = '#00ff00';
+        const PINK = '#00ff00';
+        const WHITE = '#ffffff';
+        const YELLOW = '#ffa500';
+        const BROWN = '#8b4513';
+        const OFF = '';
+
+        const SAMPLES = [
+            { name: '0', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
+            { name: '1', data: [OFF, OFF, RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, RED, RED, OFF] },
+            { name: '2', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, RED, RED, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED] },
+            { name: '3', data: [RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
+            { name: '4', data: [RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED] },
+            { name: '5', data: [RED, RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
+            { name: '6', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
+            { name: '7', data: [RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF] },
+            { name: '8', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
+            { name: '9', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
+            { name: '愛心', data: [OFF, RED, OFF, RED, OFF, RED, RED, RED, RED, RED, RED, RED, RED, RED, RED, OFF, RED, RED, RED, OFF, OFF, OFF, RED, OFF, OFF] },
+            {
+                name: '小熊',
+                data: [
+                    BROWN, BROWN, BROWN, BROWN, BROWN,
+                    BROWN, BROWN, BROWN, BROWN, BROWN,
+                    BROWN, OFF, BROWN, OFF, BROWN,
+                    BROWN, BROWN, OFF, BROWN, BROWN,
+                    OFF, BROWN, BROWN, BROWN, OFF
+                ]
+            },
+            {
+                name: '橘貓',
+                data: [
+                    ORANGE, OFF, OFF, OFF, ORANGE,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
+                    ORANGE, OFF, ORANGE, OFF, ORANGE,
+                    ORANGE, ORANGE, PINK, ORANGE, ORANGE,
+                    OFF, ORANGE, ORANGE, ORANGE, OFF
+                ]
+            },
+            {
+                name: '彩虹',
+                data: [
+                    RED, ORANGE, YELLOW, GREEN, BLUE,
+                    ORANGE, YELLOW, GREEN, BLUE, PINK,
+                    YELLOW, GREEN, BLUE, PINK, RED,
+                    GREEN, BLUE, PINK, RED, ORANGE,
+                    BLUE, PINK, RED, ORANGE, GREEN
+                ]
+            },
+            {
+                name: '白兔',
+                data: [
+                    WHITE, RED, OFF, RED, WHITE,
+                    WHITE, WHITE, WHITE, WHITE, WHITE,
+                    WHITE, OFF, WHITE, OFF, WHITE,
+                    WHITE, WHITE, RED, WHITE, WHITE,
+                    OFF, WHITE, WHITE, WHITE, OFF
+                ]
+            },
+            {
+                name: '小雞',
+                data: [
+                    OFF, YELLOW, YELLOW, YELLOW, OFF,
+                    YELLOW, YELLOW, YELLOW, YELLOW, YELLOW,
+                    YELLOW, OFF, YELLOW, OFF, YELLOW,
+                    YELLOW, YELLOW, ORANGE, YELLOW, YELLOW,
+                    OFF, YELLOW, YELLOW, YELLOW, OFF
+                ]
+            },
+            { name: '清空', data: Array(25).fill(OFF)}
+        ];
+
+        // Wiring Logic
+        wiringBtn.addEventListener('click', () => {
+            showWiring = !showWiring;
+            grid.classList.toggle('show-wiring', showWiring);
+            wiringBtn.classList.toggle('btn-active', showWiring);
+        });
+
+        // Modal Logic
+        libraryBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'flex';
+            setTimeout(() => modalOverlay.classList.add('show'), 10);
+        });
+
+        const closeFunc = () => {
+            modalOverlay.classList.remove('show');
+            setTimeout(() => modalOverlay.style.display = 'none', 300);
+        };
+
+        closeModal.addEventListener('click', closeFunc);
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeFunc(); });
+
+        function initGrid() {
+            for (let i = 0; i < 25; i++) {
+                const led = document.createElement('div');
+                led.className = 'led';
+                led.dataset.index = i;
+                led.addEventListener('mousedown', () => { isMouseDown = true; paintLED(i); });
+                led.addEventListener('mouseenter', () => { if (isMouseDown) paintLED(i); });
+                grid.appendChild(led);
+            }
+        }
+
+        function initLibrary() {
+            SAMPLES.forEach((sample, idx) => {
+                const item = document.createElement('div');
+                item.className = 'sample-item';
+                item.innerHTML = `<div class="sample-icon">${sample.data.map(c => `<div class="sample-pixel" style="background:${c || '#333'}"></div>`).join('')}</div>`;
+                item.addEventListener('click', () => { applySample(idx); closeFunc(); });
+                sampleLibrary.appendChild(item);
+            });
+        }
+
+        function applySample(index) {
+            const data = SAMPLES[index].data;
+            Array.from(grid.querySelectorAll('.led')).forEach((led, i) => {
+                if (data[i]) {
+                    led.classList.add('active');
+                    led.style.backgroundColor = data[i];
+                    led.style.setProperty('--glow-color', data[i]);
+                } else {
+                    led.classList.remove('active');
+                    led.style.backgroundColor = '';
+                }
+            });
+        }
+
+        function paintLED(index) {
+            const led = grid.querySelectorAll('.led')[index];
+            if (isEraser) {
+                led.classList.remove('active');
+                led.style.backgroundColor = '';
+            } else {
+                led.classList.add('active');
+                led.style.backgroundColor = currentColor;
+                led.style.setProperty('--glow-color', currentColor);
+            }
+        }
+
+        document.addEventListener('mouseup', () => isMouseDown = false);
+
+        palette.addEventListener('click', (e) => {
+            if (e.target.classList.contains('color-swatch')) {
+                document.querySelector('.color-swatch.selected')?.classList.remove('selected');
+                e.target.classList.add('selected');
+                currentColor = e.target.dataset.color;
+                isEraser = false;
+                eraserBtn.classList.remove('btn-active');
+            }
+        });
+
+        eraserBtn.addEventListener('click', () => {
+            isEraser = !isEraser;
+            eraserBtn.classList.toggle('btn-active', isEraser);
+        });
+
+        function clearAll() {
+            Array.from(grid.querySelectorAll('.led')).forEach(led => {
+                led.classList.remove('active');
+                led.style.backgroundColor = '';
+                led.style.setProperty('--glow-color', 'transparent');
+            });
+        }
+
+        clearBtn.addEventListener('click', clearAll);
+
+        grid.addEventListener('contextmenu', e => e.preventDefault());
+        initGrid();
+        initLibrary();
+    </script>
+</body>
+
+</html>
