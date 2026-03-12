@@ -17,9 +17,10 @@
             --accent-color: #6366f1;
             --text-color: #f8fafc;
             --led-off: #334155;
-            --board-wood: #1e293b; /* Dark board for better glow visibility */
-            --led-size: 14px;
-            --grid-gap: 45px;
+            --board-wood: #1e293b;
+            /* Dark board for better glow visibility */
+            --led-size: 32px;
+            --grid-gap: 60px;
         }
 
         * {
@@ -64,18 +65,17 @@
         }
 
         .main-container {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
+            display: grid;
+            grid-template-columns: 550px 1fr;
+            gap: 40px;
+            padding: 40px;
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-            max-width: 800px;
-            width: fit-content;
-            flex-wrap: nowrap;
-            justify-content: center;
-            align-items: stretch;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            width: 1000px;
+            height: 600px;
+            align-items: center;
         }
 
         /* LED Grid */
@@ -89,15 +89,15 @@
             display: grid;
             grid-template-columns: repeat(5, var(--led-size));
             grid-template-rows: repeat(5, var(--led-size));
-            gap: 32px;
+            gap: var(--grid-gap);
             background: var(--board-wood);
-            padding: 50px 30px 30px 30px;
+            padding: 80px 40px 40px 40px;
             border-radius: 4px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
             position: relative;
-            /* Tabbed board shape matching reference image */
-            clip-path: polygon(0% 12%,
-                    60% 12%,
+            /* Adjusted clip-path to avoid cutting LEDs at larger scale */
+            clip-path: polygon(0% 8%,
+                    60% 8%,
                     60% 0%,
                     100% 0%,
                     100% 100%,
@@ -121,7 +121,7 @@
             cursor: pointer;
             position: relative;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.05);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(255, 255, 255, 0.05);
         }
 
         /* LED leg holes decoration */
@@ -131,7 +131,7 @@
             position: absolute;
             width: 3px;
             height: 3px;
-            background: rgba(0,0,0,0.15);
+            background: rgba(0, 0, 0, 0.15);
             border-radius: 50%;
             left: 50%;
             transform: translateX(-50%);
@@ -139,11 +139,11 @@
         }
 
         .led::before {
-            top: -8px;
+            top: -12px;
         }
 
         .led::after {
-            bottom: -8px;
+            bottom: -12px;
         }
 
         .led.active {
@@ -151,28 +151,15 @@
                 0 0 15px var(--glow-color),
                 0 0 30px var(--glow-color),
                 0 0 45px var(--glow-color),
-                0 0 60px var(--glow-color); /* Extra layer for volume */
+                0 0 60px var(--glow-color);
+            /* Extra layer for volume */
             background-color: var(--glow-color);
             z-index: 5;
-            filter: brightness(1.2); /* Make it pop more */
+            filter: brightness(1.2);
+            /* Make it pop more */
         }
 
-        /* Wiring Overlay */
-        .wiring-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 3;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
 
-        .led-grid.show-wiring .wiring-svg {
-            opacity: 1;
-        }
 
         .terminal-label {
             position: absolute;
@@ -183,25 +170,23 @@
 
         .pos-label {
             color: #ff4444;
-            left: 10px;
-            bottom: 10px;
+            left: 20px;
+            bottom: 20px;
         }
 
         .neg-label {
             color: #888;
-            right: 10px;
-            bottom: 10px;
+            right: 20px;
+            bottom: 20px;
         }
 
         /* Control Panel */
         .controls-section {
-            flex: 1;
-            min-width: 200px;
-            /* More compact */
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            /* Reduced gap */
+            gap: 24px;
+            justify-content: center;
+            height: 100%;
         }
 
         .control-group {
@@ -305,24 +290,63 @@
 
         .modal-content {
             background: #111827;
-            width: 90%;
-            max-width: 440px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 85vh;
             border-radius: 20px;
             padding: 24px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             transform: translateY(20px);
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .modal-overlay.show .modal-content {
             transform: translateY(0);
         }
 
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
         .sample-library {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 12px;
+            overflow-y: auto;
+            padding-right: 8px;
+            /* Scrollbar styling */
+            scrollbar-width: thin;
+            scrollbar-color: var(--led-off) transparent;
+        }
+
+        .sample-library::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sample-library::-webkit-scrollbar-thumb {
+            background-color: var(--led-off);
+            border-radius: 10px;
         }
 
         .sample-item {
@@ -380,17 +404,7 @@
     <div class="main-container">
         <section class="grid-section">
             <div class="led-grid" id="ledGrid">
-                <!-- SVG Wiring Overlay -->
-                <svg class="wiring-svg" id="wiringSvg" viewBox="0 0 300 300">
-                    <!-- Positive Copper Branches (Shifted Left) -->
-                    <path d="M15,20 V280" stroke="#b87333" stroke-width="4" fill="none" /> <!-- Main vertical -->
-                    <path d="M15,55 H260 M15,105 H260 M15,155 H260 M15,205 H260 M15,255 H260" stroke="#b87333"
-                        stroke-width="2" fill="none" /> <!-- Horizontal rows -->
 
-                    <!-- Negative Silver Branches -->
-                    <path d="M60,40 V240 M110,40 V240 M160,40 V240 M210,40 V240 M260,40 V240" stroke="#c0c0c0"
-                        stroke-width="2" fill="none" /> <!-- Vertical silver for negative -->
-                </svg>
                 <div class="terminal-label pos-label" id="posLabel">+</div>
                 <div class="terminal-label neg-label" id="negLabel">-</div>
                 <!-- LEDs will be injected here -->
@@ -420,14 +434,7 @@
                     </svg>
                     範例圖案庫
                 </button>
-                <button class="btn" id="wiringBtn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2v20" />
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7" />
-                    </svg>
-                    顯示接線圖
-                </button>
+
                 <div class="tool-row">
                     <button class="btn" id="eraserBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -471,7 +478,6 @@
         const clearBtn = document.getElementById('clearBtn');
         const eraserBtn = document.getElementById('eraserBtn');
         const libraryBtn = document.getElementById('libraryBtn');
-        const wiringBtn = document.getElementById('wiringBtn');
         const modalOverlay = document.getElementById('modalOverlay');
         const closeModal = document.getElementById('closeModal');
         const sampleLibrary = document.getElementById('sampleLibrary');
@@ -479,24 +485,47 @@
         let currentColor = '#ff0000';
         let isEraser = false;
         let isMouseDown = false;
-        let showWiring = false;
 
         const RED = '#ff0000';
-        const BLUE = '#0000ff';
-        const ORANGE = '#ffa500';
-        const GREEN = '#00ff00';
-        const PINK = '#00ff00';
+        const BLUE = '#3366ff';
+        const ORANGE = '#ff8c00';
+        const GREEN = '#10b981';
+        const PINK = '#ec4899';
         const WHITE = '#ffffff';
-        const YELLOW = '#ffa500';
-        const BROWN = '#8b4513';
+        const YELLOW = '#f59e0b';
+        const BROWN = '#78350f';
         const OFF = '';
 
         const SAMPLES = [
-            { name: '0', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
-            { name: '1', data: [OFF, OFF, RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, RED, RED, OFF] },
-            { name: '2', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, RED, RED, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED] },
+            {
+                name: '0', data: [OFF, RED, RED, RED, OFF,
+                    RED, OFF, OFF, OFF, RED,
+                    RED, OFF, OFF, OFF, RED,
+                    RED, OFF, OFF, OFF, RED,
+                    OFF, RED, RED, RED, OFF]
+            },
+            {
+                name: '1', data: [OFF, OFF, RED, OFF, OFF,
+                    OFF, RED, RED, OFF, OFF,
+                    OFF, OFF, RED, OFF, OFF,
+                    OFF, OFF, RED, OFF, OFF,
+                    OFF, RED, RED, RED, OFF]
+            },
+            {
+                name: '2', data: [OFF, RED, RED, RED, OFF,
+                    RED, OFF, OFF, OFF, RED,
+                    OFF, OFF, RED, RED, OFF,
+                    OFF, RED, OFF, OFF, OFF,
+                    RED, RED, RED, RED, RED]
+            },
             { name: '3', data: [RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
-            { name: '4', data: [RED, OFF, OFF, OFF, RED, RED, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED] },
+            {
+                name: '4', data: [RED, OFF, OFF, OFF, RED,
+                    RED, OFF, OFF, OFF, RED,
+                    RED, RED, RED, RED, RED,
+                    OFF, OFF, OFF, OFF, RED,
+                    OFF, OFF, OFF, OFF, RED]
+            },
             { name: '5', data: [RED, RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
             { name: '6', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
             { name: '7', data: [RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF] },
@@ -553,15 +582,70 @@
                     OFF, YELLOW, YELLOW, YELLOW, OFF
                 ]
             },
-            { name: '清空', data: Array(25).fill(OFF)}
+            {
+                name: '外星人',
+                data: [
+                    OFF, GREEN, OFF, GREEN, OFF,
+                    OFF, OFF, GREEN, OFF, OFF,
+                    OFF, GREEN, GREEN, GREEN, OFF,
+                    GREEN, OFF, GREEN, OFF, GREEN,
+                    GREEN, GREEN, GREEN, GREEN, GREEN
+                ]
+            },
+            {
+                name: '苦力怕',
+                data: [
+                    GREEN, GREEN, GREEN, GREEN, GREEN,
+                    GREEN, BROWN, GREEN, BROWN, GREEN,
+                    GREEN, BROWN, BROWN, BROWN, GREEN,
+                    GREEN, GREEN, BROWN, GREEN, GREEN,
+                    GREEN, BROWN, GREEN, BROWN, GREEN
+                ]
+            },
+            {
+                name: '幽靈',
+                data: [
+                    OFF, WHITE, WHITE, WHITE, OFF,
+                    WHITE, BLUE, WHITE, BLUE, WHITE,
+                    WHITE, WHITE, WHITE, WHITE, WHITE,
+                    WHITE, WHITE, WHITE, WHITE, WHITE,
+                    WHITE, OFF, WHITE, OFF, WHITE
+                ]
+            },
+            {
+                name: '笑臉',
+                data: [
+                    OFF, YELLOW, YELLOW, YELLOW, OFF,
+                    YELLOW, OFF, YELLOW, OFF, YELLOW,
+                    YELLOW, YELLOW, YELLOW, YELLOW, YELLOW,
+                    YELLOW, ORANGE, YELLOW, ORANGE, YELLOW,
+                    OFF, YELLOW, YELLOW, YELLOW, OFF
+                ]
+            },
+            {
+                name: '鑽石',
+                data: [
+                    OFF, OFF, BLUE, OFF, OFF,
+                    OFF, BLUE, BLUE, BLUE, OFF,
+                    BLUE, BLUE, WHITE, BLUE, BLUE,
+                    OFF, BLUE, BLUE, BLUE, OFF,
+                    OFF, OFF, BLUE, OFF, OFF
+                ]
+            },
+            {
+                name: '炸彈',
+                data: [
+                    OFF, OFF, RED, OFF, OFF,
+                    OFF, OFF, BROWN, OFF, OFF,
+                    OFF, BROWN, BROWN, BROWN, OFF,
+                    BROWN, BROWN, RED, BROWN, BROWN,
+                    OFF, BROWN, BROWN, BROWN, OFF
+                ]
+            },
+            { name: '清空', data: Array(25).fill(OFF) }
         ];
 
-        // Wiring Logic
-        wiringBtn.addEventListener('click', () => {
-            showWiring = !showWiring;
-            grid.classList.toggle('show-wiring', showWiring);
-            wiringBtn.classList.toggle('btn-active', showWiring);
-        });
+
 
         // Modal Logic
         libraryBtn.addEventListener('click', () => {
