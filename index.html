@@ -21,6 +21,7 @@
             /* Dark board for better glow visibility */
             --led-size: 32px;
             --grid-gap: 60px;
+            --grid-size: 5;
         }
 
         * {
@@ -87,8 +88,8 @@
 
         .led-grid {
             display: grid;
-            grid-template-columns: repeat(5, var(--led-size));
-            grid-template-rows: repeat(5, var(--led-size));
+            grid-template-columns: repeat(var(--grid-size), var(--led-size));
+            grid-template-rows: repeat(var(--grid-size), var(--led-size));
             gap: var(--grid-gap);
             background: var(--board-wood);
             padding: 80px 40px 40px 40px;
@@ -221,6 +222,13 @@
             border-color: #fff;
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .color-swatch.disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(1);
         }
 
         .action-buttons {
@@ -380,6 +388,37 @@
             background: #333;
         }
 
+        /* Library Tabs */
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .modal-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .modal-tab:hover {
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-tab.active {
+            color: var(--accent-color);
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
         @media (max-width: 650px) {
             .main-container {
                 flex-direction: column;
@@ -415,11 +454,13 @@
             <div class="control-group">
                 <span class="label">顏色</span>
                 <div class="color-palette" id="palette">
-                    <div class="color-swatch selected" data-color="#ff0000" style="background: #ff0000;"></div>
-                    <div class="color-swatch" data-color="#0000ff" style="background: #0000ff;"></div>
-                    <div class="color-swatch" data-color="#ffa500" style="background: #ffa500;"></div>
-                    <div class="color-swatch" data-color="#00ff00" style="background: #00ff00;"></div>
-                    <div class="color-swatch" data-color="#ffffff" style="background: #ffffff;"></div>
+                    <div class="color-swatch selected" data-color="#ff0000" data-group="warm"
+                        style="background: #ff0000;"></div>
+                    <div class="color-swatch" data-color="#ffa500" data-group="warm" style="background: #ffa500;"></div>
+                    <div class="color-swatch" data-color="#0000ff" data-group="cool" style="background: #0000ff;"></div>
+                    <div class="color-swatch" data-color="#00ff00" data-group="cool" style="background: #00ff00;"></div>
+                    <div class="color-swatch" data-color="#ffffff" data-group="neutral" style="background: #ffffff;">
+                    </div>
                 </div>
             </div>
 
@@ -455,6 +496,9 @@
                         清除
                     </button>
                 </div>
+                <button class="btn btn-primary" id="gridToggleBtn">
+                    切換至 10x10 網格
+                </button>
             </div>
         </section>
     </div>
@@ -465,6 +509,12 @@
             <div class="modal-header">
                 <h2 class="modal-title">範例圖案庫</h2>
                 <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-tabs" id="modalTabs">
+                <div class="modal-tab active" data-tab="all">全部</div>
+                <div class="modal-tab" data-tab="warm">暖色系 (紅/橘)</div>
+                <div class="modal-tab" data-tab="cool">冷色系 (藍/綠)</div>
+                <div class="modal-tab" data-tab="neutral">其他</div>
             </div>
             <div class="sample-library" id="sampleLibrary">
                 <!-- Samples will be injected here -->
@@ -478,72 +528,65 @@
         const clearBtn = document.getElementById('clearBtn');
         const eraserBtn = document.getElementById('eraserBtn');
         const libraryBtn = document.getElementById('libraryBtn');
+        const gridToggleBtn = document.getElementById('gridToggleBtn');
         const modalOverlay = document.getElementById('modalOverlay');
         const closeModal = document.getElementById('closeModal');
         const sampleLibrary = document.getElementById('sampleLibrary');
+        const modalTabs = document.getElementById('modalTabs');
 
         let currentColor = '#ff0000';
         let isEraser = false;
         let isMouseDown = false;
+        let currentGridSize = 5;
+        let activeGroup = null; // 'warm' or 'cool'
 
         const RED = '#ff0000';
-        const BLUE = '#3366ff';
-        const ORANGE = '#ff8c00';
-        const GREEN = '#10b981';
-        const PINK = '#ec4899';
+        const ORANGE = '#ffa500';
+        const BLUE = '#0000ff';
+        const GREEN = '#00ff00';
         const WHITE = '#ffffff';
-        const YELLOW = '#f59e0b';
-        const BROWN = '#78350f';
+        const PINK = '#ec4899';
+        const BROWN = '#8b4513';
         const OFF = '';
 
         const SAMPLES = [
             {
-                name: '0', data: [OFF, RED, RED, RED, OFF,
+                name: '0', group: 'warm', data: [OFF, RED, RED, RED, OFF,
                     RED, OFF, OFF, OFF, RED,
                     RED, OFF, OFF, OFF, RED,
                     RED, OFF, OFF, OFF, RED,
                     OFF, RED, RED, RED, OFF]
             },
             {
-                name: '1', data: [OFF, OFF, RED, OFF, OFF,
+                name: '1', group: 'warm', data: [OFF, OFF, RED, OFF, OFF,
                     OFF, RED, RED, OFF, OFF,
                     OFF, OFF, RED, OFF, OFF,
                     OFF, OFF, RED, OFF, OFF,
                     OFF, RED, RED, RED, OFF]
             },
             {
-                name: '2', data: [OFF, RED, RED, RED, OFF,
+                name: '2', group: 'warm', data: [OFF, RED, RED, RED, OFF,
                     RED, OFF, OFF, OFF, RED,
                     OFF, OFF, RED, RED, OFF,
                     OFF, RED, OFF, OFF, OFF,
                     RED, RED, RED, RED, RED]
             },
-            { name: '3', data: [RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
+            { name: '3', group: 'warm', data: [RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
             {
-                name: '4', data: [RED, OFF, OFF, OFF, RED,
+                name: '4', group: 'warm', data: [RED, OFF, OFF, OFF, RED,
                     RED, OFF, OFF, OFF, RED,
                     RED, RED, RED, RED, RED,
                     OFF, OFF, OFF, OFF, RED,
                     OFF, OFF, OFF, OFF, RED]
             },
-            { name: '5', data: [RED, RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
-            { name: '6', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
-            { name: '7', data: [RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF] },
-            { name: '8', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
-            { name: '9', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
-            { name: '愛心', data: [OFF, RED, OFF, RED, OFF, RED, RED, RED, RED, RED, RED, RED, RED, RED, RED, OFF, RED, RED, RED, OFF, OFF, OFF, RED, OFF, OFF] },
+            { name: '5', group: 'warm', data: [RED, RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
+            { name: '6', group: 'warm', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
+            { name: '7', group: 'warm', data: [RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF] },
+            { name: '8', group: 'warm', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
+            { name: '9', group: 'warm', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
+            { name: '愛心', group: 'warm', data: [OFF, RED, OFF, RED, OFF, RED, RED, RED, RED, RED, RED, RED, RED, RED, RED, OFF, RED, RED, RED, OFF, OFF, OFF, RED, OFF, OFF] },
             {
-                name: '小熊',
-                data: [
-                    BROWN, BROWN, BROWN, BROWN, BROWN,
-                    BROWN, BROWN, BROWN, BROWN, BROWN,
-                    BROWN, OFF, BROWN, OFF, BROWN,
-                    BROWN, BROWN, OFF, BROWN, BROWN,
-                    OFF, BROWN, BROWN, BROWN, OFF
-                ]
-            },
-            {
-                name: '橘貓',
+                name: '橘貓', group: 'warm',
                 data: [
                     ORANGE, OFF, OFF, OFF, ORANGE,
                     ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
@@ -553,17 +596,7 @@
                 ]
             },
             {
-                name: '彩虹',
-                data: [
-                    RED, ORANGE, YELLOW, GREEN, BLUE,
-                    ORANGE, YELLOW, GREEN, BLUE, PINK,
-                    YELLOW, GREEN, BLUE, PINK, RED,
-                    GREEN, BLUE, PINK, RED, ORANGE,
-                    BLUE, PINK, RED, ORANGE, GREEN
-                ]
-            },
-            {
-                name: '白兔',
+                name: '白兔', group: 'warm',
                 data: [
                     WHITE, RED, OFF, RED, WHITE,
                     WHITE, WHITE, WHITE, WHITE, WHITE,
@@ -573,17 +606,17 @@
                 ]
             },
             {
-                name: '小雞',
+                name: '小雞', group: 'warm',
                 data: [
-                    OFF, YELLOW, YELLOW, YELLOW, OFF,
-                    YELLOW, YELLOW, YELLOW, YELLOW, YELLOW,
-                    YELLOW, OFF, YELLOW, OFF, YELLOW,
-                    YELLOW, YELLOW, ORANGE, YELLOW, YELLOW,
-                    OFF, YELLOW, YELLOW, YELLOW, OFF
+                    OFF, ORANGE, ORANGE, ORANGE, OFF,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
+                    ORANGE, OFF, ORANGE, OFF, ORANGE,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
+                    OFF, ORANGE, ORANGE, ORANGE, OFF
                 ]
             },
             {
-                name: '外星人',
+                name: '外星人', group: 'cool',
                 data: [
                     OFF, GREEN, OFF, GREEN, OFF,
                     OFF, OFF, GREEN, OFF, OFF,
@@ -593,17 +626,17 @@
                 ]
             },
             {
-                name: '苦力怕',
+                name: '苦力怕', group: 'cool',
                 data: [
                     GREEN, GREEN, GREEN, GREEN, GREEN,
-                    GREEN, BROWN, GREEN, BROWN, GREEN,
-                    GREEN, BROWN, BROWN, BROWN, GREEN,
-                    GREEN, GREEN, BROWN, GREEN, GREEN,
-                    GREEN, BROWN, GREEN, BROWN, GREEN
+                    GREEN, OFF, GREEN, OFF, GREEN,
+                    GREEN, OFF, OFF, OFF, GREEN,
+                    GREEN, GREEN, OFF, GREEN, GREEN,
+                    GREEN, OFF, GREEN, OFF, GREEN
                 ]
             },
             {
-                name: '幽靈',
+                name: '幽靈', group: 'cool',
                 data: [
                     OFF, WHITE, WHITE, WHITE, OFF,
                     WHITE, BLUE, WHITE, BLUE, WHITE,
@@ -613,17 +646,17 @@
                 ]
             },
             {
-                name: '笑臉',
+                name: '笑臉', group: 'warm',
                 data: [
-                    OFF, YELLOW, YELLOW, YELLOW, OFF,
-                    YELLOW, OFF, YELLOW, OFF, YELLOW,
-                    YELLOW, YELLOW, YELLOW, YELLOW, YELLOW,
-                    YELLOW, ORANGE, YELLOW, ORANGE, YELLOW,
-                    OFF, YELLOW, YELLOW, YELLOW, OFF
+                    OFF, ORANGE, ORANGE, ORANGE, OFF,
+                    ORANGE, OFF, ORANGE, OFF, ORANGE,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
+                    OFF, ORANGE, ORANGE, ORANGE, OFF
                 ]
             },
             {
-                name: '鑽石',
+                name: '鑽石', group: 'cool',
                 data: [
                     OFF, OFF, BLUE, OFF, OFF,
                     OFF, BLUE, BLUE, BLUE, OFF,
@@ -633,24 +666,127 @@
                 ]
             },
             {
-                name: '炸彈',
+                name: '太陽', group: 'warm',
                 data: [
-                    OFF, OFF, RED, OFF, OFF,
-                    OFF, OFF, BROWN, OFF, OFF,
-                    OFF, BROWN, BROWN, BROWN, OFF,
-                    BROWN, BROWN, RED, BROWN, BROWN,
-                    OFF, BROWN, BROWN, BROWN, OFF
+                    ORANGE, RED, ORANGE, RED, ORANGE,
+                    RED, ORANGE, ORANGE, ORANGE, RED,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
+                    RED, ORANGE, ORANGE, ORANGE, RED,
+                    ORANGE, RED, ORANGE, RED, ORANGE
                 ]
             },
-            { name: '清空', data: Array(25).fill(OFF) }
+            {
+                name: '火焰', group: 'warm',
+                data: [
+                    OFF, OFF, RED, OFF, OFF,
+                    OFF, RED, ORANGE, RED, OFF,
+                    RED, ORANGE, ORANGE, ORANGE, RED,
+                    RED, ORANGE, ORANGE, ORANGE, RED,
+                    OFF, RED, RED, RED, OFF
+                ]
+            },
+            {
+                name: '螃蟹', group: 'warm',
+                data: [
+                    RED, OFF, OFF, OFF, RED,
+                    OFF, RED, RED, RED, OFF,
+                    RED, RED, RED, RED, RED,
+                    OFF, RED, RED, RED, OFF,
+                    RED, OFF, OFF, OFF, RED
+                ]
+            },
+            {
+                name: '夕陽', group: 'warm',
+                data: [
+                    OFF, OFF, RED, OFF, OFF,
+                    OFF, ORANGE, ORANGE, ORANGE, OFF,
+                    RED, ORANGE, ORANGE, ORANGE, RED,
+                    RED, RED, RED, RED, RED,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE
+                ]
+            },
+            {
+                name: '水滴', group: 'cool',
+                data: [
+                    OFF, OFF, BLUE, OFF, OFF,
+                    OFF, BLUE, BLUE, BLUE, OFF,
+                    BLUE, BLUE, BLUE, BLUE, BLUE,
+                    BLUE, BLUE, BLUE, BLUE, BLUE,
+                    OFF, BLUE, BLUE, BLUE, OFF
+                ]
+            },
+            {
+                name: '冰山', group: 'cool',
+                data: [
+                    OFF, OFF, WHITE, OFF, OFF,
+                    OFF, WHITE, WHITE, WHITE, OFF,
+                    WHITE, WHITE, BLUE, WHITE, WHITE,
+                    WHITE, BLUE, BLUE, BLUE, WHITE,
+                    BLUE, BLUE, BLUE, BLUE, BLUE
+                ]
+            },
+            {
+                name: '星星', group: 'neutral',
+                data: [
+                    OFF, OFF, WHITE, OFF, OFF,
+                    OFF, WHITE, WHITE, WHITE, OFF,
+                    WHITE, WHITE, WHITE, WHITE, WHITE,
+                    OFF, WHITE, WHITE, WHITE, OFF,
+                    OFF, WHITE, OFF, WHITE, OFF
+                ]
+            },
+            {
+                name: '閃電', group: 'neutral',
+                data: [
+                    OFF, OFF, ORANGE, OFF, OFF,
+                    OFF, ORANGE, ORANGE, OFF, OFF,
+                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
+                    OFF, OFF, ORANGE, ORANGE, OFF,
+                    OFF, OFF, ORANGE, OFF, OFF
+                ]
+            },
+            {
+                name: '十字', group: 'neutral',
+                data: [
+                    OFF, OFF, WHITE, OFF, OFF,
+                    OFF, OFF, WHITE, OFF, OFF,
+                    WHITE, WHITE, WHITE, WHITE, WHITE,
+                    OFF, OFF, WHITE, OFF, OFF,
+                    OFF, OFF, WHITE, OFF, OFF
+                ]
+            },
+            {
+                name: '方框', group: 'neutral',
+                data: [
+                    WHITE, WHITE, WHITE, WHITE, WHITE,
+                    WHITE, OFF, OFF, OFF, WHITE,
+                    WHITE, OFF, OFF, OFF, WHITE,
+                    WHITE, OFF, OFF, OFF, WHITE,
+                    WHITE, WHITE, WHITE, WHITE, WHITE
+                ]
+            },
+            { name: '清空', group: 'neutral', data: Array(25).fill(OFF) }
         ];
 
 
 
         // Modal Logic
+        let currentTab = 'all';
+
         libraryBtn.addEventListener('click', () => {
+            initLibrary();
             modalOverlay.style.display = 'flex';
             setTimeout(() => modalOverlay.classList.add('show'), 10);
+        });
+
+        modalTabs.addEventListener('click', (e) => {
+            const tab = e.target.closest('.modal-tab');
+            if (tab) {
+                modalTabs.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                initLibrary();
+            }
         });
 
         const closeFunc = () => {
@@ -661,8 +797,20 @@
         closeModal.addEventListener('click', closeFunc);
         modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeFunc(); });
 
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (element && element.classList.contains('led')) {
+                const index = parseInt(element.dataset.index);
+                paintLED(index);
+            }
+        }
+
         function initGrid() {
-            for (let i = 0; i < 25; i++) {
+            grid.querySelectorAll('.led').forEach(led => led.remove());
+            const totalLEDs = currentGridSize * currentGridSize;
+            for (let i = 0; i < totalLEDs; i++) {
                 const led = document.createElement('div');
                 led.className = 'led';
                 led.dataset.index = i;
@@ -672,8 +820,31 @@
             }
         }
 
+        gridToggleBtn.addEventListener('click', () => {
+            currentGridSize = currentGridSize === 5 ? 10 : 5;
+            const root = document.documentElement;
+            if (currentGridSize === 10) {
+                root.style.setProperty('--grid-size', '10');
+                root.style.setProperty('--led-size', '20px');
+                root.style.setProperty('--grid-gap', '25px');
+                gridToggleBtn.textContent = '切換至 5x5 網格';
+            } else {
+                root.style.setProperty('--grid-size', '5');
+                root.style.setProperty('--led-size', '32px');
+                root.style.setProperty('--grid-gap', '60px');
+                gridToggleBtn.textContent = '切換至 10x10 網格';
+            }
+            clearAll();
+            initGrid();
+        });
+
         function initLibrary() {
+            sampleLibrary.innerHTML = ''; // Clear previous
             SAMPLES.forEach((sample, idx) => {
+                // Tab filter
+                if (currentTab !== 'all' && sample.group !== currentTab) {
+                    return;
+                }
                 const item = document.createElement('div');
                 item.className = 'sample-item';
                 item.innerHTML = `<div class="sample-icon">${sample.data.map(c => `<div class="sample-pixel" style="background:${c || '#333'}"></div>`).join('')}</div>`;
@@ -683,42 +854,108 @@
         }
 
         function applySample(index) {
-            const data = SAMPLES[index].data;
-            Array.from(grid.querySelectorAll('.led')).forEach((led, i) => {
-                if (data[i]) {
-                    led.classList.add('active');
-                    led.style.backgroundColor = data[i];
-                    led.style.setProperty('--glow-color', data[i]);
+            const sample = SAMPLES[index];
+            const data = sample.data;
+
+            if (sample.group !== 'neutral') {
+                activeGroup = sample.group;
+                updatePaletteStatus();
+            }
+
+            // Clear current grid first
+            grid.querySelectorAll('.led').forEach(led => {
+                led.classList.remove('active');
+                led.style.backgroundColor = '';
+                delete led.dataset.group;
+            });
+
+            const leds = grid.querySelectorAll('.led');
+            if (currentGridSize === 5) {
+                data.forEach((color, i) => {
+                    if (color) {
+                        const led = leds[i];
+                        led.classList.add('active');
+                        led.style.backgroundColor = color;
+                        led.style.setProperty('--glow-color', color);
+                        led.dataset.group = sample.group;
+                    }
+                });
+            } else {
+                // Center 5x5 on 10x10
+                const offset = 2;
+                data.forEach((color, i) => {
+                    if (color) {
+                        const r = Math.floor(i / 5) + offset;
+                        const c = (i % 5) + offset;
+                        const targetIdx = r * 10 + c;
+                        const led = leds[targetIdx];
+                        if (led) {
+                            led.classList.add('active');
+                            led.style.backgroundColor = color;
+                            led.style.setProperty('--glow-color', color);
+                            led.dataset.group = sample.group;
+                        }
+                    }
+                });
+            }
+        }
+
+        palette.addEventListener('click', (e) => {
+            const swatch = e.target.closest('.color-swatch');
+            if (swatch && !swatch.classList.contains('disabled')) {
+                document.querySelector('.color-swatch.selected')?.classList.remove('selected');
+                swatch.classList.add('selected');
+                currentColor = swatch.dataset.color;
+                isEraser = false;
+                eraserBtn.classList.remove('btn-active');
+            }
+        });
+
+        function updatePaletteStatus() {
+            const swatches = document.querySelectorAll('.color-palette .color-swatch');
+            swatches.forEach(swatch => {
+                const group = swatch.dataset.group;
+                if (activeGroup && group !== 'neutral' && group !== activeGroup) {
+                    swatch.classList.add('disabled');
                 } else {
-                    led.classList.remove('active');
-                    led.style.backgroundColor = '';
+                    swatch.classList.remove('disabled');
                 }
             });
         }
 
         function paintLED(index) {
-            const led = grid.querySelectorAll('.led')[index];
+            const leds = grid.querySelectorAll('.led');
+            const led = leds[index];
             if (isEraser) {
                 led.classList.remove('active');
                 led.style.backgroundColor = '';
+                checkActiveGroup();
             } else {
+                const selectedSwatch = document.querySelector('.color-swatch.selected');
+                const group = selectedSwatch?.dataset.group;
+
+                if (group && group !== 'neutral') {
+                    activeGroup = group;
+                    updatePaletteStatus();
+                }
+
                 led.classList.add('active');
                 led.style.backgroundColor = currentColor;
                 led.style.setProperty('--glow-color', currentColor);
+                led.dataset.group = group;
             }
         }
 
-        document.addEventListener('mouseup', () => isMouseDown = false);
-
-        palette.addEventListener('click', (e) => {
-            if (e.target.classList.contains('color-swatch')) {
-                document.querySelector('.color-swatch.selected')?.classList.remove('selected');
-                e.target.classList.add('selected');
-                currentColor = e.target.dataset.color;
-                isEraser = false;
-                eraserBtn.classList.remove('btn-active');
+        function checkActiveGroup() {
+            const activeLeds = Array.from(grid.querySelectorAll('.led.active'));
+            const groups = activeLeds.map(l => l.dataset.group).filter(g => g && g !== 'neutral');
+            if (groups.length === 0) {
+                activeGroup = null;
+            } else {
+                activeGroup = groups[0];
             }
-        });
+            updatePaletteStatus();
+        }
 
         eraserBtn.addEventListener('click', () => {
             isEraser = !isEraser;
@@ -730,12 +967,30 @@
                 led.classList.remove('active');
                 led.style.backgroundColor = '';
                 led.style.setProperty('--glow-color', 'transparent');
+                delete led.dataset.group;
             });
+            activeGroup = null;
+            updatePaletteStatus();
         }
 
         clearBtn.addEventListener('click', clearAll);
 
         grid.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Touch events
+        grid.addEventListener('touchstart', (e) => {
+            isMouseDown = true;
+            handleTouch(e);
+        }, { passive: false });
+
+        grid.addEventListener('touchmove', (e) => {
+            if (isMouseDown) handleTouch(e);
+        }, { passive: false });
+
+        grid.addEventListener('touchend', () => {
+            isMouseDown = false;
+        });
+
         initGrid();
         initLibrary();
     </script>
