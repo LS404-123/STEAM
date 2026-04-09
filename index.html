@@ -1,999 +1,672 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix LED Designer | 5x5</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@700&display=swap"
-        rel="stylesheet">
+    <title>3x3 LED 矩陣接線教學</title>
     <style>
         :root {
-            --bg-color: #ffffff;
-            --panel-bg: #0f172a;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-color: #6366f1;
-            --text-color: #f8fafc;
-            --led-off: #334155;
-            --board-wood: #1e293b;
-            /* Dark board for better glow visibility */
-            --led-size: 32px;
-            --grid-gap: 60px;
-            --grid-size: 5;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
+            --bg-color: #f0f4f8;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --accent-color: #0ea5e9;
+            --text-color: #0f172a;
+            --secondary-text: #64748b;
+            --anode-color: #ef4444; 
+            --cathode-color: #2563eb;
+            --led-off: #cbd5e1;
+            --wire-color: #94a3b8;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(-45deg, #e0f2fe, #f0f9ff, #dbeafe, #f1f5f9);
+            background-size: 400% 400%;
+            animation: meshGradient 15s ease infinite;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            padding-top: 1.5rem;
             min-height: 100vh;
-            overflow-x: hidden;
-            padding: 20px;
+            overflow: hidden;
         }
 
-        header {
+        @keyframes meshGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 1100px;
+            height: 650px;
+            padding: 0.75rem 2rem 1rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1),
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
             text-align: center;
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
         }
 
         h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            font-size: 1.75rem;
+            margin: 0.25rem 0 0.5rem 0;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #0ea5e9, #6366f1);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
         }
 
-        .subtitle {
-            color: #64748b;
-            font-size: 0.85rem;
-        }
-
-        .main-container {
-            display: grid;
-            grid-template-columns: 550px 1fr;
-            gap: 40px;
-            padding: 40px;
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-            width: 1000px;
-            height: 600px;
-            align-items: center;
-        }
-
-        /* LED Grid */
-        .grid-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .led-grid {
-            display: grid;
-            grid-template-columns: repeat(var(--grid-size), var(--led-size));
-            grid-template-rows: repeat(var(--grid-size), var(--led-size));
-            gap: var(--grid-gap);
-            background: var(--board-wood);
-            padding: 80px 40px 40px 40px;
-            border-radius: 4px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        #canvas-container {
+            width: 450px;
+            height: 450px;
+            margin: 0 auto 0.5rem;
             position: relative;
-            /* Adjusted clip-path to avoid cutting LEDs at larger scale */
-            clip-path: polygon(0% 8%,
-                    60% 8%,
-                    60% 0%,
-                    100% 0%,
-                    100% 100%,
-                    0% 100%);
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .led-grid::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-            z-index: -1;
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .step-info {
+            min-height: 90px;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .step-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: #0369a1;
+        }
+
+        .step-desc {
+            font-size: 1.05rem;
+            color: var(--secondary-text);
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-prev {
+            background: #cbd5e1;
+            color: #475569;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.02);
+            filter: brightness(1.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animation Styles */
+        .wire {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            transition: stroke-dashoffset 1s ease-in-out;
+            stroke-linecap: round;
+        }
+
+        .wire.active {
+            stroke-dashoffset: 0;
         }
 
         .led {
-            width: var(--led-size);
-            height: var(--led-size);
-            background-color: var(--led-off);
-            border-radius: 50%;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(255, 255, 255, 0.05);
+            transition: fill 0.5s ease;
         }
 
-        /* LED leg holes decoration */
-        .led::before,
-        .led::after {
-            content: '';
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 50%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: -1;
+        .led.highlight {
+            filter: drop-shadow(0 0 12px var(--accent-color));
         }
 
-        .led::before {
-            top: -12px;
-        }
-
-        .led::after {
-            bottom: -12px;
-        }
-
-        .led.active {
-            box-shadow:
-                0 0 15px var(--glow-color),
-                0 0 30px var(--glow-color),
-                0 0 45px var(--glow-color),
-                0 0 60px var(--glow-color);
-            /* Extra layer for volume */
-            background-color: var(--glow-color);
-            z-index: 5;
-            filter: brightness(1.2);
-            /* Make it pop more */
-        }
-
-
-
-        .terminal-label {
-            position: absolute;
-            font-weight: bold;
-            font-size: 14px;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .pos-label {
-            color: #ff4444;
-            left: 20px;
-            bottom: 20px;
-        }
-
-        .neg-label {
-            color: #888;
-            right: 20px;
-            bottom: 20px;
-        }
-
-        /* Control Panel */
-        .controls-section {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #94a3b8;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .color-palette {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-        }
-
-        .color-swatch {
-            height: 38px;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .color-swatch.selected {
-            border-color: #fff;
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
-
-        .color-swatch.disabled {
-            opacity: 0.2;
-            cursor: not-allowed;
-            pointer-events: none;
-            filter: grayscale(1);
-        }
-
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 0.9rem;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background: var(--accent-color);
-            border: none;
-        }
-
-        .btn-active {
-            background: #10b981;
-            border-color: #10b981;
-        }
-
-        .tool-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .progress-bar {
             width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 99px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        #progress-inner {
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            background: linear-gradient(to right, #0ea5e9, #6366f1);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .flow-path {
+            stroke-dasharray: 6, 12;
+            stroke-width: 3;
+            fill: none;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            pointer-events: none;
+            transition: opacity 0.3s;
         }
-
-        .modal-overlay.show {
-            display: flex;
-            opacity: 1;
+        .flow-active {
+            opacity: 1 !important;
+            animation: dash 0.8s linear infinite;
         }
-
-        .modal-content {
-            background: #111827;
-            width: 95%;
-            max-width: 500px;
-            max-height: 85vh;
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .modal-overlay.show .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            color: var(--accent-color);
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: #64748b;
-            font-size: 1.5rem;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .sample-library {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            overflow-y: auto;
-            padding-right: 8px;
-            /* Scrollbar styling */
-            scrollbar-width: thin;
-            scrollbar-color: var(--led-off) transparent;
-        }
-
-        .sample-library::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sample-library::-webkit-scrollbar-thumb {
-            background-color: var(--led-off);
-            border-radius: 10px;
-        }
-
-        .sample-item {
-            aspect-ratio: 1;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .sample-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: scale(1.05);
-            border-color: #fff;
-        }
-
-        .sample-icon {
-            width: 50px;
-            height: 50px;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 2px;
-        }
-
-        .sample-pixel {
-            border-radius: 1px;
-            background: #333;
-        }
-
-        /* Library Tabs */
-        .modal-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 5px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .modal-tab {
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #64748b;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .modal-tab:hover {
-            color: var(--text-color);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .modal-tab.active {
-            color: var(--accent-color);
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.2);
-        }
-
-        @media (max-width: 650px) {
-            .main-container {
-                flex-direction: column;
-                padding: 15px;
-            }
-
-            .led-grid {
-                padding: 60px 30px 30px 30px;
-                gap: 24px;
-            }
+        @keyframes dash {
+            to { stroke-dashoffset: -18; }
         }
     </style>
 </head>
-
 <body>
 
-    <header>
-        <h1>矩陣 5&times;5</h1>
-        <p class="subtitle">精準設計您的 LED 圖案</p>
-    </header>
-
-    <div class="main-container">
-        <section class="grid-section">
-            <div class="led-grid" id="ledGrid">
-
-                <div class="terminal-label pos-label" id="posLabel">+</div>
-                <div class="terminal-label neg-label" id="negLabel">-</div>
-                <!-- LEDs will be injected here -->
-            </div>
-        </section>
-
-        <section class="controls-section">
-            <div class="control-group">
-                <span class="label">顏色</span>
-                <div class="color-palette" id="palette">
-                    <div class="color-swatch selected" data-color="#ff0000" data-group="warm"
-                        style="background: #ff0000;"></div>
-                    <div class="color-swatch" data-color="#ffa500" data-group="warm" style="background: #ffa500;"></div>
-                    <div class="color-swatch" data-color="#0000ff" data-group="cool" style="background: #0000ff;"></div>
-                    <div class="color-swatch" data-color="#00ff00" data-group="cool" style="background: #00ff00;"></div>
-                    <div class="color-swatch" data-color="#ffffff" data-group="neutral" style="background: #ffffff;">
-                    </div>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-primary" id="libraryBtn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
-                    </svg>
-                    範例圖案庫
-                </button>
-
-                <div class="tool-row">
-                    <button class="btn" id="eraserBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.9-9.9c1-1 2.5-1 3.4 0l4.4 4.4c1 1 1 2.5 0 3.4L10.5 21z" />
-                            <path d="m22 21-6 0" />
-                        </svg>
-                        橡皮
-                    </button>
-                    <button class="btn" id="clearBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 6h18" />
-                            <path d="M19 6V4c0-1-1-2-2-2H7c-1 0-2 1-2 2v2" />
-                            <line x1="10" y1="11" x2="10" y2="17" />
-                        </svg>
-                        清除
-                    </button>
-                </div>
-                <button class="btn btn-primary" id="gridToggleBtn">
-                    切換至 10x10 網格
-                </button>
-            </div>
-        </section>
+<div class="container">
+    <h1>3x3 LED 矩陣接線教學</h1>
+    
+    <div class="progress-bar">
+        <div id="progress-inner"></div>
     </div>
 
-    <!-- Library Modal -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">範例圖案庫</h2>
-                <button class="close-btn" id="closeModal">&times;</button>
-            </div>
-            <div class="modal-tabs" id="modalTabs">
-                <div class="modal-tab active" data-tab="all">全部</div>
-                <div class="modal-tab" data-tab="warm">暖色系 (紅/橘)</div>
-                <div class="modal-tab" data-tab="cool">冷色系 (藍/綠)</div>
-                <div class="modal-tab" data-tab="neutral">其他</div>
-            </div>
-            <div class="sample-library" id="sampleLibrary">
-                <!-- Samples will be injected here -->
-            </div>
-        </div>
+    <div id="canvas-container">
+        <svg id="svg" viewBox="0 0 300 300">
+            <!-- Wood Board Grid -->
+            <rect x="25" y="25" width="250" height="250" rx="10" fill="#2d2d2d" stroke="#1a1a1a" />
+            
+            <!-- All wires in a group for state management -->
+            <g id="wires-layer">
+                <!-- Rows Anode Wires (Positive - Red) -->
+                <path id="row-0" class="wire" d="M 50 55 H 235" stroke="#ef4444" stroke-width="3" fill="none" opacity="0.6" />
+                <path id="row-1" class="wire" d="M 50 130 H 235" stroke="#ef4444" stroke-width="3" fill="none" opacity="0.6" />
+                <path id="row-2" class="wire" d="M 50 205 H 235" stroke="#ef4444" stroke-width="3" fill="none" opacity="0.6" />
+
+                <!-- Rows Cathode Wires (Negative - Blue) -->
+                <path id="col-0" class="wire" d="M 65 90 H 265" stroke="#3b82f6" stroke-width="3" fill="none" opacity="0.6" />
+                <path id="col-1" class="wire" d="M 65 165 H 265" stroke="#3b82f6" stroke-width="3" fill="none" opacity="0.6" />
+                <path id="col-2" class="wire" d="M 65 240 H 265" stroke="#3b82f6" stroke-width="3" fill="none" opacity="0.6" />
+
+                <!-- Bus Bars (Vertical aggregation) -->
+                <path id="red-bus" class="wire" d="M 50 55 V 280" stroke="#ef4444" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round" />
+                <path id="blue-bus" class="wire" d="M 265 90 V 280" stroke="#3b82f6" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round" />
+            </g>
+
+            <!-- Polarity Labels -->
+            <text x="50" y="295" font-family="Arial" font-size="14" font-weight="bold" fill="#ef4444" text-anchor="middle">+</text>
+            <text x="265" y="295" font-family="Arial" font-size="14" font-weight="bold" fill="#3b82f6" text-anchor="middle">−</text>
+
+            <!-- LEDs with Legs (Long: 40, Short: 24) -->
+            <g id="led-grid">
+                <!-- Row 0 -->
+                <g class="led-group" transform="translate(75, 75)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <g class="led-group" transform="translate(150, 75)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <g class="led-group" transform="translate(225, 75)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <!-- Row 1 -->
+                <g class="led-group" transform="translate(75, 150)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <g class="led-group" transform="translate(150, 150)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <g class="led-group" transform="translate(225, 150)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <!-- Row 2 -->
+                <g class="led-group" transform="translate(75, 225)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <g class="led-group" transform="translate(150, 225)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+                <g class="led-group" transform="translate(225, 225)">
+                    <path class="leg-short" d="M -3,0 V 24" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+                    <path class="leg-long" d="M 3,0 V 40" stroke="#cbd5e1" stroke-width="1.5" fill="none" />
+                    <circle r="8" fill="#475569" class="led" />
+                </g>
+            </g>
+
+            <!-- Warnings/Highlights (Positions for row-to-row gap safety) -->
+            <!-- Spot 1: Gap between Row 0 Blue and Row 1 Red -->
+            <circle id="warning-1" cx="150" cy="110" r="15" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0" stroke-dasharray="3,3" />
+            <!-- Spot 2: Gap between Row 1 Blue and Row 2 Red -->
+            <circle id="warning-2" cx="150" cy="185" r="15" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0" stroke-dasharray="3,3" />
+
+            <!-- Flow Paths (Current Visualization) -->
+            <g id="flow-layer">
+                <!-- Positive Bus Flow -->
+                <path class="flow-path" d="M 50,280 V 55" stroke="#fef08a" />
+                
+                <!-- Row 0: Flow through LEDs -->
+                <path class="flow-path" d="M 50,55 H 228" stroke="#fef08a" />
+                <path class="flow-path" d="M 78,55 V 75" stroke="#fef08a" />
+                <path class="flow-path" d="M 72,75 V 90" stroke="#fef08a" />
+                <path class="flow-path" d="M 153,55 V 75" stroke="#fef08a" />
+                <path class="flow-path" d="M 147,75 V 90" stroke="#fef08a" />
+                <path class="flow-path" d="M 228,55 V 75" stroke="#fef08a" />
+                <path class="flow-path" d="M 222,75 V 90" stroke="#fef08a" />
+                <path class="flow-path" d="M 65,90 H 265" stroke="#60a5fa" />
+
+                <!-- Row 1: Flow through LEDs -->
+                <path class="flow-path" d="M 50,130 H 228" stroke="#fef08a" />
+                <path class="flow-path" d="M 78,130 V 150" stroke="#fef08a" />
+                <path class="flow-path" d="M 72,150 V 165" stroke="#fef08a" />
+                <path class="flow-path" d="M 153,130 V 150" stroke="#fef08a" />
+                <path class="flow-path" d="M 147,150 V 165" stroke="#fef08a" />
+                <path class="flow-path" d="M 228,130 V 150" stroke="#fef08a" />
+                <path class="flow-path" d="M 222,150 V 165" stroke="#fef08a" />
+                <path class="flow-path" d="M 65,165 H 265" stroke="#60a5fa" />
+
+                <!-- Row 2: Flow through LEDs -->
+                <path class="flow-path" d="M 50,205 H 228" stroke="#fef08a" />
+                <path class="flow-path" d="M 78,205 V 225" stroke="#fef08a" />
+                <path class="flow-path" d="M 72,225 V 240" stroke="#fef08a" />
+                <path class="flow-path" d="M 153,205 V 225" stroke="#fef08a" />
+                <path class="flow-path" d="M 147,225 V 240" stroke="#fef08a" />
+                <path class="flow-path" d="M 228,205 V 225" stroke="#fef08a" />
+                <path class="flow-path" d="M 222,225 V 240" stroke="#fef08a" />
+                <path class="flow-path" d="M 65,240 H 265" stroke="#60a5fa" />
+
+                <!-- Negative Bus Flow (Return) -->
+                <path class="flow-path" d="M 265,90 V 270" stroke="#60a5fa" />
+            </g>
+        </svg>
     </div>
 
-    <script>
-        const grid = document.getElementById('ledGrid');
-        const palette = document.getElementById('palette');
-        const clearBtn = document.getElementById('clearBtn');
-        const eraserBtn = document.getElementById('eraserBtn');
-        const libraryBtn = document.getElementById('libraryBtn');
-        const gridToggleBtn = document.getElementById('gridToggleBtn');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const closeModal = document.getElementById('closeModal');
-        const sampleLibrary = document.getElementById('sampleLibrary');
-        const modalTabs = document.getElementById('modalTabs');
+    <div class="step-info">
+        <div id="step-title" class="step-title">準備工作</div>
+        <div id="step-desc" class="step-desc">準備一塊 3x3 網格樣板，將 LED 的長腳（正極）朝向同一個方向。</div>
+    </div>
 
-        let currentColor = '#ff0000';
-        let isEraser = false;
-        let isMouseDown = false;
-        let currentGridSize = 5;
-        let activeGroup = null; // 'warm' or 'cool'
+    <div class="controls">
+        <button id="prevBtn" class="btn-prev" disabled>上一步</button>
+        <button id="nextBtn" class="btn-next">開始教學</button>
+    </div>
+</div>
 
-        const RED = '#ff0000';
-        const ORANGE = '#ffa500';
-        const BLUE = '#0000ff';
-        const GREEN = '#00ff00';
-        const WHITE = '#ffffff';
-        const PINK = '#ec4899';
-        const BROWN = '#8b4513';
-        const OFF = '';
-
-        const SAMPLES = [
-            {
-                name: '0', group: 'warm', data: [OFF, RED, RED, RED, OFF,
-                    RED, OFF, OFF, OFF, RED,
-                    RED, OFF, OFF, OFF, RED,
-                    RED, OFF, OFF, OFF, RED,
-                    OFF, RED, RED, RED, OFF]
-            },
-            {
-                name: '1', group: 'warm', data: [OFF, OFF, RED, OFF, OFF,
-                    OFF, RED, RED, OFF, OFF,
-                    OFF, OFF, RED, OFF, OFF,
-                    OFF, OFF, RED, OFF, OFF,
-                    OFF, RED, RED, RED, OFF]
-            },
-            {
-                name: '2', group: 'warm', data: [OFF, RED, RED, RED, OFF,
-                    RED, OFF, OFF, OFF, RED,
-                    OFF, OFF, RED, RED, OFF,
-                    OFF, RED, OFF, OFF, OFF,
-                    RED, RED, RED, RED, RED]
-            },
-            { name: '3', group: 'warm', data: [RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
-            {
-                name: '4', group: 'warm', data: [RED, OFF, OFF, OFF, RED,
-                    RED, OFF, OFF, OFF, RED,
-                    RED, RED, RED, RED, RED,
-                    OFF, OFF, OFF, OFF, RED,
-                    OFF, OFF, OFF, OFF, RED]
-            },
-            { name: '5', group: 'warm', data: [RED, RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, OFF, RED, RED, RED, RED, RED, OFF] },
-            { name: '6', group: 'warm', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, OFF, RED, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
-            { name: '7', group: 'warm', data: [RED, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, RED, OFF, OFF, OFF, OFF, RED, OFF, OFF] },
-            { name: '8', group: 'warm', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
-            { name: '9', group: 'warm', data: [OFF, RED, RED, RED, OFF, RED, OFF, OFF, OFF, RED, OFF, RED, RED, RED, RED, OFF, OFF, OFF, OFF, RED, OFF, RED, RED, RED, OFF] },
-            { name: '愛心', group: 'warm', data: [OFF, RED, OFF, RED, OFF, RED, RED, RED, RED, RED, RED, RED, RED, RED, RED, OFF, RED, RED, RED, OFF, OFF, OFF, RED, OFF, OFF] },
-            {
-                name: '橘貓', group: 'warm',
-                data: [
-                    ORANGE, OFF, OFF, OFF, ORANGE,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
-                    ORANGE, OFF, ORANGE, OFF, ORANGE,
-                    ORANGE, ORANGE, PINK, ORANGE, ORANGE,
-                    OFF, ORANGE, ORANGE, ORANGE, OFF
-                ]
-            },
-            {
-                name: '白兔', group: 'warm',
-                data: [
-                    WHITE, RED, OFF, RED, WHITE,
-                    WHITE, WHITE, WHITE, WHITE, WHITE,
-                    WHITE, OFF, WHITE, OFF, WHITE,
-                    WHITE, WHITE, RED, WHITE, WHITE,
-                    OFF, WHITE, WHITE, WHITE, OFF
-                ]
-            },
-            {
-                name: '小雞', group: 'warm',
-                data: [
-                    OFF, ORANGE, ORANGE, ORANGE, OFF,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
-                    ORANGE, OFF, ORANGE, OFF, ORANGE,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
-                    OFF, ORANGE, ORANGE, ORANGE, OFF
-                ]
-            },
-            {
-                name: '外星人', group: 'cool',
-                data: [
-                    OFF, GREEN, OFF, GREEN, OFF,
-                    OFF, OFF, GREEN, OFF, OFF,
-                    OFF, GREEN, GREEN, GREEN, OFF,
-                    GREEN, OFF, GREEN, OFF, GREEN,
-                    GREEN, GREEN, GREEN, GREEN, GREEN
-                ]
-            },
-            {
-                name: '苦力怕', group: 'cool',
-                data: [
-                    GREEN, GREEN, GREEN, GREEN, GREEN,
-                    GREEN, OFF, GREEN, OFF, GREEN,
-                    GREEN, OFF, OFF, OFF, GREEN,
-                    GREEN, GREEN, OFF, GREEN, GREEN,
-                    GREEN, OFF, GREEN, OFF, GREEN
-                ]
-            },
-            {
-                name: '幽靈', group: 'cool',
-                data: [
-                    OFF, WHITE, WHITE, WHITE, OFF,
-                    WHITE, BLUE, WHITE, BLUE, WHITE,
-                    WHITE, WHITE, WHITE, WHITE, WHITE,
-                    WHITE, WHITE, WHITE, WHITE, WHITE,
-                    WHITE, OFF, WHITE, OFF, WHITE
-                ]
-            },
-            {
-                name: '笑臉', group: 'warm',
-                data: [
-                    OFF, ORANGE, ORANGE, ORANGE, OFF,
-                    ORANGE, OFF, ORANGE, OFF, ORANGE,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
-                    OFF, ORANGE, ORANGE, ORANGE, OFF
-                ]
-            },
-            {
-                name: '鑽石', group: 'cool',
-                data: [
-                    OFF, OFF, BLUE, OFF, OFF,
-                    OFF, BLUE, BLUE, BLUE, OFF,
-                    BLUE, BLUE, WHITE, BLUE, BLUE,
-                    OFF, BLUE, BLUE, BLUE, OFF,
-                    OFF, OFF, BLUE, OFF, OFF
-                ]
-            },
-            {
-                name: '太陽', group: 'warm',
-                data: [
-                    ORANGE, RED, ORANGE, RED, ORANGE,
-                    RED, ORANGE, ORANGE, ORANGE, RED,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
-                    RED, ORANGE, ORANGE, ORANGE, RED,
-                    ORANGE, RED, ORANGE, RED, ORANGE
-                ]
-            },
-            {
-                name: '火焰', group: 'warm',
-                data: [
-                    OFF, OFF, RED, OFF, OFF,
-                    OFF, RED, ORANGE, RED, OFF,
-                    RED, ORANGE, ORANGE, ORANGE, RED,
-                    RED, ORANGE, ORANGE, ORANGE, RED,
-                    OFF, RED, RED, RED, OFF
-                ]
-            },
-            {
-                name: '螃蟹', group: 'warm',
-                data: [
-                    RED, OFF, OFF, OFF, RED,
-                    OFF, RED, RED, RED, OFF,
-                    RED, RED, RED, RED, RED,
-                    OFF, RED, RED, RED, OFF,
-                    RED, OFF, OFF, OFF, RED
-                ]
-            },
-            {
-                name: '夕陽', group: 'warm',
-                data: [
-                    OFF, OFF, RED, OFF, OFF,
-                    OFF, ORANGE, ORANGE, ORANGE, OFF,
-                    RED, ORANGE, ORANGE, ORANGE, RED,
-                    RED, RED, RED, RED, RED,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE
-                ]
-            },
-            {
-                name: '水滴', group: 'cool',
-                data: [
-                    OFF, OFF, BLUE, OFF, OFF,
-                    OFF, BLUE, BLUE, BLUE, OFF,
-                    BLUE, BLUE, BLUE, BLUE, BLUE,
-                    BLUE, BLUE, BLUE, BLUE, BLUE,
-                    OFF, BLUE, BLUE, BLUE, OFF
-                ]
-            },
-            {
-                name: '冰山', group: 'cool',
-                data: [
-                    OFF, OFF, WHITE, OFF, OFF,
-                    OFF, WHITE, WHITE, WHITE, OFF,
-                    WHITE, WHITE, BLUE, WHITE, WHITE,
-                    WHITE, BLUE, BLUE, BLUE, WHITE,
-                    BLUE, BLUE, BLUE, BLUE, BLUE
-                ]
-            },
-            {
-                name: '星星', group: 'neutral',
-                data: [
-                    OFF, OFF, WHITE, OFF, OFF,
-                    OFF, WHITE, WHITE, WHITE, OFF,
-                    WHITE, WHITE, WHITE, WHITE, WHITE,
-                    OFF, WHITE, WHITE, WHITE, OFF,
-                    OFF, WHITE, OFF, WHITE, OFF
-                ]
-            },
-            {
-                name: '閃電', group: 'neutral',
-                data: [
-                    OFF, OFF, ORANGE, OFF, OFF,
-                    OFF, ORANGE, ORANGE, OFF, OFF,
-                    ORANGE, ORANGE, ORANGE, ORANGE, ORANGE,
-                    OFF, OFF, ORANGE, ORANGE, OFF,
-                    OFF, OFF, ORANGE, OFF, OFF
-                ]
-            },
-            {
-                name: '十字', group: 'neutral',
-                data: [
-                    OFF, OFF, WHITE, OFF, OFF,
-                    OFF, OFF, WHITE, OFF, OFF,
-                    WHITE, WHITE, WHITE, WHITE, WHITE,
-                    OFF, OFF, WHITE, OFF, OFF,
-                    OFF, OFF, WHITE, OFF, OFF
-                ]
-            },
-            {
-                name: '方框', group: 'neutral',
-                data: [
-                    WHITE, WHITE, WHITE, WHITE, WHITE,
-                    WHITE, OFF, OFF, OFF, WHITE,
-                    WHITE, OFF, OFF, OFF, WHITE,
-                    WHITE, OFF, OFF, OFF, WHITE,
-                    WHITE, WHITE, WHITE, WHITE, WHITE
-                ]
-            },
-            { name: '清空', group: 'neutral', data: Array(25).fill(OFF) }
-        ];
-
-
-
-        // Modal Logic
-        let currentTab = 'all';
-
-        libraryBtn.addEventListener('click', () => {
-            initLibrary();
-            modalOverlay.style.display = 'flex';
-            setTimeout(() => modalOverlay.classList.add('show'), 10);
-        });
-
-        modalTabs.addEventListener('click', (e) => {
-            const tab = e.target.closest('.modal-tab');
-            if (tab) {
-                modalTabs.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentTab = tab.dataset.tab;
-                initLibrary();
+<script>
+    const steps = [
+        {
+            title: "1. 準備組件",
+            desc: "將 9 顆 LED 放入樣板並確認長腳方向一致。導線準備從左右兩側引出。",
+            action: () => {
+                resetAll();
+                bendLegs(null, 'long', false);
+                bendLegs(null, 'short', false);
             }
-        });
-
-        const closeFunc = () => {
-            modalOverlay.classList.remove('show');
-            setTimeout(() => modalOverlay.style.display = 'none', 300);
-        };
-
-        closeModal.addEventListener('click', closeFunc);
-        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeFunc(); });
-
-        function handleTouch(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            if (element && element.classList.contains('led')) {
-                const index = parseInt(element.dataset.index);
-                paintLED(index);
+        },
+        {
+            title: "2. 折彎正極腳",
+            desc: "將第一排 LED 的長腳垂直往上折。保持針腳筆直，指向紅線預定位置。",
+            action: () => {
+                resetAll();
+                bendLegs(0, 'long', true);
+            }
+        },
+        {
+            title: "3. 焊接正極線",
+            desc: "將紅色導線水平焊接在第一排正極上。導線位置距 LED 中心約 20 單位。",
+            action: () => {
+                resetAll();
+                bendLegs(0, 'long', true);
+                showRow(0, true);
+            }
+        },
+        {
+            title: "4. 完成正極焊接",
+            desc: "依序將其餘兩排的長腳往上折，並完成水平紅線的焊接與固定。",
+            action: () => {
+                resetAll();
+                [0,1,2].forEach(i => bendLegs(i, 'long', true));
+                showRows(true);
+            }
+        },
+        {
+            title: "5. 修剪多餘針腳",
+            desc: "剪掉焊接點上方多餘的長腳。動畫中可看到針腳縮短，確保電路整潔不短路。",
+            action: () => {
+                resetAll();
+                [0,1,2].forEach(i => bendLegs(i, 'long', 'trim'));
+                showRows(true);
+            }
+        },
+        {
+            title: "6. 焊接負極線",
+            desc: "將藍色導線水平與各排短腳焊接。藍線位置距中心約 15 單位，由右側引出。",
+            action: () => {
+                resetAll();
+                bendLegs(null, 'long', 'trim');
+                bendLegs(null, 'short', true);
+                showRows(true);
+                showCols(true);
+            }
+        },
+        {
+            title: "7. 安裝總線",
+            desc: "在左側用垂直紅線連接三排正極，右側則連接三排負極。總線延伸至板底以便連線。",
+            action: () => {
+                resetAll();
+                bendLegs(null, 'long', 'trim');
+                bendLegs(null, 'short', 'trim');
+                showRows(true);
+                showCols(true);
+                toggleBuses(true);
+            }
+        },
+        {
+            title: "8. 安全檢查",
+            desc: "仔細觀察圖中標示處：1. 上下兩排導線間的絕緣間隙（垂直間距）。2. 嚴防正負極線意外接觸。確保電路安全。",
+            action: () => {
+                resetAll();
+                bendLegs(null, 'long', 'trim');
+                bendLegs(null, 'short', 'trim');
+                showRows(true);
+                showCols(true);
+                toggleBuses(true);
+                highlightWarning(true);
+            }
+        },
+        {
+            title: "9. 並聯原理：電流流向",
+            desc: "看電流（黃光）如何分流至 3 條路徑，再匯集回負極。這就是並聯電路！",
+            action: () => {
+                resetAll();
+                bendLegs(null, 'long', 'trim');
+                bendLegs(null, 'short', 'trim');
+                showRows(true);
+                showCols(true);
+                toggleBuses(true);
+                allLEDsGlow(true);
+                toggleFlow(true);
+            }
+        },
+        {
+            title: "10. 5x5 挑戰模式 (延伸範例)",
+            desc: "看看更複雜的 5x5 矩陣佈線！25 顆 LED 的並聯邏輯與 3x3 完全相同，但規模更壯觀。",
+            action: () => {
+                render5x5Challenge();
             }
         }
+    ];
 
-        function initGrid() {
-            grid.querySelectorAll('.led').forEach(led => led.remove());
-            const totalLEDs = currentGridSize * currentGridSize;
-            for (let i = 0; i < totalLEDs; i++) {
-                const led = document.createElement('div');
-                led.className = 'led';
-                led.dataset.index = i;
-                led.addEventListener('mousedown', () => { isMouseDown = true; paintLED(i); });
-                led.addEventListener('mouseenter', () => { if (isMouseDown) paintLED(i); });
-                grid.appendChild(led);
-            }
-        }
+    let currentStep = 0;
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const stepTitle = document.getElementById('step-title');
+    const stepDesc = document.getElementById('step-desc');
+    const progressInner = document.getElementById('progress-inner');
 
-        gridToggleBtn.addEventListener('click', () => {
-            currentGridSize = currentGridSize === 5 ? 10 : 5;
-            const root = document.documentElement;
-            if (currentGridSize === 10) {
-                root.style.setProperty('--grid-size', '10');
-                root.style.setProperty('--led-size', '20px');
-                root.style.setProperty('--grid-gap', '25px');
-                gridToggleBtn.textContent = '切換至 5x5 網格';
-            } else {
-                root.style.setProperty('--grid-size', '5');
-                root.style.setProperty('--led-size', '32px');
-                root.style.setProperty('--grid-gap', '60px');
-                gridToggleBtn.textContent = '切換至 10x10 網格';
-            }
-            clearAll();
-            initGrid();
+    function resetAll() {
+        document.getElementById('led-grid').innerHTML = document.getElementById('led-grid').dataset.original || document.getElementById('led-grid').innerHTML;
+        const wiresLayer = document.getElementById('wires-layer');
+        if(wiresLayer.dataset.original) wiresLayer.innerHTML = wiresLayer.dataset.original;
+        const flowLayer = document.getElementById('flow-layer');
+        if(flowLayer.dataset.original) flowLayer.innerHTML = flowLayer.dataset.original;
+        else flowLayer.innerHTML = '';
+        
+        document.querySelectorAll('.wire').forEach(w => w.classList.remove('active'));
+        document.querySelectorAll('.led').forEach(l => {
+            l.style.fill = '#475569';
+            l.classList.remove('highlight');
         });
+        const w1 = document.getElementById('warning-1');
+        const w2 = document.getElementById('warning-2');
+        if (w1) w1.setAttribute('opacity', '0');
+        if (w2) w2.setAttribute('opacity', '0');
+        toggleFlow(false);
+    }
 
-        function initLibrary() {
-            sampleLibrary.innerHTML = ''; // Clear previous
-            SAMPLES.forEach((sample, idx) => {
-                // Tab filter
-                if (currentTab !== 'all' && sample.group !== currentTab) {
-                    return;
-                }
-                const item = document.createElement('div');
-                item.className = 'sample-item';
-                item.innerHTML = `<div class="sample-icon">${sample.data.map(c => `<div class="sample-pixel" style="background:${c || '#333'}"></div>`).join('')}</div>`;
-                item.addEventListener('click', () => { applySample(idx); closeFunc(); });
-                sampleLibrary.appendChild(item);
+    // Save originals for reset
+    document.getElementById('led-grid').dataset.original = document.getElementById('led-grid').innerHTML;
+    document.getElementById('wires-layer').dataset.original = document.getElementById('wires-layer').innerHTML;
+    document.getElementById('flow-layer').dataset.original = document.getElementById('flow-layer').innerHTML;
+
+    function render5x5Challenge() {
+        const ledGrid = document.getElementById('led-grid');
+        const wiresLayer = document.getElementById('wires-layer');
+        const flowLayer = document.getElementById('flow-layer');
+
+        ledGrid.innerHTML = '';
+        wiresLayer.innerHTML = '';
+        flowLayer.innerHTML = '';
+
+        const LED_X = [55, 100, 145, 190, 235];
+        const LED_Y = [55, 100, 145, 190, 235];
+        const ANODE_Y = [37, 82, 127, 172, 217];
+        const CATHODE_Y = [67, 112, 157, 202, 247];
+
+        // 5x5 LEDs
+        LED_Y.forEach((y, rIdx) => {
+            LED_X.forEach((x, cIdx) => {
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                g.setAttribute("class", "led-group");
+                g.setAttribute("transform", `translate(${x}, ${y})`);
+                g.innerHTML = `<path class="leg-short" d="M -3,0 V 12" stroke="#3b82f6" stroke-width="1.2" fill="none" /><path class="leg-long" d="M 3,0 V -18" stroke="#ef4444" stroke-width="1.2" fill="none" /><circle r="6" fill="#fbbf24" class="led highlight" />`;
+                ledGrid.appendChild(g);
             });
-        }
-
-        function applySample(index) {
-            const sample = SAMPLES[index];
-            const data = sample.data;
-
-            if (sample.group !== 'neutral') {
-                activeGroup = sample.group;
-                updatePaletteStatus();
-            }
-
-            // Clear current grid first
-            grid.querySelectorAll('.led').forEach(led => {
-                led.classList.remove('active');
-                led.style.backgroundColor = '';
-                delete led.dataset.group;
-            });
-
-            const leds = grid.querySelectorAll('.led');
-            if (currentGridSize === 5) {
-                data.forEach((color, i) => {
-                    if (color) {
-                        const led = leds[i];
-                        led.classList.add('active');
-                        led.style.backgroundColor = color;
-                        led.style.setProperty('--glow-color', color);
-                        led.dataset.group = sample.group;
-                    }
-                });
-            } else {
-                // Center 5x5 on 10x10
-                const offset = 2;
-                data.forEach((color, i) => {
-                    if (color) {
-                        const r = Math.floor(i / 5) + offset;
-                        const c = (i % 5) + offset;
-                        const targetIdx = r * 10 + c;
-                        const led = leds[targetIdx];
-                        if (led) {
-                            led.classList.add('active');
-                            led.style.backgroundColor = color;
-                            led.style.setProperty('--glow-color', color);
-                            led.dataset.group = sample.group;
-                        }
-                    }
-                });
-            }
-        }
-
-        palette.addEventListener('click', (e) => {
-            const swatch = e.target.closest('.color-swatch');
-            if (swatch && !swatch.classList.contains('disabled')) {
-                document.querySelector('.color-swatch.selected')?.classList.remove('selected');
-                swatch.classList.add('selected');
-                currentColor = swatch.dataset.color;
-                isEraser = false;
-                eraserBtn.classList.remove('btn-active');
-            }
         });
 
-        function updatePaletteStatus() {
-            const swatches = document.querySelectorAll('.color-palette .color-swatch');
-            swatches.forEach(swatch => {
-                const group = swatch.dataset.group;
-                if (activeGroup && group !== 'neutral' && group !== activeGroup) {
-                    swatch.classList.add('disabled');
+        // 5x5 Wires
+        ANODE_Y.forEach((y, r) => {
+            wiresLayer.innerHTML += `<path class="wire active" d="M 40 ${y} H 238" stroke="#ef4444" stroke-width="2.5" fill="none" />`;
+            wiresLayer.innerHTML += `<path class="wire active" d="M 52 ${CATHODE_Y[r]} H 260" stroke="#3b82f6" stroke-width="2.5" fill="none" />`;
+        });
+        wiresLayer.innerHTML += `<path class="wire active" d="M 40 37 V 285" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round" />`;
+        wiresLayer.innerHTML += `<path class="wire active" d="M 260 67 V 285" stroke="#3b82f6" stroke-width="3" fill="none" stroke-linecap="round" />`;
+
+        // 5x5 Flow
+        let html = `<path class="flow-path flow-active" d="M 40,285 V 37" stroke="#fef08a" />`;
+        ANODE_Y.forEach((y, r) => {
+            html += `<path class="flow-path flow-active" d="M 40,${y} H 238" stroke="#fef08a" />`;
+            LED_X.forEach(x => {
+                html += `<path class="flow-path flow-active" d="M ${x+3},${y} V ${LED_Y[r]}" stroke="#fef08a" />`;
+                html += `<path class="flow-path flow-active" d="M ${x-3},${LED_Y[r]} V ${CATHODE_Y[r]}" stroke="#fef08a" />`;
+            });
+            html += `<path class="flow-path flow-active" d="M 55,${CATHODE_Y[r]} H 260" stroke="#60a5fa" />`;
+        });
+        html += `<path class="flow-path flow-active" d="M 260,67 V 285" stroke="#60a5fa" />`;
+        flowLayer.innerHTML = html;
+    }
+
+    function toggleFlow(active) {
+        document.querySelectorAll('.flow-path').forEach(p => {
+            if(active) p.classList.add('flow-active');
+            else p.classList.remove('flow-active');
+        });
+    }
+
+    function updateStep() {
+        if (!steps[currentStep]) return;
+        const step = steps[currentStep];
+        console.log(`Updating to step ${currentStep}: ${step.title}`);
+        stepTitle.innerText = step.title;
+        stepDesc.innerText = step.desc;
+        
+        try {
+            step.action();
+        } catch (e) {
+            console.error("Action Error:", e);
+        }
+
+        nextBtn.innerText = currentStep === steps.length - 1 ? "重新開始" : (currentStep === 0 ? "開始教學" : "下一步");
+        nextBtn.className = currentStep === steps.length - 1 ? "btn-prev" : "btn-next";
+        prevBtn.disabled = currentStep === 0;
+        
+        progressInner.style.width = `${(currentStep / (steps.length - 1)) * 100}%`;
+    }
+
+    // Safe helper to toggle element class
+    function toggleClass(id, className, add) {
+        const el = document.getElementById(id);
+        if (el) {
+            if (add) el.classList.add(className);
+            else el.classList.remove(className);
+        }
+    }
+
+    function bendLegs(rowIdx, type, state) {
+        const groups = document.querySelectorAll('.led-group');
+        groups.forEach((g, i) => {
+            const itemsPerRow = groups.length === 25 ? 5 : 3;
+            const currentRow = Math.floor(i / itemsPerRow);
+            if (rowIdx === null || rowIdx === currentRow) {
+                const leg = g.querySelector(`.leg-${type}`);
+                if (!leg) return;
+                
+                if (state === true) {
+                    if (type === 'long') {
+                        leg.setAttribute('d', groups.length === 25 ? 'M 3,0 V -18' : 'M 3,0 V -40');
+                        leg.setAttribute('stroke', '#ef4444');
+                    } else {
+                        leg.setAttribute('d', groups.length === 25 ? 'M -3,0 V 12' : 'M -3,0 V 24');
+                        leg.setAttribute('stroke', '#3b82f6');
+                    }
+                } else if (state === 'trim') {
+                    if (type === 'long') {
+                        leg.setAttribute('d', groups.length === 25 ? 'M 3,0 V -18' : 'M 3,0 V -20');
+                    } else {
+                        leg.setAttribute('d', groups.length === 25 ? 'M -3,0 V 12' : 'M -3,0 V 15');
+                    }
                 } else {
-                    swatch.classList.remove('disabled');
+                    leg.setAttribute('d', type === 'long' ? 'M 3,0 V 40' : 'M -3,0 V 24');
+                    leg.setAttribute('stroke', type === 'long' ? '#cbd5e1' : '#94a3b8');
                 }
-            });
-        }
-
-        function paintLED(index) {
-            const leds = grid.querySelectorAll('.led');
-            const led = leds[index];
-            if (isEraser) {
-                led.classList.remove('active');
-                led.style.backgroundColor = '';
-                checkActiveGroup();
-            } else {
-                const selectedSwatch = document.querySelector('.color-swatch.selected');
-                const group = selectedSwatch?.dataset.group;
-
-                if (group && group !== 'neutral') {
-                    activeGroup = group;
-                    updatePaletteStatus();
-                }
-
-                led.classList.add('active');
-                led.style.backgroundColor = currentColor;
-                led.style.setProperty('--glow-color', currentColor);
-                led.dataset.group = group;
             }
-        }
-
-        function checkActiveGroup() {
-            const activeLeds = Array.from(grid.querySelectorAll('.led.active'));
-            const groups = activeLeds.map(l => l.dataset.group).filter(g => g && g !== 'neutral');
-            if (groups.length === 0) {
-                activeGroup = null;
-            } else {
-                activeGroup = groups[0];
-            }
-            updatePaletteStatus();
-        }
-
-        eraserBtn.addEventListener('click', () => {
-            isEraser = !isEraser;
-            eraserBtn.classList.toggle('btn-active', isEraser);
         });
+    }
 
-        function clearAll() {
-            Array.from(grid.querySelectorAll('.led')).forEach(led => {
-                led.classList.remove('active');
-                led.style.backgroundColor = '';
-                led.style.setProperty('--glow-color', 'transparent');
-                delete led.dataset.group;
-            });
-            activeGroup = null;
-            updatePaletteStatus();
-        }
+    function showRow(idx, active) {
+        const row = document.getElementById(`row-${idx}`);
+        if(row && active) row.classList.add('active');
+        else if(row) row.classList.remove('active');
+    }
 
-        clearBtn.addEventListener('click', clearAll);
+    function showRows(show) {
+        [0, 1, 2].forEach(i => showRow(i, show));
+    }
 
-        grid.addEventListener('contextmenu', e => e.preventDefault());
-
-        // Touch events
-        grid.addEventListener('touchstart', (e) => {
-            isMouseDown = true;
-            handleTouch(e);
-        }, { passive: false });
-
-        grid.addEventListener('touchmove', (e) => {
-            if (isMouseDown) handleTouch(e);
-        }, { passive: false });
-
-        grid.addEventListener('touchend', () => {
-            isMouseDown = false;
+    function showCols(show) {
+        ['col-0', 'col-1', 'col-2'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el && show) el.classList.add('active');
+            else if(el) el.classList.remove('active');
         });
+    }
 
-        initGrid();
-        initLibrary();
-    </script>
+    function toggleBuses(show) {
+        const rb = document.getElementById('red-bus');
+        const bb = document.getElementById('blue-bus');
+        if(show) {
+            rb.classList.add('active');
+            bb.classList.add('active');
+        } else {
+            rb.classList.remove('active');
+            bb.classList.remove('active');
+        }
+    }
+
+    function highlightWarning(show) {
+        const w1 = document.getElementById('warning-1');
+        const w2 = document.getElementById('warning-2');
+        if (w1) w1.setAttribute('opacity', show ? '1' : '0');
+        if (w2) w2.setAttribute('opacity', show ? '1' : '0');
+    }
+
+    function allLEDsGlow(active) {
+        document.querySelectorAll('.led').forEach(l => {
+            l.style.fill = active ? '#fbbf24' : '#475569';
+            if(active) l.classList.add('highlight');
+        });
+    }
+
+    nextBtn.addEventListener('click', () => {
+        if (currentStep === steps.length - 1) {
+            currentStep = 0;
+        } else {
+            currentStep++;
+        }
+        updateStep();
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+            currentStep--;
+            updateStep();
+        }
+    });
+
+    updateStep();
+</script>
+
 </body>
-
 </html>
