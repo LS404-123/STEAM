@@ -307,40 +307,40 @@
             <!-- Flow Paths (Current Visualization) -->
             <g id="flow-layer">
                 <!-- Positive Bus Flow -->
-                <path class="flow-path" d="M 50,280 V 55" stroke="#fef08a" />
+                <path class="flow-path" d="M 50,280 V 55" stroke="#eab308" />
                 
                 <!-- Row 0: Flow through LEDs -->
-                <path class="flow-path" d="M 50,55 H 228" stroke="#fef08a" />
-                <path class="flow-path" d="M 78,55 V 75" stroke="#fef08a" />
-                <path class="flow-path" d="M 72,75 V 90" stroke="#fef08a" />
-                <path class="flow-path" d="M 153,55 V 75" stroke="#fef08a" />
-                <path class="flow-path" d="M 147,75 V 90" stroke="#fef08a" />
-                <path class="flow-path" d="M 228,55 V 75" stroke="#fef08a" />
-                <path class="flow-path" d="M 222,75 V 90" stroke="#fef08a" />
-                <path class="flow-path" d="M 65,90 H 265" stroke="#60a5fa" />
+                <path class="flow-path" d="M 50,55 H 228" stroke="#eab308" />
+                <path class="flow-path" d="M 78,55 V 75" stroke="#eab308" />
+                <path class="flow-path" d="M 72,75 V 90" stroke="#eab308" />
+                <path class="flow-path" d="M 153,55 V 75" stroke="#eab308" />
+                <path class="flow-path" d="M 147,75 V 90" stroke="#eab308" />
+                <path class="flow-path" d="M 228,55 V 75" stroke="#eab308" />
+                <path class="flow-path" d="M 222,75 V 90" stroke="#eab308" />
+                <path class="flow-path" d="M 65,90 H 265" stroke="#eab308" />
 
                 <!-- Row 1: Flow through LEDs -->
-                <path class="flow-path" d="M 50,130 H 228" stroke="#fef08a" />
-                <path class="flow-path" d="M 78,130 V 150" stroke="#fef08a" />
-                <path class="flow-path" d="M 72,150 V 165" stroke="#fef08a" />
-                <path class="flow-path" d="M 153,130 V 150" stroke="#fef08a" />
-                <path class="flow-path" d="M 147,150 V 165" stroke="#fef08a" />
-                <path class="flow-path" d="M 228,130 V 150" stroke="#fef08a" />
-                <path class="flow-path" d="M 222,150 V 165" stroke="#fef08a" />
-                <path class="flow-path" d="M 65,165 H 265" stroke="#60a5fa" />
+                <path class="flow-path" d="M 50,130 H 228" stroke="#eab308" />
+                <path class="flow-path" d="M 78,130 V 150" stroke="#eab308" />
+                <path class="flow-path" d="M 72,150 V 165" stroke="#eab308" />
+                <path class="flow-path" d="M 153,130 V 150" stroke="#eab308" />
+                <path class="flow-path" d="M 147,150 V 165" stroke="#eab308" />
+                <path class="flow-path" d="M 228,130 V 150" stroke="#eab308" />
+                <path class="flow-path" d="M 222,150 V 165" stroke="#eab308" />
+                <path class="flow-path" d="M 65,165 H 265" stroke="#eab308" />
 
                 <!-- Row 2: Flow through LEDs -->
-                <path class="flow-path" d="M 50,205 H 228" stroke="#fef08a" />
-                <path class="flow-path" d="M 78,205 V 225" stroke="#fef08a" />
-                <path class="flow-path" d="M 72,225 V 240" stroke="#fef08a" />
-                <path class="flow-path" d="M 153,205 V 225" stroke="#fef08a" />
-                <path class="flow-path" d="M 147,225 V 240" stroke="#fef08a" />
-                <path class="flow-path" d="M 228,205 V 225" stroke="#fef08a" />
-                <path class="flow-path" d="M 222,225 V 240" stroke="#fef08a" />
-                <path class="flow-path" d="M 65,240 H 265" stroke="#60a5fa" />
+                <path class="flow-path" d="M 50,205 H 228" stroke="#eab308" />
+                <path class="flow-path" d="M 78,205 V 225" stroke="#eab308" />
+                <path class="flow-path" d="M 72,225 V 240" stroke="#eab308" />
+                <path class="flow-path" d="M 153,205 V 225" stroke="#eab308" />
+                <path class="flow-path" d="M 147,225 V 240" stroke="#eab308" />
+                <path class="flow-path" d="M 228,205 V 225" stroke="#eab308" />
+                <path class="flow-path" d="M 222,225 V 240" stroke="#eab308" />
+                <path class="flow-path" d="M 65,240 H 265" stroke="#eab308" />
 
                 <!-- Negative Bus Flow (Return) -->
-                <path class="flow-path" d="M 265,90 V 270" stroke="#60a5fa" />
+                <path class="flow-path" d="M 265,90 V 270" stroke="#eab308" />
             </g>
         </svg>
     </div>
@@ -552,19 +552,19 @@
                 wiresLayer.innerHTML += `<path class="wire active" d="M ${260+offsetX} 67 V 285" stroke="#3b82f6" stroke-width="3" fill="none" stroke-linecap="round" />`;
 
                 // Flow
-                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},285 V 37" stroke="#fef08a" />`;
+                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},285 V 37" stroke="#eab308" />`;
                 ANODE_Y.forEach((y, r) => {
-                    flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},${y} H ${238+offsetX}" stroke="#fef08a" />`;
+                    flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},${y} H ${238+offsetX}" stroke="#eab308" />`;
                     const currentY = LED_Y[r];
                     LED_X.forEach(x => {
                         // Current into LED (Pos Rail down to LED center)
-                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V ${currentY}" stroke="#fef08a" />`;
+                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V ${currentY}" stroke="#eab308" />`;
                         // Current out of LED (LED center down to Neg Rail)
-                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},${currentY} V ${CATHODE_Y[r]}" stroke="#fef08a" />`;
+                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},${currentY} V ${CATHODE_Y[r]}" stroke="#eab308" />`;
                     });
-                    flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${55+offsetX},${CATHODE_Y[r]} H ${260+offsetX}" stroke="#fef08a" />`;
+                    flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${55+offsetX},${CATHODE_Y[r]} H ${260+offsetX}" stroke="#eab308" />`;
                 });
-                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${260+offsetX},67 V 285" stroke="#fef08a" />`;
+                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${260+offsetX},67 V 285" stroke="#eab308" />`;
             } else {
                 // Shared Rail Method (Positive-Negative-Negative-Positive mirroring)
                 const RAIL_Y = [37, 77.5, 122.5, 167.5, 212.5, 252.5];
@@ -607,37 +607,37 @@
                 wiresLayer.innerHTML += `<path class="wire active" d="M ${260+offsetX} 252.5 H ${265+offsetX}" stroke="#3b82f6" stroke-width="2.5" />`;
 
                 // Flow
-                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},285 V 37" stroke="#fef08a" />`;
+                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},285 V 37" stroke="#eab308" />`;
                 RAIL_Y.forEach((y, r) => {
                     if (RAIL_TYPES[r] === 'pos') {
-                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},${y} H ${240+offsetX}" stroke="#fef08a" />`;
+                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${40+offsetX},${y} H ${240+offsetX}" stroke="#eab308" />`;
                         LED_X.forEach(x => {
-                            if (r === 0) flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 55" stroke="#fef08a" />`;
+                            if (r === 0) flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 55" stroke="#eab308" />`;
                             else if (r === 2) {
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 100" stroke="#fef08a" />`;
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 145" stroke="#fef08a" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 100" stroke="#eab308" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 145" stroke="#eab308" />`;
                             } else if (r === 4) {
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 190" stroke="#fef08a" />`;
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 235" stroke="#fef08a" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 190" stroke="#eab308" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX+3},${y} V 235" stroke="#eab308" />`;
                             }
                         });
                     } else {
-                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${240+offsetX},${y} H ${260+offsetX}" stroke="#fef08a" />`;
+                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${240+offsetX},${y} H ${260+offsetX}" stroke="#eab308" />`;
                         LED_X.forEach(x => {
                             if (r === 1) {
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},55 V ${y}" stroke="#fef08a" />`;
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},100 V ${y}" stroke="#fef08a" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},55 V ${y}" stroke="#eab308" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},100 V ${y}" stroke="#eab308" />`;
                             } else if (r === 3) {
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},145 V ${y}" stroke="#fef08a" />`;
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},190 V ${y}" stroke="#fef08a" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},145 V ${y}" stroke="#eab308" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},190 V ${y}" stroke="#eab308" />`;
                             } else if (r === 5) {
-                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},235 V ${y}" stroke="#fef08a" />`;
+                                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${x+offsetX-3},235 V ${y}" stroke="#eab308" />`;
                             }
                         });
-                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${55+offsetX},${y} H ${260+offsetX}" stroke="#fef08a" />`;
+                        flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${55+offsetX},${y} H ${260+offsetX}" stroke="#eab308" />`;
                     }
                 });
-                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${260+offsetX},77.5 V 285" stroke="#fef08a" />`;
+                flowLayer.innerHTML += `<path class="flow-path flow-active" d="M ${260+offsetX},77.5 V 285" stroke="#eab308" />`;
             }
         };
 
