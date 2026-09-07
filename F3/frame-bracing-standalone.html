@@ -1052,7 +1052,7 @@ html&gt;body{padding:0}&lt;/style&gt;
   &lt;div class=&quot;text-small text-muted&quot;&gt;固定底邊 · 可轉動接點 · 可受拉及受壓的彈性斜撐&lt;/div&gt;
 &lt;/div&gt;
 &lt;style&gt;
-  #frame-bracing .frame-panels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin:12px 0 20px; }
+  #frame-bracing .frame-panels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:12px 0 20px; }
   #frame-bracing section { min-width:0; }
   #frame-bracing h3 { text-align:center; margin:0 0 8px; }
   #frame-bracing svg { display:block; width:100%; overflow:visible; color:var(--foreground); }
@@ -1100,9 +1100,9 @@ html&gt;body{padding:0}&lt;/style&gt;
     panels.forEach((panel, count) =&gt; {
       const svg = panel.querySelector(&#x27;svg&#x27;);
       const w = panel.clientWidth;
-      const side = Math.min(160, (w - 44) / 2.2);
+      const side = Math.min(320, (w - 16) / 2.2);
       const x = displacement(value * 0.006, count);
-      const baseY = side + 82;
+      const baseY = side + 64;
       const left = (w - side) / 2;
       const topY = baseY - side * Math.sqrt(1 - x * x);
       const a = [left, baseY], b = [left + side, baseY];
