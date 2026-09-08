@@ -35,6 +35,10 @@ for(const [key,value] of Object.entries(B.MATERIAL)) {
   assert.equal(Number(input[1])*(key==='young'?1e9:key==='density'?1:1e6),value,'介面與求解器材料預設必須相同');
 }
 const single=beam(B),double=beam(B,2),triple=beam(B,3);
+assert.equal(single.sim.peakStress.bar,0);
+close(single.sim.peakStress.t,.5,1e-8,'中央負重梁的最高應力位於跨中');
+const peakMoment=.02*9.81/4+B.MATERIAL.density*B.AREA*9.81/8;
+close(single.sim.peakStress.value,peakMoment*.003/B.INERTIA,.07,'最高應力符合梁的截面彎曲應力');
 close(single.sim.nodes.reduce((sum,n)=>sum+n.baseMass,0),.00576,1e-12,'一米 6 × 6 mm 預設輕木的質量為 5.76 g');
 beam(B,1,.02,.273);beam(B,1,0);
 const stiff=beam(B,1,.02,.5,{young:B.MATERIAL.young*2});close(single.actual/stiff.actual,2,.025,'彈性模數加倍使下彎減半');
@@ -99,6 +103,63 @@ for(const angle of [0,.7,2.4]) {
 const falling=B.empty();B.addBar(falling,{x:9,y:3},{x:15,y:3});
 const free=settle(B,B.simulate(falling),.1);
 assert.ok(free.bars[0].stress<1e-6,'共同自由落體不把重力錯算成彎曲');
+// 沒有空氣阻力時，不同密度／步長均須給出 g；水平平移不可被數值阻尼拖慢。
+for(const dt of [B.DT,B.DT/2]) for(const density of [80,320]) {
+  const sim=B.simulate(falling,{density}),duration=.2,steps=Math.round(duration/dt);
+  sim.nodes.forEach(n=>n.vx=10);
+  settle(B,sim,duration,dt);
+  for(const n of sim.nodes) {
+    close(n.vy*B.UNIT,9.81*duration,1e-9,'自由落體速度 v = gt');
+    close(n.vx*B.UNIT,1,1e-9,'無水平外力時動量守恆');
+    // 半隱式 Euler 的累積位置；誤差應隨 dt 減半，而非加入假的空氣阻力。
+    close((n.y-3)*B.UNIT,9.81*dt*dt*steps*(steps+1)/2,1e-9,'自由落體位移符合已知積分誤差');
+  }
+}
+const sliding=B.simulate({nodes:[{x:5,y:8,load:1}],bars:[],joints:[]});
+sliding.nodes[0].vx=10;settle(B,sliding,.1);
+close(sliding.nodes[0].vx*B.UNIT,1-.6*9.81*.1,1e-8,'滑動摩擦的減速度為 μg');
+const cutModel=model(source.replace('return {UNIT,DT','return {cutAt(sim,index){breakBar(sim,sim.bars[index],2);rebuildConstraints(sim);},UNIT,DT'));
+const splitting=cutModel.simulate(falling);
+splitting.nodes.forEach(n=>{n.vx=3-(n.y-3)*2;n.vy=4+(n.x-12)*2;});
+const conserved=sim=>sim.nodes.reduce((sum,n)=>{
+  const m=n.baseMass+n.load;
+  return [sum[0]+m,sum[1]+m*n.vx,sum[2]+m*n.vy,sum[3]+m*(n.x*n.vy-n.y*n.vx)];
+},[0,0,0,0]);
+const beforeCut=conserved(splitting);cutModel.cutAt(splitting,0);
+conserved(splitting).forEach((value,i)=>close(value,beforeCut[i],1e-12,'切開瞬間保留質量、線動量與角動量'));
+// 用真實斷橋碰撞觸發穩定處理；空中的獨立木桿仍須正常自由落體。
+const independent=B.sample();independent.nodes.find(n=>n.load).load=20;
+assert.equal(B.addBar(independent,{x:10,y:2},{x:14,y:2}),'');
+const separate=B.simulate(independent),probe=separate.bars.at(-1);
+probe.path.forEach(i=>separate.nodes[i].vx=1);
+settle(B,separate,.45);
+assert.ok(separate.firstBreak && !separate.unstable,'測試須經過斷裂後的碰撞');
+for(const i of probe.path) {
+  close(separate.nodes[i].vx,1,1e-7,'其他碎段碰撞不改變獨立木桿的水平動量');
+  close(separate.nodes[i].vy*B.UNIT,9.81*.45,1e-7,'其他碎段碰撞不拖慢獨立木桿的下落');
+}
 assert.throws(()=>B.simulate(falling,{young:NaN}),/正數/,'拒絕無效材料數值');
+// 涵蓋首次斷裂、撞河岸側面及落到底部；舊版約 0.34 s 後速度會發散。
+for(const settled of [false,true]) {
+const collapse=B.sample();if(!settled) collapse.nodes.find(n=>n.load).load=20;
+const rubble=B.simulate(collapse),massBefore=rubble.nodes.reduce((sum,n)=>sum+n.baseMass,0);
+if(settled) {settle(B,rubble,.5);rubble.nodes.find(n=>n.load).load=20;}
+let peakSpeed=0;
+for(let i=0;i<4/B.DT;i++) {
+  B.step(rubble);
+  assert.ok(!rubble.unstable,'20 kg 範例橋必須完成跌落，不能以暫停代替修正');
+  assert.ok(rubble.nodes.every(n=>[n.x,n.y,n.vx,n.vy].every(Number.isFinite)),'斷裂和碰撞後保持有限解');
+  peakSpeed=Math.max(peakSpeed,...rubble.nodes.map(n=>Math.hypot(n.vx,n.vy)*B.UNIT));
+  assert.ok(peakSpeed<20,'碎段不能因碰撞修正而高速飛走');
+}
+assert.ok(rubble.firstBreak && rubble.fragments.length>=2,'重載須實際斷裂');
+close(rubble.nodes.reduce((sum,n)=>sum+n.baseMass,0),massBefore,1e-10,'斷裂跌落保留木材質量');
+assert.ok(rubble.nodes.find(n=>n.load===20).y>12.7,'重物須落到底部');
+assert.ok(Math.max(...rubble.nodes.map(n=>Math.hypot(n.vx,n.vy)*B.UNIT))<1,'落地後速度應降低');
+for(const c of rubble.constraints) if(c.kind==='pin') {
+  const gap=Math.hypot(...['x','y'].map(axis=>c.terms.reduce((sum,[i,w])=>sum+rubble.nodes[i][axis]*w,0)));
+  assert.ok(gap<1e-4,'跌落後存留接點保持相連');
+}
+}
 console.log(results.join('\n'));
-console.log('通過：輕木預設與介面一致、SI 質量、梁下彎、複合截面、非中央負重、地面反力、步長／網格收斂、拉壓彎曲斷裂閾值、軸向剛度、Euler 挫曲及剛體不變性。');
+console.log('通過：SI 質量、梁下彎與應力、複合截面、地面反力、步長／網格收斂、材料閾值、Euler 挫曲、自由落體、滑動摩擦、斷裂動量及獨立物件互不影響。');

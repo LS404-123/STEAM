@@ -12,6 +12,8 @@ function element() {
     addEventListener(name,fn){this.listeners[name]=fn;},checkValidity(){return true;},classList:{toggle(){}},setAttribute(k,v){attributes.set(k,v);},getAttribute(k){return attributes.get(k);}};
   e.context=new Proxy(calls,{get(target,key){return target[key]??((...args)=>{target['count:'+key]=(target['count:'+key]||0)+1;});}});
   e.getContext=()=>e.context;e.width=300;e.height=150;
+  e.focus=()=>{};e.setPointerCapture=()=>{};e.releasePointerCapture=()=>{};e.hasPointerCapture=()=>false;
+  e.getBoundingClientRect=()=>({left:0,top:0,width:canvasWidth,height:canvasWidth*7/12});
   Object.defineProperty(e,'clientWidth',{get(){layoutReads++;return canvasWidth;}});
   return e;
 }
@@ -19,9 +21,9 @@ const document={hidden:false,listeners:{},getElementById(id){if(!elements.has(id
 const frames=new Map();let nextFrame=0,cpuTime=0,steps=0;
 const step=Bridge.step;
 Bridge.step=(sim,dt)=>{steps++;cpuTime+=5;step(sim,dt);};
-const context={Bridge,document,window:{devicePixelRatio:1},ResizeObserver:class {observe(){}},performance:{now:()=>cpuTime},
+const context={Bridge,document,window:{devicePixelRatio:1,matchMedia:()=>({matches:true})},ResizeObserver:class {observe(){}},performance:{now:()=>cpuTime},
   requestAnimationFrame(fn){const id=++nextFrame;frames.set(id,fn);return id;},cancelAnimationFrame(id){frames.delete(id);}};
-vm.runInNewContext(scripts[1].replace('  update();draw();\n})();','  globalThis.renderer={draw,model};update();draw();\n})();'),context);
+vm.runInNewContext(scripts[1].replace('  update();draw();\n})();','  globalThis.renderer={draw,model,operate};update();draw();\n})();'),context);
 const canvas=elements.get('bridge'),calls=canvas.context;
 let arcs=calls['count:arc'];
 assert.ok(arcs>700,'首次繪製包含完整方格背景');
@@ -36,16 +38,136 @@ assert.equal(canvas.width,698);assert.ok(calls['count:arc']-arcs>700,'像素密�
 assert.equal(frames.size,0,'建造閒置時沒有動畫循環');
 for(const [key,value] of Object.entries(Bridge.MATERIAL)) elements.get('mat-'+key).value=value/(key==='young'?1e9:key==='density'?1:1e6);
 const click=id=>elements.get(id).listeners.click();
+const autoLoad=checked=>{elements.get('auto-load').checked=checked;elements.get('auto-load').listeners.change();};
 function frame(time) {assert.equal(frames.size,1,'最多只排一個動畫幀');const [id,fn]=frames.entries().next().value;frames.delete(id);fn(time);}
 click('test');frame(1000);assert.equal(steps,0);
 frame(1050);assert.equal(steps,2,'每步耗 5 ms 時，8 ms 預算只容許兩步，不一次追算 12 步');
-click('auto-load');frame(1100);
+autoLoad(true);frame(1100);
 const weight=context.renderer.model().nodes.find(n=>n.load).load;
-frame(1150);assert.equal(steps,4);
+frame(1150);assert.equal(steps,6);
 assert.ok(Math.abs(context.renderer.model().nodes.find(n=>n.load).load-weight-2*Bridge.DT*.5)<1e-12,'加重跟隨完成的物理步數，不按丟棄的積欠時間跳升');
 click('test');assert.equal(frames.size,0,'暫停立即取消動畫');
 click('test');document.hidden=true;document.listeners.visibilitychange();assert.equal(frames.size,0,'背景分頁不繼續運算');
-document.hidden=false;document.listeners.visibilitychange();frame(9000);assert.equal(steps,4,'返回分頁不追算離開期間');
-frame(9050);assert.equal(steps,6);
+document.hidden=false;document.listeners.visibilitychange();frame(9000);assert.equal(steps,6,'返回分頁不追算離開期間');
+frame(9050);assert.equal(steps,8);
 click('reset');assert.equal(frames.size,0,'返回建造停止動畫循環');
-console.log('通過：背景快取、縮放、布局讀取、閒置／暫停／背景停止、單一動畫排程、每幀預算及加重時間。');
+autoLoad(true);assert.equal(frames.size,0,'選擇連續加重不會自行開始測試');
+click('test');frame(10000);frame(10050);
+click('test');autoLoad(false);autoLoad(true);
+assert.equal(frames.size,0,'暫停時切換模式不會恢復播放');
+click('test');frame(11000);
+const fixedWeight=context.renderer.model().nodes.find(n=>n.load).load;
+autoLoad(false);frame(11050);
+assert.equal(context.renderer.model().nodes.find(n=>n.load).load,fixedWeight,'停止加重後仍播放，但保持目前重量');
+assert.equal(frames.size,1);
+autoLoad(true);
+context.renderer.model().firstBreak={bar:0,load:fixedWeight,position:.5};frame(11100);
+assert.equal(elements.get('auto-load').checked,false,'首斷後取消連續加重');
+assert.equal(frames.size,1,'首斷後繼續播放碎段');
+click('reset');
+elements.get('weight').value=19.99999;elements.get('weight').listeners.input();
+autoLoad(true);click('test');frame(12000);frame(12050);
+assert.equal(context.renderer.model().nodes.find(n=>n.load).load,20,'連續加重準確停在 20 kg');
+assert.equal(elements.get('auto-load').checked,false);
+click('reset');
+
+// 選取只標示目標；必須按明確操作才改動模型，重疊物件可逐一選取。
+const {operate,model}=context.renderer;
+const choose=label=>{
+  const option=[...elements.get('selection-target').innerHTML.matchAll(/<option value="(\d+)">([^<]+)<\/option>/g)].find(match=>match[2]===label);
+  assert.ok(option,`可選取 ${label}`);
+  elements.get('selection-target').value=option[1];elements.get('selection-target').listeners.change();
+};
+click('clear');assert.equal(elements.get('auto-load').disabled,true);
+operate({x:6,y:6});operate({x:10,y:6});operate({x:6,y:5.5});operate({x:10,y:5.5});
+const original=JSON.stringify(model());
+click('edit');operate({x:8,y:6});choose('木桿 1');
+assert.equal(JSON.stringify(model()),original,'點選不會刪除或加固木桿');
+click('reinforce');assert.equal(model().bars.length,3);assert.equal(model().joints.length,1);
+click('undo');assert.equal(JSON.stringify(model()),original,'加固能完整復原');
+click('erase');assert.equal(JSON.stringify(model()),original,'復原清除失效選取，不能誤刪舊索引');
+operate({x:8,y:6});choose('木桿 1');click('glue');operate({x:8,y:5.5});choose('木桿 2');
+assert.equal(JSON.stringify(model()),original,'第二條木桿選好後仍要確認膠合');
+click('cancel-glue');assert.equal(JSON.stringify(model()),original,'取消膠合保持原設計');
+operate({x:8,y:6});choose('木桿 1');click('glue');operate({x:8,y:5.5});choose('木桿 2');click('glue-confirm');
+assert.equal(model().joints.length,1);assert.ok(Math.abs(model().nodes[2].y-5.94)<1e-8);
+operate({x:8,y:5.97});choose('膠合 1');click('erase');
+assert.equal(model().joints.length,0);assert.equal(model().bars.length,2,'解除膠合不刪除木桿');
+operate({x:8,y:5.97});choose('木桿 1');click('erase');
+assert.equal(model().bars.length,1,'已解除膠合的相鄰木桿不會整組刪除');
+click('undo');assert.equal(model().bars.length,2);assert.equal(model().joints.length,0);
+click('undo');operate({x:8,y:5.97});choose('木桿 1');click('erase');
+assert.equal(model().bars.length,0);assert.equal(model().joints.length,0,'手動膠合的木桿須整組刪除');
+click('undo');assert.equal(model().bars.length,2);assert.equal(model().joints.length,1);
+
+// 加固層的索引不一定連續；只追蹤膠合，不沿普通接點刪掉其他結構。
+click('clear');operate({x:10,y:6});operate({x:14,y:6});operate({x:10,y:5.5});operate({x:14,y:5.5});
+click('edit');operate({x:12,y:6});choose('木桿 1');click('reinforce');click('reinforce');
+click('wood');operate({x:12,y:6});operate({x:12,y:4});click('join');operate({x:12,y:6});
+Bridge.placeLoad(model(),null,2,.5,2);Bridge.placeLoad(model(),null,1,.5,1);
+click('load');operate({x:12,y:5.5});click('edit');
+const stacked=JSON.stringify(model());
+for(const label of ['木桿 1','木桿 3','木桿 4']) {
+  operate({x:13,y:5.9});choose(label);
+  assert.equal(elements.get('erase').textContent,'刪除整組（3 條）','刪除前明確顯示整組數量');
+  click('erase');
+  assert.equal(model().bars.length,2,'選任一層均刪除三層，保留旁邊木桿及接點相連的支桿');
+  assert.ok(Math.abs(Bridge.totalLength(model())-.6)<1e-10,'整組木材用量退回');
+  assert.equal(model().nodes.reduce((sum,n)=>sum+n.load,0),1,'只刪除隨整組木桿依附的負重');
+  assert.equal(Number(elements.get('weight').value),1,'保留另一木桿上已選取的負重');
+  assert.ok(model().joints.every(j=>model().bars[j.a] && model().bars[j.b]),'批次刪除後接點索引有效');
+  click('undo');assert.equal(JSON.stringify(model()),stacked,'一次復原整組木桿、負重及接合');
+}
+
+click('clear');operate({x:10,y:6});operate({x:14,y:6});
+elements.get('weight').value=2;elements.get('weight').listeners.input();
+click('load');operate({x:12,y:6});
+click('edit');operate({x:12,y:7});click('erase');
+assert.equal(model().nodes.reduce((sum,n)=>sum+n.load,0),0);assert.equal(model().bars.length,1,'卸重保留木桿');
+click('undo');assert.equal(model().nodes.reduce((sum,n)=>sum+n.load,0),2);
+const pointer=(name,x,y)=>canvas.listeners[name]({isPrimary:true,button:0,pointerId:1,clientX:x*canvasWidth/24,clientY:y*canvasWidth/24});
+pointer('pointerdown',10,6);pointer('pointermove',10,5.5);pointer('pointerup',10,5.5);
+assert.equal(model().nodes[0].y,5.5,'選取模式仍可直接拖動端點');
+const moved=JSON.stringify(model());
+pointer('pointerdown',14,6);pointer('pointermove',14,5.5);document.listeners.keydown({key:'Escape'});
+assert.equal(JSON.stringify(model()),moved,'Esc 完整取消拖動');
+operate({x:10,y:5.5});canvas.listeners.keydown({key:'ArrowRight',preventDefault(){}});
+assert.equal(model().nodes[0].x,10.5,'選取端點後仍可用方向鍵修改');
+click('test');assert.equal(elements.get('selection-actions').hidden,true);
+const duringTest=JSON.stringify(model());click('erase');click('reinforce');click('glue-confirm');
+assert.equal(JSON.stringify(model()),duringTest,'測試期間不可透過選取操作改動結構');
+click('reset');
+click('clear');operate({x:6,y:6});operate({x:9,y:6});operate({x:10,y:4});operate({x:14,y:4});click('edit');
+const beforeEndDrag=JSON.stringify(model());
+pointer('pointerdown',9,6);pointer('pointermove',10.04,4.02);
+assert.equal(model().joints.length,1,'拖近末端顯示接合預覽');
+pointer('pointermove',9,5);pointer('pointerup',9,5);
+assert.equal(model().joints.length,0,'移開後放手不會保留途中接點');
+assert.equal(model().nodes[2].x,10);assert.equal(model().nodes[2].y,4,'途中吸附不能拖走目標木桿');
+click('undo');assert.equal(JSON.stringify(model()),beforeEndDrag);
+pointer('pointerdown',9,6);pointer('pointermove',10.04,4.02);document.listeners.keydown({key:'Escape'});
+assert.equal(JSON.stringify(model()),beforeEndDrag,'Esc 取消末端接合及位置修改');
+pointer('pointerdown',9,6);pointer('pointermove',10.04,4.02);pointer('pointerup',10.04,4.02);
+assert.equal(model().joints.length,1);assert.equal(model().nodes[1].x,10);assert.equal(model().nodes[1].y,4);
+assert.match(elements.get('message').textContent,/已接合木桿端點/);
+click('undo');assert.equal(JSON.stringify(model()),beforeEndDrag,'一次復原位置、長度及新接點');
+operate({x:9,y:6});
+for(const key of ['ArrowUp','ArrowUp','ArrowUp','ArrowUp','ArrowRight','ArrowRight']) canvas.listeners.keydown({key,preventDefault(){}});
+assert.equal(model().joints.length,1,'鍵盤修改亦可接合末端');
+click('example');elements.get('slow').checked=false;
+elements.get('weight').value=20;elements.get('weight').listeners.input();click('test');
+let breakTime=20000;frame(breakTime);
+for(let i=0;i<20 && !model().firstBreak;i++) {breakTime+=50;frame(breakTime);}
+assert.ok(model().firstBreak,'固定負重也須觸發實際斷裂');
+assert.equal(elements.get('slow').checked,false,'自動慢速保留使用者原本未勾選的偏好');
+assert.equal(elements.get('slow').hidden,true);assert.match(elements.get('slow-label').textContent,/斷裂.*¼/);
+assert.equal(elements.get('stress-note').hidden,false);assert.match(elements.get('stress-value').textContent,/木桿 \d+.*MPa/);
+assert.match(elements.get('message').textContent,/自動切換 ¼ 速/);
+const beforeAutoSlow=steps;breakTime+=20;frame(breakTime);
+assert.equal(steps-beforeAutoSlow,1,'首斷清除快轉積欠時間，20 ms 只推進四分一速度');
+click('test');assert.equal(frames.size,0);click('test');breakTime+=50;frame(breakTime);
+const beforeResume=steps;breakTime+=20;frame(breakTime);
+assert.equal(steps-beforeResume,1,'暫停再繼續仍保持斷裂慢速');
+click('reset');assert.equal(elements.get('stress-note').hidden,true);assert.equal(elements.get('slow').hidden,false);
+assert.equal(elements.get('slow').checked,false,'返回建造後恢復原慢速偏好');
+console.log('通過：繪製快取與排程、單一測試入口、加重／暫停／首斷／上限、重疊選取、加固／膠合／刪除／卸重、復原及滑鼠／鍵盤修改。');
