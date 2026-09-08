@@ -46,27 +46,6 @@ const editSnap=input.buildPoint({x:8.73,y:7.9},snapEdited,editedTip);
 assert.equal(B.moveNode(snapEdited,editedTip,editSnap),'');
 assert.ok(snapEdited.nodes[editedTip].x===8.5 && snapEdited.nodes[editedTip].y===8,'拖動修改採用相同的方格與桿身吸附');
 assert.equal(snapEdited.joints.length,0,'修改吸附不會繞過接合確認');
-const labelSource=html.match(/\/\/ 長度標籤布局開始[^\n]*\n([\s\S]*?)\/\/ 長度標籤布局結束/)[1];
-const labelLayout=new Function('Bridge',labelSource+';return lengthLabels;')(B);
-const labelDesign=B.empty();B.addBar(labelDesign,{x:7,y:8},{x:17,y:8});B.reinforce(labelDesign,0);
-for(const width of [349,929]) {
-  const labels=labelLayout(labelDesign,width);
-  assert.equal(labels.length,2,'不必選取，兩條木桿均須顯示長度');
-  assert.ok(labels.every(l=>l.value==='100 cm'),'標籤顯示木材原長');
-  assert.ok(labels[0].y+labels[0].h<=labels[1].y || labels[1].y+labels[1].h<=labels[0].y,'膠合木材的標籤不能互相覆蓋');
-}
-for(const width of [349,929]) {
-  const labels=labelLayout(B.sample(),width);
-  assert.equal(labels.length,18,'預設橋的每條木桿均須顯示長度');
-  for(let i=0;i<labels.length;i++) for(const other of labels.slice(i+1)) {
-    assert.ok(labels[i].x+labels[i].w<=other.x || other.x+other.w<=labels[i].x || labels[i].y+labels[i].h<=other.y || other.y+other.h<=labels[i].y,'預設橋的長度標籤不能互相重疊');
-  }
-}
-const labelSim=B.simulate(labelDesign);labelSim.nodes[1].x-=1;
-assert.equal(labelLayout(labelSim,929)[0].value,'100 cm','模擬變形不把原長標籤改成兩端距離');
-B.cutAt(labelSim,0,.3);
-assert.deepEqual(labelLayout(labelSim,929).map(l=>l.value),['100 cm','30 cm','70 cm'],'斷裂後分別標示碎段的材料長度');
-assert.equal(labelLayout(B.empty(),929).length,0,'清空設計不留下標籤');
 const a={x:6,y:8}, b={x:6.5,y:8};
 assert.equal(B.distance(input.snap(a),input.snap(b)),.5,'相鄰 5 cm 方格不能吸回原節點');
 assert.ok(input.isDrag(a,b,349),'手機畫布必須接受一格 5 cm 的短拖拉');

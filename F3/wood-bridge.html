@@ -36,9 +36,6 @@
     canvas { display:block; width:100%; aspect-ratio:12/7; touch-action:none; cursor:crosshair; }
     .stage-label { position:absolute; top:20px; left:22px; pointer-events:none; color:var(--muted); font-size:12px; letter-spacing:.08em; }
     .stage-label strong { display:block; color:var(--ink); font-size:14px; letter-spacing:.02em; }
-    #wood-labels { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
-    .label-leaders { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-    .wood-length-label { position:absolute; padding:1px 4px; border:1px solid #cfdee2; border-radius:3px; background:rgba(255,255,255,.94); color:#365864; font-size:10px; line-height:14px; white-space:nowrap; }
     .legend { display:flex; flex-wrap:wrap; align-items:center; gap:18px; padding:12px 20px; font-size:12px; color:var(--muted); border-top:1px solid var(--line); }
     .legend span { display:flex; align-items:center; gap:6px; }
     .materials { padding:18px 20px; border-top:1px solid var(--line); }
@@ -121,8 +118,6 @@
       <div class="stage">
         <div class="stage-label"><strong>跨越 95 cm</strong>地面承托 · 可滑動、可離地</div>
         <canvas id="bridge" width="1200" height="700" tabindex="0" role="application" aria-label="木橋搭建區" aria-describedby="keyboard-help message">木橋搭建區：用方向鍵移動游標，Enter 操作，Escape 取消。負重工具只可在河口中央線與木桿的交點掛重物。</canvas>
-        <svg class="label-leaders" aria-hidden="true"><path id="wood-label-leaders" fill="none" stroke="#9ab4bd" stroke-width="0.8"/></svg>
-        <div id="wood-labels" role="group" aria-label="木桿長度"></div>
       </div>
       <div class="legend"><span><i class="swatch"></i>木桿</span><span><i class="swatch high"></i>接近斷裂</span><span>● 接合　▤ 膠合</span><span>每小格 5 cm</span><span>虛線：原設計</span></div>
       <section class="materials" aria-label="木橋材料計算">
@@ -164,7 +159,7 @@
     <p id="message" role="status">點兩個位置或拖拉放木桿；先對齊方格，靠近木桿時沿桿移動，接近端點時吸附端點。中段接觸需按「接合」。按 Esc 取消。</p>
     <details><summary>操作與模型說明</summary>
       <p>預設及「範例橋」採用工作紙橋形：100 cm 橋底兩條膠合、80 cm 橋頂一條、13 cm 直桿七條，以及八條斜桿。橋頂分成六個等寬格，斜桿向中央下方排列；外側斜桿約 16.4 cm、內側約 18.6 cm。水平長梁保持完整，中段接點不會把長梁切成獨立木條。橋身高度按主橋底至橋頂的中心線計算。</p>
-      <p id="keyboard-help">點起點、終點，或直接拖拉放木桿。位置先對齊 5 cm 方格；靠近已有木桿時，把方格位置投影到桿身，沿桿移動。接近任一木桿端點時優先吸附該端點，即使端點不在方格上。按木桿可作為新木桿的起點，中段接觸需按「接合」才連接。每條木桿旁的小標籤常駐顯示原長，修改端點時更新；測試彎曲不改變標示原長，斷裂後改為顯示各碎段長度。每條最多 100 cm，全部木材合計最多 20 m；重疊及膠合的木材也分別計算。刪除或縮短木桿可退回用量。</p>
+      <p id="keyboard-help">點起點、終點，或直接拖拉放木桿。位置先對齊 5 cm 方格；靠近已有木桿時，把方格位置投影到桿身，沿桿移動。接近任一木桿端點時優先吸附該端點，即使端點不在方格上。按木桿可作為新木桿的起點，中段接觸需按「接合」才連接。每條最多 100 cm，全部木材合計最多 20 m；重疊及膠合的木材也分別計算。刪除或縮短木桿可退回用量。</p>
       <p>選「加固」再點木桿，自動複製同長木桿並在旁邊貼合，不複製重物。優先向上或側面堆疊，避開地面；空間或剩餘木材不足時取消。可以重複加固，也可以按「復原」。手動放木桿及「膠水」工具仍可使用。</p>
       <p>共用端點本來已相連；木桿交叉或端點碰到桿身時，選「接合」再點接觸處才會接合，容許相對轉動。整條長木桿保持完整。選「膠水」依次點兩條平行、相隔最多一格且重疊至少 5 cm 的木桿，會先靠攏至表面貼合，再固定相對滑動和轉動。接地木桿優先保持原位，其餘情況以第一條為準；若現有接合阻止靠攏，整次操作會取消。「移除」點重物可卸下，點接合圓點或膠合區中央可解除連接，其餘位置可移除木桿。</p>
       <p>選「修改」拖動端點，相連木桿及重物一起更新；膠合組合會保持木材長度，解除膠合後才可改形。超出木材用量、端點重疊、移入地面或無法維持接合時，修改會取消。建造操作可復原。新負重只可掛在河口中央垂直線（距兩岸各 47.5 cm）與木桿或碎段的交點；掛上後隨木桿移動，不限制水平運動。已有重物可繼續調整重量；卸下後若位置已離開中央線，須重新選中央交點。最多 150 個中段負重位置，卸下後可重用。連續加重以每秒 0.5 kg 平滑增加，首斷或達 20 kg 時停止加重，慢速模式同步放慢。</p>
@@ -656,7 +651,51 @@ const Bridge = (() => {
     }
     c.value=value;c.valueY=valueY;
   }
+  // 節點包含繪圖、負重及碰撞狀態；PCG 熱迴圈只使用連續數值暫存。
+  // WeakMap 讓暫存跟隨模擬釋放，也不混入設計複製／復原資料。
+  const solverBuffers=new WeakMap();
+  function solveLinearRows(rows,buffers) {
+    const {tx,ty,mass,linear:w}=buffers,count=rows.length;
+    const {offset,node,gx,gy,alpha,inverse,rhs,delta,fixed,residual,z,direction,product}=w;
+    tx.fill(0);ty.fill(0);
+    for(let i=0;i<count;i++) {
+      delta[i]=rows[i].delta;fixed[i]=rows[i].fixed;
+      for(let k=offset[i];k<offset[i+1];k++) {tx[node[k]]+=gx[k]*delta[i];ty[node[k]]+=gy[k]*delta[i];}
+    }
+    let rz=0;
+    for(let i=0;i<count;i++) {
+      let value=fixed[i]?0:rhs[i]-alpha[i]*delta[i];
+      if(!fixed[i]) for(let k=offset[i];k<offset[i+1];k++) value-=mass[node[k]]*(gx[k]*tx[node[k]]+gy[k]*ty[node[k]]);
+      residual[i]=value;z[i]=value*inverse[i];direction[i]=z[i];rz+=value*z[i];
+    }
+    const initial=rz;
+    // 與原求解相同的 PCG、累加次序及停止條件；只將熱迴圈改用數值陣列。
+    for(let iteration=0;iteration<Math.min(count*2,240) && rz>Math.max(1e-28,initial*1e-14);iteration++) {
+      tx.fill(0);ty.fill(0);
+      for(let i=0;i<count;i++) for(let k=offset[i];k<offset[i+1];k++) {tx[node[k]]+=gx[k]*direction[i];ty[node[k]]+=gy[k]*direction[i];}
+      let denominator=0;
+      for(let i=0;i<count;i++) {
+        let value=fixed[i]?0:alpha[i]*direction[i];
+        if(!fixed[i]) for(let k=offset[i];k<offset[i+1];k++) value+=mass[node[k]]*(gx[k]*tx[node[k]]+gy[k]*ty[node[k]]);
+        product[i]=value;denominator+=direction[i]*value;
+      }
+      if(denominator<1e-30) break;
+      const scale=rz/denominator;
+      let next=0;
+      for(let i=0;i<count;i++) {delta[i]+=scale*direction[i];residual[i]-=scale*product[i];z[i]=residual[i]*inverse[i];next+=residual[i]*z[i];}
+      for(let i=0;i<count;i++) direction[i]=z[i]+next/rz*direction[i];
+      rz=next;
+    }
+    for(let i=0;i<count;i++) rows[i].delta=delta[i];
+  }
   function solveConstraints(sim,dt) {
+    let buffers=solverBuffers.get(sim);
+    if(!buffers || buffers.tx.length!==sim.nodes.length) {
+      buffers={tx:new Float64Array(sim.nodes.length),ty:new Float64Array(sim.nodes.length),mass:new Float64Array(sim.nodes.length)};
+      solverBuffers.set(sim,buffers);
+    }
+    const {tx,ty,mass}=buffers;
+    for(let i=0;i<sim.nodes.length;i++) mass[i]=sim.nodes[i].invMass;
     const rows=[];
     for(const c of sim.constraints) {
       if(c.loadNode!==undefined && sim.nodes[c.loadNode].load<=0) continue;
@@ -677,34 +716,20 @@ const Bridge = (() => {
       r.b=-r.value-r.alpha*r.c[r.key];r.delta=sim.firstSolve?(r.c[r.key==='lambda'?'previous':'previousY']||0):0;r.fixed=false;
     }
     sim.firstSolve=false;
+    const terms=rows.reduce((sum,r)=>sum+r.terms.length,0);
+    if(!buffers.linear || buffers.linear.delta.length<rows.length || buffers.linear.node.length<terms) {
+      const w={offset:new Uint32Array(rows.length+1),node:new Uint32Array(terms),gx:new Float64Array(terms),gy:new Float64Array(terms),fixed:new Uint8Array(rows.length)};
+      for(const key of ['alpha','inverse','rhs','delta','residual','z','direction','product']) w[key]=new Float64Array(rows.length);
+      buffers.linear=w;
+    }
+    const w=buffers.linear;let term=0;
+    rows.forEach((r,i)=>{
+      w.offset[i]=term;w.alpha[i]=r.alpha;w.inverse[i]=r.inv;w.rhs[i]=r.b;
+      for(const g of r.terms) {w.node[term]=g.i;w.gx[term]=g.x;w.gy[term]=g.y;term++;}
+    });
+    w.offset[rows.length]=term;
     for(let activePass=0;activePass<20;activePass++) {
-    for(const n of sim.nodes) {n.tx=0;n.ty=0;}
-    for(const r of rows) for(const g of r.terms) {const n=sim.nodes[g.i];n.tx+=g.x*r.delta;n.ty+=g.y*r.delta;}
-    for(const r of rows) {
-      if(r.fixed) {r.r=0;r.z=0;r.p=0;continue;}
-      r.r=r.b-r.alpha*r.delta;
-      for(const g of r.terms) {const n=sim.nodes[g.i];r.r-=n.invMass*(g.x*n.tx+g.y*n.ty);}
-      r.z=r.r*r.inv;r.p=r.z;
-    }
-    let rz=rows.reduce((sum,r)=>sum+r.r*r.z,0),initial=rz;
-    // 同時求解整個網絡，避免局部迭代把膠合梁變成過軟的彈簧鏈。
-    for(let iteration=0;iteration<Math.min(rows.length*2,240) && rz>Math.max(1e-28,initial*1e-14);iteration++) {
-      for(const n of sim.nodes) {n.tx=0;n.ty=0;}
-      for(const r of rows) for(const g of r.terms) {const n=sim.nodes[g.i];n.tx+=g.x*r.p;n.ty+=g.y*r.p;}
-      let denominator=0;
-      for(const r of rows) {
-        if(r.fixed) {r.ap=0;continue;}
-        r.ap=r.alpha*r.p;
-        for(const g of r.terms) {const n=sim.nodes[g.i];r.ap+=n.invMass*(g.x*n.tx+g.y*n.ty);}
-        denominator+=r.p*r.ap;
-      }
-      if(denominator<1e-30) break;
-      const scale=rz/denominator;
-      let next=0;
-      for(const r of rows) {r.delta+=scale*r.p;r.r-=scale*r.ap;r.z=r.r*r.inv;next+=r.r*r.z;}
-      for(const r of rows) r.p=r.z+next/rz*r.p;
-      rz=next;
-    }
+    solveLinearRows(rows,buffers);
     let changed=false;
     for(const r of rows) {
       const c=r.c;if(!c.contact) continue;
@@ -719,11 +744,11 @@ const Bridge = (() => {
       if(Math.abs(clamped-next)>1e-12) {if(!r.fixed) r.slipSign=Math.sign(next);r.delta=clamped-old;r.fixed=true;changed=true;}
     }
     if(!changed) {
-      for(const n of sim.nodes) {n.tx=0;n.ty=0;}
-      for(const r of rows) for(const g of r.terms) {const n=sim.nodes[g.i];n.tx+=g.x*r.delta;n.ty+=g.y*r.delta;}
+      tx.fill(0);ty.fill(0);
+      for(const r of rows) for(const g of r.terms) {tx[g.i]+=g.x*r.delta;ty[g.i]+=g.y*r.delta;}
       for(const r of rows) if(r.fixed) {
         let residual=r.value;
-        for(const g of r.terms) {const n=sim.nodes[g.i];residual+=n.invMass*(g.x*n.tx+g.y*n.ty);}
+        for(const g of r.terms) residual+=mass[g.i]*(g.x*tx[g.i]+g.y*ty[g.i]);
         if((r.c.contact==='normal' && residual>1e-9) || (r.c.contact==='friction' && residual*r.slipSign>1e-9)) {r.fixed=false;changed=true;}
       }
     }
@@ -826,7 +851,7 @@ const Bridge = (() => {
   let design = Bridge.sample(), simulation = null, running = false, tool = 'wood';
   let start = null, hover = null, pointerDown = null, keyboard = {x:6,y:8}, keyboardActive = false;
   let selectedLoad = design.nodes.findIndex(n => n.load), history = [], lastTime = 0, accumulator = 0;
-  let lastStats = 0, maxDrop = 0, selectedBar = -1, editNode = -1;
+  let lastStats = 0, maxDrop = 0, editNode = -1;
   let autoLoading = false, glueFirst = -1;
   const formatWeight=value=>String(Number(value.toFixed(2)));
   const toolNames=['wood','edit','join','glue','reinforce','load','erase'];
@@ -929,7 +954,7 @@ const Bridge = (() => {
   function operate(point, dragging = false) {
     if(!simulation && tool==='reinforce') {
       const before=Bridge.clone(design),index=nearestBar(point),error=Bridge.reinforce(design,index);
-      if(!error) {remember(before);selectedBar=design.bars.length-1;}
+      if(!error) remember(before);
       tell(error || '已複製並貼合加固，木材用量已更新；可按「復原」。');
       update();draw();return;
     }
@@ -991,7 +1016,7 @@ const Bridge = (() => {
       } else {
         const index = nearestBar(point);
         if (index < 0) { tell('請點要移除的木桿或負重節點。'); return; }
-        remember(); Bridge.removeBar(design,index); selectedLoad = -1; selectedBar = -1; tell('已移除木桿及不再連接的端點。');
+        remember(); Bridge.removeBar(design,index); selectedLoad = -1; tell('已移除木桿及不再連接的端點。');
       }
     }
     update(); draw();
@@ -1008,49 +1033,8 @@ const Bridge = (() => {
   function text(value,x,y,color='#526b76',size=13,align='center') {
     ctx.font=`${size}px "Microsoft JhengHei",sans-serif`; ctx.textAlign=align; ctx.fillStyle=color; ctx.fillText(value,x,y);
   }
-  // 長度標籤布局開始：用畫布的 CSS 尺寸布局，小螢幕也保持可讀字級。
-  function lengthLabels(structure,width) {
-    const labels=[],height=width*7/12;
-    const pieces=[...structure.bars.map((bar,i)=>({bar,name:`木桿 ${i+1}`})),...(structure.fragments||[]).map(bar=>({bar,name:`木桿 ${bar.source+1} 碎段`}))];
-    for(const {bar,name} of pieces) {
-      if(bar.broken) continue;
-      const path=bar.path || [bar.a,bar.b],middle=(path.length-1)/2,a=structure.nodes[path[Math.floor(middle)]],b=structure.nodes[path[Math.ceil(middle)]];
-      const px=(a.x+b.x)/2*width/24,py=(a.y+b.y)/2*width/24;
-      if(px<0 || px>width || py<0 || py>height) continue;
-      const value=`${Number((bar.length*Bridge.UNIT*100).toFixed(1))} cm`,w=value.length*6+10,h=18;
-      let x,y;
-      // 同位置的膠合木桿將標籤上下錯開，避免完全重疊。
-      // 窄畫布的上下空間不足時，向兩側排開並保留引線。
-      placement: for(let column=0;column<2*Math.ceil(width/(w+3))+1;column++) {
-        x=Math.max(1,Math.min(width-w-1,px-w/2+(column%2?1:-1)*Math.ceil(column/2)*(w+3)));
-        for(let slot=0;slot<16;slot++) {
-          y=Math.max(44,Math.min(height-h-1,py+(slot%2?7:-h-7)+(slot%2?1:-1)*Math.floor(slot/2)*(h+3)));
-          if(!labels.some(r=>x<r.x+r.w+2 && x+w+2>r.x && y<r.y+r.h+2 && y+h+2>r.y)) break placement;
-        }
-      }
-      labels.push({x,y,w,h,px,py,value,name});
-    }
-    return labels;
-  }
-  // 長度標籤布局結束
-  function updateLengthLabels(current) {
-    const labels=lengthLabels(current,canvas.clientWidth),container=$('wood-labels');
-    $('wood-label-leaders').setAttribute('d',labels.map(l=>`M${Math.max(l.x,Math.min(l.x+l.w,l.px))},${Math.max(l.y,Math.min(l.y+l.h,l.py))}L${l.px},${l.py}`).join(''));
-    while(container.children.length>labels.length) container.lastElementChild.remove();
-    labels.forEach((label,i)=>{
-      let element=container.children[i];
-      if(!element) {element=document.createElement('span');element.className='wood-length-label';container.append(element);}
-      if(element.textContent!==label.value) element.textContent=label.value;
-      element.setAttribute('aria-label',`${label.name}，${label.value}`);
-      element.style.left=`${label.x}px`;element.style.top=`${label.y}px`;element.style.width=`${label.w}px`;element.style.textAlign='center';
-    });
-  }
-  function draw() {
-    const current = model(), ratio = Math.min(window.devicePixelRatio || 1,2);
-    updateLengthLabels(current);
-    const width = Math.round(canvas.clientWidth*ratio), height = Math.round(canvas.clientWidth*7/12*ratio);
-    if (canvas.width !== width || canvas.height !== height) { canvas.width=width; canvas.height=height; }
-    ctx.setTransform(width/1200,0,0,height/700,0,0); ctx.clearRect(0,0,1200,700);
+  const background=document.createElement('canvas');
+  function drawBackground() {
     ctx.fillStyle='#edf5f7'; ctx.fillRect(0,0,1200,700);
     for (let x=200;x<=1000;x+=25) for (let y=50;y<=575;y+=25) {
       ctx.fillStyle=x%100===0&&y%100===0?'#abc4ce':'#c7dbe1'; ctx.beginPath(); ctx.arc(x,y,1.2,0,Math.PI*2); ctx.fill();
@@ -1072,6 +1056,16 @@ const Bridge = (() => {
     text('岸面承托',275,448,'#315950',13); text('岸面承托',925,448,'#315950',13);
     line({x:Bridge.CENTER_X,y:1},{x:Bridge.CENTER_X,y:10.9},'#72a9a2',1.5,[5,7]);
     text('負重中央線',Bridge.CENTER_X*50,37,'#176b67',14);
+  }
+  function draw() {
+    const current=model(),ratio=Math.min(window.devicePixelRatio || 1,2),canvasWidth=canvas.clientWidth;
+    const width=Math.round(canvasWidth*ratio),height=Math.round(canvasWidth*7/12*ratio);
+    if(canvas.width!==width || canvas.height!==height) {canvas.width=width;canvas.height=height;}
+    ctx.setTransform(width/1200,0,0,height/700,0,0);
+    if(background.width!==width || background.height!==height) {
+      drawBackground();background.width=width;background.height=height;
+      background.getContext('2d').drawImage(canvas,0,0);
+    } else ctx.drawImage(background,0,0,1200,700);
     if (simulation) for (const bar of design.bars) line(design.nodes[bar.a],design.nodes[bar.b],'#b8ccd3',1.5,[5,6]);
     for (const joint of current.joints) if(joint.kind==='glue') {
       const seam=link=>{const a=Bridge.barPoint(current,joint.a,link.ta),b=Bridge.barPoint(current,joint.b,link.tb);return{x:(a.x+b.x)/2,y:(a.y+b.y)/2};};
@@ -1088,8 +1082,6 @@ const Bridge = (() => {
     if(glueFirst>=0) {
       const bar=current.bars[glueFirst];line(current.nodes[bar.a],current.nodes[bar.b],'#d8aa34',16);
     }
-    const selected = current.bars[selectedBar];
-    if (selected && !selected.broken) timberLine(current,selected,'#176b67',15);
     for (const bar of current.bars) {
       if (bar.broken) continue;
       const stressed = simulation && bar.stress > .55;
@@ -1098,7 +1090,6 @@ const Bridge = (() => {
     }
     for (const fragment of current.fragments || []) {
       const a=current.nodes[fragment.path.at(-2)], b=current.nodes[fragment.b];
-      if (fragment.source === selectedBar) timberLine(current,fragment,'#176b67',14);
       timberLine(current,fragment,'#94633a',Bridge.WOOD_WIDTH*50); timberLine(current,fragment,'#d1a16a',Bridge.WOOD_WIDTH*50*.55);
       const length=Math.max(Bridge.distance(a,b),1e-8), ux=(b.x-a.x)/length, uy=(b.y-a.y)/length;
       ctx.beginPath();ctx.moveTo(b.x*50-uy*4,b.y*50+ux*4);ctx.lineTo(b.x*50+ux*2,b.y*50+uy*2);ctx.lineTo(b.x*50+uy*4,b.y*50-ux*4);ctx.strokeStyle='#9b432f';ctx.lineWidth=2;ctx.stroke();
@@ -1123,15 +1114,14 @@ const Bridge = (() => {
       ctx.beginPath();ctx.arc(p.x*50,p.y*50,8,0,Math.PI*2);ctx.fillStyle='#176b67';ctx.fill();
       text(joint.kind==='glue'?'=':'+',p.x*50,p.y*50+4,'#fff',13);
     }
-    const previewStart = tool === 'wood' && (pointerDown && hover && isDrag(pointerDown.point,hover,canvas.clientWidth) ? buildPoint(pointerDown.point) : start);
+    const previewStart = tool === 'wood' && (pointerDown && hover && isDrag(pointerDown.point,hover,canvasWidth) ? buildPoint(pointerDown.point) : start);
     if(!simulation && previewStart) {
       const end = hover ? buildPoint(hover) : previewStart, length=Bridge.distance(previewStart,end);
       line(previewStart,end,length>Bridge.MAX_LENGTH?'#c34e3c':'#176b67',4,[7,5]);
-      text(`${(length*Bridge.UNIT*100).toFixed(0)} cm`,(previewStart.x+end.x)*25,(previewStart.y+end.y)*25-16,'#176b67',15);
       ctx.beginPath();ctx.arc(previewStart.x*50,previewStart.y*50,10,0,Math.PI*2);ctx.strokeStyle='#176b67';ctx.lineWidth=2;ctx.stroke();
     }
     const cursorPoint=keyboardActive?keyboard:hover;
-    const target=tool==='load' && cursorPoint?Bridge.loadHit(current,cursorPoint,Math.max(.2,12*24/canvas.clientWidth)):null;
+    const target=tool==='load' && cursorPoint?Bridge.loadHit(current,cursorPoint,Math.max(.2,12*24/canvasWidth)):null;
     let cursor=keyboardActive ? keyboard : hover && !simulation ? snap(hover) : null;
     if(tool==='load') cursor=target ? Bridge.barPoint(current,target.bar,target.t) : null;
     else if(!simulation && cursorPoint && (tool==='wood' || (tool==='edit' && !keyboardActive))) {
@@ -1146,12 +1136,12 @@ const Bridge = (() => {
   for(const id of toolNames) $(id).addEventListener('click',()=>setTool(id));
   $('undo').addEventListener('click',()=>{
     if(!history.length || simulation) return;
-    cancelPointer();const previous=history.pop();design=previous.design;selectedLoad=previous.selectedLoad;start=null;selectedBar=-1;editNode=-1;glueFirst=-1;
+    cancelPointer();const previous=history.pop();design=previous.design;selectedLoad=previous.selectedLoad;start=null;editNode=-1;glueFirst=-1;
     if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
     tell('已復原上一步。');update();draw();
   });
   for(const id of ['clear','example']) $(id).addEventListener('click',()=>{
-    cancelPointer();remember();design=id==='clear'?Bridge.empty():Bridge.sample();selectedLoad=design.nodes.findIndex(n=>n.load);start=null;selectedBar=-1;
+    cancelPointer();remember();design=id==='clear'?Bridge.empty():Bridge.sample();selectedLoad=design.nodes.findIndex(n=>n.load);start=null;
     if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
     setTool('wood');tell(id==='clear'?'已清空。由岸上開始搭橋；可按「復原」取回設計。':'已載入範例橋，按「開始測試」觀察。');update();draw();
   });
@@ -1197,7 +1187,6 @@ const Bridge = (() => {
     canvas.focus({preventScroll:true});keyboardActive=false;
     pointerDown={point:pointFrom(event),id:event.pointerId};
     canvas.setPointerCapture(event.pointerId);
-    selectedBar=nearestBar(pointerDown.point);draw();
     if(tool==='edit' && !simulation) {
       editNode=nearestNode(pointerDown.point);
       if(editNode>=0) {pointerDown.before=Bridge.clone(design);tell('拖動端點；相連木桿會一起更新。');}
