@@ -1,0 +1,1278 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="用木桿搭橋，在河口中央線掛上重物，測試橋樑的變形與斷裂。">
+  <title>木橋實驗室 · STEAM</title>
+  <style>
+    :root { color-scheme:light; --sky:#edf5f7; --ink:#183642; --muted:#526b76; --wood:#ba8450; --teal:#176b67; --red:#c34e3c; --line:#cfdee2; --white:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--sky); color:var(--ink); font-family:"Microsoft JhengHei","PingFang TC",system-ui,sans-serif; line-height:1.6; }
+    button,input { font:inherit; }
+    button,a,input { -webkit-tap-highlight-color:transparent; }
+    button { min-height:44px; padding:9px 15px; border:1px solid var(--line); border-radius:7px; background:var(--white); color:var(--ink); cursor:pointer; font-weight:700; }
+    button:hover:not(:disabled) { border-color:var(--teal); background:#f2f9f8; }
+    button:disabled { opacity:.4; cursor:default; }
+    :focus-visible { outline:3px solid var(--teal); outline-offset:4px; }
+    a { color:var(--teal); text-underline-offset:4px; }
+    main { max-width:1480px; margin:auto; padding:24px 32px 20px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:23px; }
+    .brand { display:flex; align-items:center; gap:15px; }
+    .brand svg { width:48px; height:48px; }
+    h1 { font-size:27px; letter-spacing:.06em; margin:0; line-height:1.4; }
+    .subtitle { margin:2px 0 0; color:var(--muted); font-size:13px; }
+    .back { font-size:13px; white-space:nowrap; }
+    .workbench { display:grid; grid-template-columns:minmax(0,1fr) 270px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--white); }
+    .workarea { min-width:0; }
+    .toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); }
+    .tools,.edit-actions { display:flex; gap:7px; }
+    .tools { flex-wrap:wrap; }
+    .tools button { display:flex; align-items:center; gap:7px; }
+    .tools button[aria-pressed="true"] { background:var(--teal); color:white; border-color:var(--teal); }
+    .tool-icon { font-size:20px; line-height:1; }
+    .edit-actions button { font-size:13px; padding-inline:11px; }
+    .stage { position:relative; background:var(--sky); }
+    canvas { display:block; width:100%; aspect-ratio:12/7; touch-action:none; cursor:crosshair; }
+    .stage-label { position:absolute; top:20px; left:22px; pointer-events:none; color:var(--muted); font-size:12px; letter-spacing:.08em; }
+    .stage-label strong { display:block; color:var(--ink); font-size:14px; letter-spacing:.02em; }
+    #wood-labels { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+    .label-leaders { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+    .wood-length-label { position:absolute; padding:1px 4px; border:1px solid #cfdee2; border-radius:3px; background:rgba(255,255,255,.94); color:#365864; font-size:10px; line-height:14px; white-space:nowrap; }
+    .legend { display:flex; flex-wrap:wrap; align-items:center; gap:18px; padding:12px 20px; font-size:12px; color:var(--muted); border-top:1px solid var(--line); }
+    .legend span { display:flex; align-items:center; gap:6px; }
+    .materials { padding:18px 20px; border-top:1px solid var(--line); }
+    .materials table { width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums; }
+    .materials caption { text-align:left; font-size:14px; font-weight:700; margin-bottom:10px; }
+    .materials th,.materials td { padding:8px 6px; border-bottom:1px solid var(--line); text-align:right; }
+    .materials th:first-child { text-align:left; }
+    .materials thead { background:#f2f9f8; }
+    .materials tbody th { font-weight:400; }
+    .materials tbody th,.materials tbody td { white-space:nowrap; }
+    .materials tfoot { font-weight:700; }
+    .materials p { margin:10px 0 0; }
+    .swatch { display:inline-block; width:18px; height:5px; border-radius:3px; background:var(--wood); }
+    .swatch.high { background:var(--red); }
+    aside { display:flex; flex-direction:column; gap:21px; padding:23px 21px; border-left:1px solid var(--line); }
+    h2 { margin:0 0 12px; font-size:14px; }
+    .material { display:flex; gap:13px; align-items:center; }
+    .timber { width:52px; height:18px; border:2px solid #94633a; border-radius:3px; background:repeating-linear-gradient(0deg,#ba8450 0 4px,#d09b64 4px 6px); transform:rotate(-25deg); }
+    .material p { margin:0; font-size:13px; }
+    .small { font-size:12px; color:var(--muted); }
+    .rule { border-top:1px solid var(--line); padding-top:18px; }
+    .load-heading { display:flex; justify-content:space-between; align-items:center; }
+    .load-heading h2 { margin:0; }
+    .load-value { margin:10px 0 8px; font-family:Georgia,"Times New Roman",serif; font-size:40px; line-height:1.1; font-variant-numeric:tabular-nums; }
+    .load-value small { font:14px "Microsoft JhengHei",sans-serif; color:var(--muted); }
+    input[type="range"] { width:100%; accent-color:var(--teal); height:28px; cursor:pointer; }
+    .range-labels { display:flex; justify-content:space-between; color:var(--muted); font-size:11px; }
+    #load-target { margin:10px 0 0; min-height:38px; }
+    .primary { background:var(--teal); color:white; border-color:var(--teal); width:100%; }
+    .primary:hover:not(:disabled) { background:#105854; color:white; }
+    #reset,#auto-load { width:100%; margin-top:8px; }
+    .slow-control { display:flex; gap:8px; align-items:center; min-height:40px; margin-top:5px; font-size:13px; }
+    .slow-control input { width:17px; height:17px; accent-color:var(--teal); }
+    .readouts { margin:0; display:grid; grid-template-columns:1fr auto; gap:9px; font-size:13px; }
+    .readouts dt { color:var(--muted); }
+    .readouts dd { margin:0; font-variant-numeric:tabular-nums; font-weight:700; }
+    #status { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; margin:0 0 13px; }
+    #status::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--teal); }
+    #status.failed { color:var(--red); }
+    #status.failed::before { background:var(--red); }
+    .instruction { margin:0; color:var(--muted); font-size:12px; }
+    .help { display:grid; grid-template-columns:1fr auto; gap:18px; padding:16px 2px 0; align-items:start; }
+    #message { margin:0; font-size:14px; min-height:24px; }
+    details { font-size:12px; color:var(--muted); max-width:490px; }
+    summary { cursor:pointer; text-align:right; }
+    details p { margin:8px 0; }
+    .calibration { margin-top:14px; }
+    .calibration summary { text-align:left; }
+    .calibration label { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:8px; }
+    .calibration input { width:78px; min-height:34px; border:1px solid var(--line); border-radius:4px; padding:3px 6px; }
+    kbd { font:11px monospace; padding:1px 4px; border:1px solid var(--line); border-radius:3px; }
+    @media(max-width:1000px) { main { padding:18px; } .workbench { grid-template-columns:minmax(0,1fr) 230px; } aside { padding:18px 15px; gap:17px; } .toolbar { padding:12px; } .tools button { padding-inline:10px; } }
+    @media(max-width:760px) { main { padding:16px 12px; } header { margin-bottom:17px; gap:12px; } h1 { font-size:22px; } .brand { gap:9px; min-width:0; } .brand svg { width:36px; flex-shrink:0; } .back { max-width:76px; white-space:normal; flex-shrink:0; text-align:right; font-size:11px; } .subtitle { font-size:11px; } .workbench { grid-template-columns:1fr; } aside { border-left:0; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:20px; } aside .rule { padding-top:0; border-top:0; } .material-section { grid-column:1/-1; } .test-section { align-self:center; } .instruction { grid-column:1/-1; } .help { grid-template-columns:1fr; gap:8px; } summary { text-align:left; } .stage-label { top:12px; left:14px; font-size:10px; } .stage-label strong { font-size:12px; } .legend { gap:12px; padding:10px 12px; } }
+    @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="10" fill="#176b67"/><path d="M7 33H41M8 33L16 16L24 33L32 16L40 33M16 16H32" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/><circle cx="24" cy="33" r="3" fill="#ba8450"/></svg>
+      <div><h1>木橋實驗室</h1><p class="subtitle">F3 · 木工結構與力 / 搭一座撐得住的橋</p></div>
+    </div>
+    <a class="back" href="../index.html">← STEAM 實驗室</a>
+  </header>
+  <div class="workbench">
+    <section class="workarea" aria-label="搭橋工作台">
+      <div class="toolbar">
+        <div class="tools" role="group" aria-label="建造工具">
+          <button id="wood" aria-pressed="true"><span class="tool-icon" aria-hidden="true">╱</span>木桿</button>
+          <button id="edit" aria-pressed="false"><span class="tool-icon" aria-hidden="true">↔</span>修改</button>
+          <button id="join" aria-pressed="false"><span class="tool-icon" aria-hidden="true">⊕</span>接合</button>
+          <button id="glue" aria-pressed="false"><span class="tool-icon" aria-hidden="true">▤</span>膠水</button>
+          <button id="reinforce" aria-pressed="false"><span class="tool-icon" aria-hidden="true">＋</span>加固</button>
+          <button id="load" aria-pressed="false"><span class="tool-icon" aria-hidden="true">↓</span>負重</button>
+          <button id="erase" aria-pressed="false"><span class="tool-icon" aria-hidden="true">×</span>移除</button>
+        </div>
+        <div class="edit-actions"><button id="undo" disabled aria-label="復原上一步">↶ 復原</button><button id="clear">清空</button><button id="example">範例橋</button></div>
+      </div>
+      <div class="stage">
+        <div class="stage-label"><strong>跨越 95 cm</strong>地面承托 · 可滑動、可離地</div>
+        <canvas id="bridge" width="1200" height="700" tabindex="0" role="application" aria-label="木橋搭建區" aria-describedby="keyboard-help message">木橋搭建區：用方向鍵移動游標，Enter 操作，Escape 取消。負重工具只可在河口中央線與木桿的交點掛重物。</canvas>
+        <svg class="label-leaders" aria-hidden="true"><path id="wood-label-leaders" fill="none" stroke="#9ab4bd" stroke-width="0.8"/></svg>
+        <div id="wood-labels" role="group" aria-label="木桿長度"></div>
+      </div>
+      <div class="legend"><span><i class="swatch"></i>木桿</span><span><i class="swatch high"></i>接近斷裂</span><span>● 接合　▤ 膠合</span><span>每小格 5 cm</span><span>虛線：原設計</span></div>
+      <section class="materials" aria-label="木橋材料計算">
+        <table>
+          <caption>材料計算 · 正視圖（單面）</caption>
+          <thead><tr><th scope="col">部位</th><th scope="col">單條長度（cm）</th><th scope="col">數量</th><th scope="col">小計（cm）</th></tr></thead>
+          <tbody id="material-rows"></tbody>
+          <tfoot><tr><th colspan="3" scope="row">單面木條總長</th><td id="material-total">—</td></tr><tr><th colspan="3" scope="row">正反兩面（同樣設計 × 2）</th><td id="material-both">—</td></tr></tfoot>
+        </table>
+        <p class="small">斜邊長度 = √（水平距離² ＋ 垂直距離²）。各列為單條長度 × 數量；長度顯示至小數兩位，小計至一位，合計按未取整的原長計算。測試變形不改變材料用量。</p>
+        <p class="small">工作紙把 8 條斜桿約作 18 cm，單面合計 515 cm；此表使用實際幾何長度。畫布及 20 m 上限按單面計，正反兩面用量未計橫向連接木材。</p>
+      </section>
+    </section>
+    <aside aria-label="測試控制">
+      <section class="material-section"><h2>建造材料</h2><div class="material"><div class="timber" aria-hidden="true"></div><p><strong>6 × 6 mm 輕木（Balsa）</strong><br><span class="small">每條最長 100 cm · 總共 20 m</span></p></div>
+        <details class="calibration"><summary>輕木（Balsa）· 材料校準</summary>
+          <p>預設為中密度乾燥輕木，木紋沿桿長。密度取 160 kg/m³；彈性模數、順紋抗壓及抗彎強度參照<a href="https://doi.org/10.1007/s00107-015-0983-0" target="_blank" rel="noopener">輕木試驗研究</a>的中密度組，取整數作教學參考。</p>
+          <p>順紋抗拉 25 MPa 是待實測的教學估算，該研究未提供抗拉數值。各批木材差異大，可按實測校準；返回建造後生效。</p>
+          <label>彈性模數 GPa <input id="mat-young" type="number" min="0.1" max="30" step="0.1" value="2" required></label>
+          <label>密度 kg/m³ <input id="mat-density" type="number" min="50" max="1500" step="1" value="160" required></label>
+          <label>順紋抗拉 MPa（估算）<input id="mat-tension" type="number" min="1" max="200" step="1" value="25" required></label>
+          <label>順紋抗壓 MPa <input id="mat-compression" type="number" min="1" max="200" step="1" value="9" required></label>
+          <label>抗彎強度 MPa <input id="mat-bending" type="number" min="1" max="200" step="1" value="16" required></label>
+        </details>
+      </section>
+      <section class="rule">
+        <div class="load-heading"><h2><label for="weight">中央線負重</label></h2><span aria-hidden="true">↓</span></div>
+        <div class="load-value"><output id="weight-value" for="weight">2</output> <small>kg</small></div>
+        <input id="weight" type="range" min="0" max="20" step="0.01" value="2">
+        <div class="range-labels"><span>0 kg</span><span>20 kg</span></div>
+        <p id="load-target" class="small">已選中央節點，可直接調整負重。</p>
+      </section>
+      <section class="test-section rule"><button id="test" class="primary">▶ 開始測試</button><button id="auto-load" aria-pressed="false">連續加重測試</button><label class="slow-control"><input id="slow" type="checkbox">慢速播放（¼ 速）</label><button id="reset" disabled>↶ 返回建造</button></section>
+      <section class="rule"><p id="status" role="status">建造中</p><dl class="readouts"><dt>木桿數量</dt><dd id="bar-count">18</dd><dt>木材用量</dt><dd id="wood-used">— / 20 m</dd><dt>中段接合／膠合</dt><dd id="joint-count">0 / 0</dd><dt>總負重</dt><dd id="total-load">2 kg</dd><dt>最大下移</dt><dd id="deflection">—</dd><dt>已斷木桿</dt><dd id="broken-count">0</dd><dt>首斷總負重</dt><dd id="first-break">—</dd></dl></section>
+      <p class="instruction">選「加固」點木桿，即可複製並貼合。選「負重」點中央虛線與木桿的交點掛重物，點已有重物可調整重量。掛上後隨木桿移動。</p>
+    </aside>
+  </div>
+  <div class="help">
+    <p id="message" role="status">點兩個位置或拖拉放木桿；先對齊方格，靠近木桿時沿桿移動，接近端點時吸附端點。中段接觸需按「接合」。按 Esc 取消。</p>
+    <details><summary>操作與模型說明</summary>
+      <p>預設及「範例橋」採用工作紙橋形：100 cm 橋底兩條膠合、80 cm 橋頂一條、13 cm 直桿七條，以及八條斜桿。橋頂分成六個等寬格，斜桿向中央下方排列；外側斜桿約 16.4 cm、內側約 18.6 cm。水平長梁保持完整，中段接點不會把長梁切成獨立木條。橋身高度按主橋底至橋頂的中心線計算。</p>
+      <p id="keyboard-help">點起點、終點，或直接拖拉放木桿。位置先對齊 5 cm 方格；靠近已有木桿時，把方格位置投影到桿身，沿桿移動。接近任一木桿端點時優先吸附該端點，即使端點不在方格上。按木桿可作為新木桿的起點，中段接觸需按「接合」才連接。每條木桿旁的小標籤常駐顯示原長，修改端點時更新；測試彎曲不改變標示原長，斷裂後改為顯示各碎段長度。每條最多 100 cm，全部木材合計最多 20 m；重疊及膠合的木材也分別計算。刪除或縮短木桿可退回用量。</p>
+      <p>選「加固」再點木桿，自動複製同長木桿並在旁邊貼合，不複製重物。優先向上或側面堆疊，避開地面；空間或剩餘木材不足時取消。可以重複加固，也可以按「復原」。手動放木桿及「膠水」工具仍可使用。</p>
+      <p>共用端點本來已相連；木桿交叉或端點碰到桿身時，選「接合」再點接觸處才會接合，容許相對轉動。整條長木桿保持完整。選「膠水」依次點兩條平行、相隔最多一格且重疊至少 5 cm 的木桿，會先靠攏至表面貼合，再固定相對滑動和轉動。接地木桿優先保持原位，其餘情況以第一條為準；若現有接合阻止靠攏，整次操作會取消。「移除」點重物可卸下，點接合圓點或膠合區中央可解除連接，其餘位置可移除木桿。</p>
+      <p>選「修改」拖動端點，相連木桿及重物一起更新；膠合組合會保持木材長度，解除膠合後才可改形。超出木材用量、端點重疊、移入地面或無法維持接合時，修改會取消。建造操作可復原。新負重只可掛在河口中央垂直線（距兩岸各 47.5 cm）與木桿或碎段的交點；掛上後隨木桿移動，不限制水平運動。已有重物可繼續調整重量；卸下後若位置已離開中央線，須重新選中央交點。最多 150 個中段負重位置，卸下後可重用。連續加重以每秒 0.5 kg 平滑增加，首斷或達 20 kg 時停止加重，慢速模式同步放慢。</p>
+      <p>鍵盤：Tab 選取搭建區，方向鍵移動游標，Enter 操作。「修改」模式中，Enter 選端點後用方向鍵移動，Esc 結束修改或取消未完成操作。「返回建造」還原測試前的橋形，保留設定的負重。</p>
+      <p>兩岸淨距 95 cm，橋樑自由放在岸上，沒有固定鉸點。地面承托木桿的模擬點並提供有限摩擦力。木桿內部能彎曲；端點和手動接合仍可轉動。膠合木桿沿桿身一起彎曲，加固後下彎通常較少。最大下移包含木桿中段。</p>
+      <p>拉伸、壓縮和彎曲應力合併超出強度時，木桿在最先失效的模擬截面切成兩段；保留當時的形狀與速度，斷口獨立移動，重物及接點跟隨所屬碎段。膠合可透過另一條完整木材繼續連接碎段。「首斷總負重」記錄第一次木桿斷裂時所有重物的合計。</p>
+      <p>輕木截面固定為 6 × 6 mm，自重、拉伸剛度 EA 及彎曲剛度 EI 由同一組材料數值計算。預設密度下每米木材重 5.76 g。實際下彎以原比例顯示，沒有視覺放大。平面離散梁使用 <a href="https://mmacklin.com/xpbd.pdf" target="_blank" rel="noopener">XPBD</a> 全域求解；驗證採用 <a href="https://research.fs.usda.gov/treesearch/62251" target="_blank" rel="noopener">Wood Handbook 梁公式</a>。</p>
+      <p>這是二維近似，並非真實承重認證。預設為輕木參考值，並非這批木材的實測值；密度、含水量、木紋方向及缺陷會影響實際表現。普通接合視為鉸接；膠合視為完全黏結、傳遞滑動與轉動的約束。地面摩擦係數假設為 0.6。不計三維扭轉、木材缺陷、桿身互撞、膠水剝離和碎段再次斷裂。木桿每段最多 10 cm，以細分節點承托；接近岸邊的局部接觸和斷裂位置仍有離散誤差。</p>
+    </details>
+  </div>
+</main>
+<script id="bridge-model">
+const Bridge = (() => {
+  // 座標每單位為 10 cm；力與質量使用 N、kg。
+  const UNIT = .1, DT = 1 / 240, MAX_LENGTH = 10, MAX_TOTAL = 20, WOOD_WIDTH = .06;
+  // 中密度乾燥 Balsa，木紋沿桿長；全部力學量採 SI 制。
+  // E、順紋抗壓、MOR 取整自 Kotlarewski 等（2016）中密度組，ρ 選 120–180 kg/m³ 級內的 160。
+  // https://doi.org/10.1007/s00107-015-0983-0；順紋抗拉 25 MPa 是獨立教學估算，非該研究實測或 MOR。
+  const MATERIAL={young:2e9,density:160,tension:25e6,compression:9e6,bending:16e6};
+  const SIDE=.006, AREA=SIDE*SIDE, INERTIA=SIDE**4/12;
+  const LEFT_EDGE = 7.25, RIGHT_EDGE = 16.75, GROUND = 8;
+  const CENTER_X=(LEFT_EDGE+RIGHT_EDGE)/2;
+  const canAddLoad=node=>!!node && (node.load>0 || Math.abs(node.x-CENTER_X)<1e-6);
+  const GROUND_FRICTION = 0.6; // 遊戲用摩擦係數，實物需按接觸表面校準。
+  const distance = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const totalLength = design => design.bars.reduce((sum,bar) => sum+bar.length*UNIT,0);
+  function materialRows(design) {
+    const horizontal=design.bars.filter(b=>Math.abs(design.nodes[b.a].y-design.nodes[b.b].y)<1e-6).sort((a,b)=>design.nodes[b.a].y-design.nodes[a.a].y);
+    const bands=[],kinds=new Map(),rows=new Map();
+    // 相鄰 6 mm 的水平層歸入同一組，讓重複加固仍計入橋底或橋頂。
+    for(const bar of horizontal) {
+      const y=design.nodes[bar.a].y,last=bands.at(-1);
+      if(!last || last.y-y>WOOD_WIDTH+1e-6) bands.push({y,bars:[bar]});
+      else {last.y=y;last.bars.push(bar);}
+    }
+    bands.forEach((band,i)=>band.bars.forEach(bar=>kinds.set(bar,i===0?0:i===bands.length-1?1:4)));
+    for(const bar of design.bars) {
+      const a=design.nodes[bar.a],b=design.nodes[bar.b],kind=kinds.get(bar)??(Math.abs(a.x-b.x)<1e-6?2:3);
+      const key=`${kind}:${bar.length.toFixed(6)}`;
+      if(!rows.has(key)) rows.set(key,{kind,length:bar.length*UNIT*100,count:0,total:0});
+      const row=rows.get(key);row.count++;row.total+=bar.length*UNIT*100;
+    }
+    return [...rows.values()].sort((a,b)=>a.kind-b.kind || a.length-b.length);
+  }
+  function empty() {
+    return { nodes:[], bars:[], joints:[] };
+  }
+  function positionError(point) {
+    if (![point.x,point.y].every(Number.isFinite)) return '端點座標無效。';
+    if (point.x < 4-1e-6 || point.x > 20+1e-6 || point.y < 1-1e-6 || point.y > 11.5+1e-6) return '請在方格範圍內搭橋。';
+    if ((point.x <= LEFT_EDGE || point.x >= RIGHT_EDGE) && point.y > GROUND+1e-6) return '木桿端點不能放在岸邊地面以下。';
+    return '';
+  }
+  const cross = (a,b) => a.x*b.y-a.y*b.x;
+  const subtract = (a,b) => ({x:a.x-b.x,y:a.y-b.y});
+  function barPoint(design,index,t) {
+    const point={x:0,y:0};
+    for(const [i,w] of attachment(design,index,t)) {point.x+=design.nodes[i].x*w;point.y+=design.nodes[i].y*w;}
+    return point;
+  }
+  function attachment(structure,index,t) {
+    let bar=structure.bars[index];
+    if(bar.broken) {const cut=bar.cutT;bar=structure.fragments[bar.fragmentStart+(t<=cut?0:1)];t=t<=cut?t/cut:(1-t)/(1-cut);}
+    const path=bar.path || [bar.a,bar.b], scaled=Math.max(0,Math.min(1,t))*(path.length-1), segment=Math.min(path.length-2,Math.floor(scaled)),u=scaled-segment;
+    return [[path[segment],1-u],[path[segment+1],u]];
+  }
+  function tangentTerms(structure,index,t) {
+    let bar=structure.bars[index],direction=1;
+    if(bar.broken) {const cut=bar.cutT;direction=t<=cut?1:-1;bar=structure.fragments[bar.fragmentStart+(t<=cut?0:1)];t=t<=cut?t/cut:(1-t)/(1-cut);}
+    const path=bar.path || [bar.a,bar.b],n=path.length-1,s=Math.max(0,Math.min(1,t))*n,i=Math.min(n-1,Math.floor(s)),weights=new Map();
+    for(const [k,w] of [[i,1-(s-i)],[i+1,s-i]]) {
+      const lo=Math.max(0,k-1),hi=Math.min(n,k+1),scale=direction*w/(hi-lo);
+      weights.set(path[lo],(weights.get(path[lo])||0)-scale);
+      weights.set(path[hi],(weights.get(path[hi])||0)+scale);
+    }
+    return [...weights].filter(([,w])=>Math.abs(w)>1e-12);
+  }
+  function syncLoadPoints(design) {
+    for(const node of design.nodes) if(node.attachment) Object.assign(node,barPoint(design,node.attachment.bar,node.attachment.t));
+  }
+  function placeLoad(design,sim,bar,t,weight) {
+    if(!design.bars[bar] || !Number.isFinite(t) || t<0 || t>1 || !Number.isFinite(weight) || weight<0 || weight>20) return -1;
+    const timber=design.bars[bar];
+    let index=t<=1e-6?timber.a:t>=1-1e-6?timber.b:design.nodes.findIndex(n=>n.attachment?.bar===bar && Math.abs(n.attachment.t-t)*timber.length<1e-6 && (!sim?.bars[bar].broken || (n.attachment.t<=sim.bars[bar].cutT)===(t<=sim.bars[bar].cutT)));
+    if(index<0) {
+      index=design.nodes.findIndex(n=>n.attachment && n.load===0);
+      const adding=index<0;
+      if(adding && design.nodes.filter(n=>n.attachment).length>=150) return -1;
+      if(adding) index=design.nodes.length;
+      const node={...barPoint(design,bar,t),load:weight,attachment:{bar,t}};
+      if(sim) {
+        const location=barPoint(sim,bar,t),terms=attachment(sim,bar,t);
+        const vx=terms.reduce((sum,[i,w])=>sum+sim.nodes[i].vx*w,0),vy=terms.reduce((sum,[i,w])=>sum+sim.nodes[i].vy*w,0);
+        // 設計節點保持在碎段節點之前，讓新增負重後的選取與復原索引一致。
+        const dynamic={...clone(node),...location,initialY:node.y,vx,vy,fx:0,fy:0,baseMass:0};
+        if(adding) {
+          for(const piece of [...sim.bars,...sim.fragments]) {
+            if(piece.a>=index) piece.a++;if(piece.b>=index) piece.b++;
+            if(piece.path) piece.path=piece.path.map(i=>i>=index?i+1:i);
+          }
+          sim.nodes.splice(index,0,dynamic);
+        } else sim.nodes[index]=dynamic;
+      }
+      if(adding) design.nodes.push(node); else design.nodes[index]=node;
+      if(sim) rebuildConstraints(sim);
+    }
+    design.nodes[index].load=weight;
+    if(sim) sim.nodes[index].load=weight;
+    return index;
+  }
+  function overlap(design,a,b) {
+    const p=barPoint(design,a,0), q=barPoint(design,b,0);
+    const r=subtract(barPoint(design,a,1),p), s=subtract(barPoint(design,b,1),q);
+    const length=Math.hypot(r.x,r.y), otherLength=Math.hypot(s.x,s.y);
+    if (Math.abs(cross(r,s))>1e-6*length*otherLength) return null;
+    const dot=v => (v.x*r.x+v.y*r.y)/(length*length);
+    const start=dot(subtract(q,p)), extent=dot(s);
+    const low=Math.max(0,Math.min(start,start+extent)), high=Math.min(1,Math.max(start,start+extent));
+    if (high-low<1e-6) return null;
+    return {low,high,start,extent,gap:Math.abs(cross(subtract(q,p),r))/length};
+  }
+  function contact(design,a,b) {
+    const first=design.bars[a], second=design.bars[b];
+    if ([first.a,first.b].some(i=>i===second.a || i===second.b)) return null;
+    const p=barPoint(design,a,0), q=barPoint(design,b,0);
+    const r=subtract(barPoint(design,a,1),p), s=subtract(barPoint(design,b,1),q), delta=subtract(q,p), det=cross(r,s);
+    let ta,tb;
+    if (Math.abs(det)<1e-8) {
+      const region=overlap(design,a,b);
+      if (!region || region.gap>1e-6) return null;
+      ta=(region.low+region.high)/2;tb=(ta-region.start)/region.extent;
+    } else {ta=cross(delta,s)/det;tb=cross(delta,r)/det;}
+    if (ta<-1e-6 || ta>1+1e-6 || tb<-1e-6 || tb>1+1e-6) return null;
+    return {a,b,kind:'pin',links:[{ta:Math.max(0,Math.min(1,ta)),tb:Math.max(0,Math.min(1,tb)),rest:0}]};
+  }
+  function connectTouching(design,point=null,radius=.3) {
+    let count=0;
+    const candidates=[], parent=new Map();
+    const key=(bar,t)=>t<1e-6?`n${design.bars[bar].a}`:t>1-1e-6?`n${design.bars[bar].b}`:`b${bar}:${Math.round(t*1e6)}`;
+    function root(value) {
+      if(!parent.has(value)) parent.set(value,value);
+      if(parent.get(value)!==value) parent.set(value,root(parent.get(value)));
+      return parent.get(value);
+    }
+    function union(a,b) {a=root(a);b=root(b);if(a===b) return false;parent.set(a,b);return true;}
+    for(const joint of design.joints) for(const link of joint.links) {
+      if(link.rest<1e-8) union(key(joint.a,link.ta),key(joint.b,link.tb));
+    }
+    for (let a=0;a<design.bars.length;a++) for (let b=a+1;b<design.bars.length;b++) {
+      if (design.joints.some(j=>j.a===a && j.b===b)) continue;
+      const joint=contact(design,a,b);
+      if (!joint || (point && distance(barPoint(design,a,joint.links[0].ta),point)>radius)) continue;
+      candidates.push(joint);
+    }
+    // 同點的多根木桿只需一條連接鏈，避免兩兩重複約束及集中在單一木桿。
+    candidates.sort((a,b)=>(a.b-a.a)-(b.b-b.a));
+    for(const joint of candidates) {
+      const link=joint.links[0];
+      if(union(key(joint.a,link.ta),key(joint.b,link.tb))) {design.joints.push(joint);count++;}
+    }
+    return count;
+  }
+  function glueBars(design,first,second) {
+    if (!design.bars[first] || !design.bars[second] || first===second) return '請選兩條不同的木桿。';
+    const a=Math.min(first,second), b=Math.max(first,second), region=overlap(design,a,b);
+    if (!region || region.gap>.5+1e-8 || (region.high-region.low)*design.bars[a].length<.49) return '請選平行、相距不超過 5 cm，且重疊至少 5 cm 的兩條木桿。';
+    if (design.joints.some(j=>j.a===a && j.b===b && j.kind==='glue')) return '這兩條木桿已膠合。';
+    const onGround=i=>[design.bars[i].a,design.bars[i].b].some(n=>Math.abs(design.nodes[n].y-GROUND)<1e-6 && (design.nodes[n].x<=LEFT_EDGE || design.nodes[n].x>=RIGHT_EDGE));
+    if(onGround(second) && !onGround(first)) [first,second]=[second,first];
+    const candidate=clone(design), fixed=design.bars[first], moving=candidate.bars[second];
+    if([fixed.a,fixed.b].some(i=>i===moving.a || i===moving.b)) return '兩條木桿共用端點，無法分別靠攏；請先放成獨立的並排木桿。';
+    const p=barPoint(candidate,first,0),end=barPoint(candidate,first,1),q=barPoint(candidate,second,0),length=distance(p,end);
+    const nx=-(end.y-p.y)/length,ny=(end.x-p.x)/length,signed=(q.x-p.x)*nx+(q.y-p.y)*ny;
+    const side=Math.abs(signed)>1e-8?Math.sign(signed):(ny>0?-1:1),shift=side*WOOD_WIDTH-signed;
+    for(const i of [moving.a,moving.b]) {candidate.nodes[i].x+=nx*shift;candidate.nodes[i].y+=ny*shift;}
+    const links=[];
+    for (const ta of [region.low,region.high]) for (const along of [region.low,region.high]) {
+      const tb=(along-region.start)/region.extent;
+      links.push({ta,tb,rest:distance(barPoint(candidate,a,ta),barPoint(candidate,b,tb))});
+    }
+    candidate.joints=candidate.joints.filter(j=>j.a!==a || j.b!==b);
+    const direction=subtract(barPoint(candidate,a,1),barPoint(candidate,a,0));
+    const offset=subtract(barPoint(candidate,b,links[0].tb),barPoint(candidate,a,links[0].ta));
+    candidate.joints.push({a,b,kind:'glue',side:Math.sign(cross(direction,offset)),links});
+    if(!fitConnections(candidate,new Set([fixed.a,fixed.b]),true)) return '現有結構無法靠攏貼合；請先解除限制移動的接合。';
+    syncLoadPoints(candidate);
+    if(candidate.nodes.some(node=>!node.attachment && positionError(node))) return '貼合會把木桿移出範圍或推入地面，已取消膠合。';
+    candidate.nodes.forEach((node,i)=>Object.assign(design.nodes[i],node));
+    design.joints=candidate.joints;
+    return '';
+  }
+  function connectionLinks(structure,editing=false,preserveAll=false) {
+    const constraints=[], glued=new Set();
+    function add(a,b,link,extra={}) {
+      const weights=new Map();
+      for (const [index,w] of attachment(structure,a,link.ta)) weights.set(index,(weights.get(index)||0)-w);
+      for (const [index,w] of attachment(structure,b,link.tb)) weights.set(index,(weights.get(index)||0)+w);
+      const terms=[...weights].filter(([,w])=>Math.abs(w)>1e-10);
+      if (terms.length) constraints.push({kind:link.rest>1e-8?'length':'pin',terms,rest:link.rest,compliance:0,...extra});
+    }
+    for (const joint of structure.joints) {
+      if(joint.kind==='glue') {
+        // 完全黏結的接觸面跟隨截面法線，允許兩條木材共同軸向伸縮與彎曲。
+        const first=joint.links[0],last=joint.links.at(-1),span=last.ta-first.ta;
+        const atB=t=>first.tb+(t-first.ta)/span*(last.tb-first.tb);
+        const stations=new Set([first.ta,last.ta]);
+        for(const [index,isFirst] of [[joint.a,true],[joint.b,false]]) {
+          const count=(structure.bars[index].path || [0,1]).length-1;
+          for(let i=0;i<=count;i++) {
+            const t=isFirst?i/count:first.ta+(i/count-first.tb)/(last.tb-first.tb)*span;
+            if(t>first.ta && t<last.ta) stations.add(t);
+          }
+          if(structure.bars[index].broken) {
+            const materialCut=structure.bars[index].cutT;
+            const cut=isFirst ? materialCut : first.ta+(materialCut-first.tb)/(last.tb-first.tb)*span;
+            if(cut>=first.ta-1e-8 && cut<=last.ta+1e-8) {
+              for(const t of stations) if(Math.abs(t-cut)<1e-8) stations.delete(t);
+              if(cut>first.ta+1e-8) stations.add(cut-1e-9);
+              if(cut<last.ta-1e-8) stations.add(cut+1e-9);
+            }
+          }
+        }
+        for(const ta of [...stations].sort((a,b)=>a-b)) {
+          add(joint.a,joint.b,{ta,tb:atB(ta),rest:0},{kind:'weld',tangent:tangentTerms(structure,joint.a,ta),offset:(joint.side || 1)*SIDE});
+        }
+      } else for (const link of joint.links) add(joint.a,joint.b,link);
+      if (joint.kind==='glue') {glued.add(joint.a);glued.add(joint.b);}
+    }
+    if(!editing) structure.nodes.forEach((node,i)=>{
+      if(node.attachment) constraints.push({kind:'pin',terms:[...attachment(structure,node.attachment.bar,node.attachment.t).map(([n,w])=>[n,-w]),[i,1]],rest:0,compliance:0,loadNode:i});
+    });
+    if(preserveAll) structure.bars.forEach((bar,i)=>glued.add(i));
+    if (editing) for (const index of glued) add(index,index,{ta:0,tb:1,rest:structure.bars[index].length});
+    return constraints;
+  }
+  function connectionVector(nodes,constraint) {
+    let x=0,y=0;
+    for (const [i,w] of constraint.terms) {x+=nodes[i].x*w;y+=nodes[i].y*w;}
+    return {x,y};
+  }
+  function fitConnections(design,fixed,preserveAll=false) {
+    const constraints=connectionLinks(design,true,preserveAll),pinned=fixed instanceof Set?fixed:new Set([fixed]);
+    initializeConstraints(constraints);
+    const fit={nodes:design.nodes.map((n,i)=>({x:n.x,y:n.y,invMass:pinned.has(i)?0:1})),constraints,contacts:[]};
+    for(let pass=0;pass<20;pass++) {
+      solveConstraints(fit,1);
+      if(constraints.every(c=>{prepareConstraint(fit,c);return Math.hypot(c.value,c.valueY)<1e-7;})) {
+        design.nodes.forEach((n,i)=>{n.x=fit.nodes[i].x;n.y=fit.nodes[i].y;});return true;
+      }
+    }
+    return false;
+  }
+  function addBar(design, from, to) {
+    const error = positionError(from) || positionError(to);
+    if (error) return error;
+    const length = distance(from,to);
+    if (length < 0.49) return '請選另一個位置作終點。';
+    if (length > MAX_LENGTH + 1e-8) return '木桿最長 100 cm，請選近一點的終點。';
+    if (totalLength(design)+length*UNIT > MAX_TOTAL+1e-8) return '木材總長度不可超過 20 m，請縮短或移除木桿。';
+    if (design.bars.length >= 150) return '已達 150 條木桿上限，請先移除部分木桿。';
+    const indexAt = p => design.nodes.findIndex(n => !n.attachment && distance(n,p) < 0.01);
+    let a = indexAt(from), b = indexAt(to);
+    if (a >= 0 && b >= 0 && design.bars.some(bar => (bar.a === a && bar.b === b) || (bar.a === b && bar.b === a))) return '這兩個端點已有木桿。';
+    if (a < 0) { a = design.nodes.length; design.nodes.push({...from,load:0}); }
+    if (b < 0) { b = design.nodes.length; design.nodes.push({...to,load:0}); }
+    design.bars.push({a,b,length});
+    return '';
+  }
+  function reinforce(design,index) {
+    const bar=design.bars[index];
+    if(!bar) return '請點要加固的木桿。';
+    if(totalLength(design)+bar.length*UNIT>MAX_TOTAL+1e-8) return '剩餘木材不足以複製整條木桿，總長最多 20 m。';
+    if(design.bars.length>=150) return '已達 150 條木桿上限。';
+    const a=design.nodes[bar.a],b=design.nodes[bar.b],nx=-(b.y-a.y)/bar.length,ny=(b.x-a.x)/bar.length;
+    const preferred=ny>0?-1:1;
+    for(const side of [preferred,-preferred]) {
+      let anchor=index;
+      for(let layer=1;layer<=design.bars.length+1;layer++) {
+        const from={x:a.x+nx*side*WOOD_WIDTH*layer,y:a.y+ny*side*WOOD_WIDTH*layer};
+        const to={x:b.x+nx*side*WOOD_WIDTH*layer,y:b.y+ny*side*WOOD_WIDTH*layer};
+        if(positionError(from) || positionError(to)) break;
+        const occupied=design.bars.findIndex(other=>{
+          const p=design.nodes[other.a],q=design.nodes[other.b];
+          return (distance(p,from)<.01 && distance(q,to)<.01) || (distance(q,from)<.01 && distance(p,to)<.01);
+        });
+        if(occupied>=0) {anchor=occupied;continue;}
+        const candidate=clone(design),error=addBar(candidate,from,to),newIndex=candidate.bars.length-1;
+        if(error) break;
+        if(design.bars.some((_,i)=>{const region=overlap(candidate,i,newIndex);return region && region.gap<WOOD_WIDTH-1e-6;})) break;
+        if(glueBars(candidate,anchor,newIndex)) break;
+        design.nodes=candidate.nodes;design.bars=candidate.bars;design.joints=candidate.joints;
+        return '';
+      }
+    }
+    return '木桿兩側沒有足夠空間加固，請先移開相鄰木桿。';
+  }
+  function moveNode(design, index, point) {
+    if (!design.nodes[index] || design.nodes[index].attachment) return '請先選擇要修改的木桿端點。';
+    const error = positionError(point);
+    if (error) return error;
+    if (design.nodes.some((node,i) => !node.attachment && i !== index && distance(node,point) < .01)) return '此處已有端點，請選另一個位置。';
+    const candidate=clone(design);
+    Object.assign(candidate.nodes[index],point);
+    if (!fitConnections(candidate,index)) return '這個位置無法維持接合；請先移除膠水或接點。';
+    syncLoadPoints(candidate);
+    if (candidate.nodes.some(node=>!node.attachment && positionError(node))) return '相連木桿會移出範圍或進入地面，修改已取消。';
+    for(let i=0;i<candidate.nodes.length;i++) for(let j=i+1;j<candidate.nodes.length;j++) {
+      if(!candidate.nodes[i].attachment && !candidate.nodes[j].attachment && distance(candidate.nodes[i],candidate.nodes[j])<.01) return '相連端點會重疊，修改已取消。';
+    }
+    const lengths=candidate.bars.map(bar=>distance(candidate.nodes[bar.a],candidate.nodes[bar.b]));
+    if (lengths.some(length => length < .49 || length > MAX_LENGTH+1e-8)) return '修改後每條相連木桿須介乎 5 至 100 cm。';
+    if (lengths.reduce((sum,length)=>sum+length*UNIT,0)>MAX_TOTAL+1e-8) return '修改後木材總長度超過 20 m。';
+    candidate.nodes.forEach((node,i)=>Object.assign(design.nodes[i],node));
+    design.bars.forEach((bar,i)=>{bar.length=lengths[i];});
+    return '';
+  }
+  function removeBar(design, index) {
+    // 移走同一接點中的一條木材，其餘木材仍保持彼此相連。
+    const bypass=new Map(), removed=design.bars[index];
+    for(const joint of design.joints) if(joint.kind==='pin' && (joint.a===index || joint.b===index)) {
+      const link=joint.links[0], t=joint.a===index?link.ta:link.tb, key=Math.round(t*1e6);
+      if(!bypass.has(key)) bypass.set(key,[]);
+      bypass.get(key).push({bar:joint.a===index?joint.b:joint.a,t:joint.a===index?link.tb:link.ta});
+    }
+    for(const [key,neighbors] of bypass) {
+      const endpoint=key===0?removed.a:key===1000000?removed.b:-1;
+      if(endpoint>=0) design.bars.forEach((bar,i)=>{
+        if(i!==index && (bar.a===endpoint || bar.b===endpoint)) neighbors.push({bar:i,t:bar.a===endpoint?0:1});
+      });
+      for(let i=1;i<neighbors.length;i++) {
+        let a=neighbors[i-1],b=neighbors[i];
+        if(a.bar===b.bar) continue;
+        if(a.bar>b.bar) [a,b]=[b,a];
+        if(!design.joints.some(j=>j.a===a.bar && j.b===b.bar)) design.joints.push({a:a.bar,b:b.bar,kind:'pin',links:[{ta:a.t,tb:b.t,rest:0}]});
+      }
+    }
+    design.bars.splice(index,1);
+    design.joints=design.joints.filter(j=>j.a!==index && j.b!==index);
+    for (const joint of design.joints) {if(joint.a>index) joint.a--;if(joint.b>index) joint.b--;}
+    const remap = new Map();
+    design.nodes = design.nodes.filter((node,i) => {
+      if(node.attachment) {
+        if(node.attachment.bar===index) return false;
+        if(node.attachment.bar>index) node.attachment.bar--;
+      } else if (!design.bars.some(bar => bar.a === i || bar.b === i)) return false;
+      remap.set(i,remap.size);
+      return true;
+    });
+    for (const bar of design.bars) { bar.a = remap.get(bar.a); bar.b = remap.get(bar.b); }
+  }
+  function barHit(structure, point, threshold,centerOnly=false) {
+    let best = threshold, hit = null;
+    const check = (bar,i,fragmentIndex=-1) => {
+      if (bar.broken) return;
+      const path=bar.path || [bar.a,bar.b];
+      for(let segment=0;segment<path.length-1;segment++) {
+        const a = structure.nodes[path[segment]], b = structure.nodes[path[segment+1]];
+        const dx = b.x-a.x, dy = b.y-a.y;
+        let t = Math.max(0,Math.min(1,((point.x-a.x)*dx+(point.y-a.y)*dy)/Math.max(dx*dx+dy*dy,1e-8)));
+        if(centerOnly) {
+          if(Math.abs(dx)<1e-10) {if(Math.abs(a.x-CENTER_X)>1e-6) continue;}
+          else {t=(CENTER_X-a.x)/dx;if(t<0 || t>1) continue;}
+        }
+        const d = distance(point,{x:a.x+t*dx,y:a.y+t*dy});
+        if (d <= best) {
+          best=d;
+          const along=(segment+t)/(path.length-1);
+          const timber=structure.bars[i],cut=timber.cutT;
+          const fraction=fragmentIndex<0?along:fragmentIndex===timber.fragmentStart?along*cut:Math.max(cut+1e-9,1-along*(1-cut));
+          hit={bar:i,t:fraction};
+        }
+      }
+    };
+    structure.bars.forEach((bar,i)=>check(bar,i));
+    (structure.fragments||[]).forEach((fragment,i)=>check(fragment,fragment.source,i));
+    return hit;
+  }
+  const barAt=(structure,point,threshold)=>barHit(structure,point,threshold)?.bar??-1;
+  const loadHit=(structure,point,threshold)=>barHit(structure,point,threshold,true);
+  function sample() {
+    const design = empty();
+    const left=CENTER_X-5,right=CENTER_X+5,top=GROUND-1.3,x=i=>left+1+i*8/6;
+    addBar(design,{x:left,y:GROUND},{x:right,y:GROUND});
+    reinforce(design,0);
+    addBar(design,{x:x(0),y:top},{x:x(6),y:top});
+    for(let i=0;i<=6;i++) addBar(design,{x:x(i),y:top},{x:x(i),y:GROUND});
+    addBar(design,{x:left,y:GROUND},{x:x(0),y:top});
+    for(let i=0;i<6;i++) {
+      addBar(design,{x:x(i),y:i<3?top:GROUND},{x:x(i+1),y:i<3?GROUND:top});
+    }
+    addBar(design,{x:x(6),y:top},{x:right,y:GROUND});
+    connectTouching(design);
+    design.nodes.find(n => Math.abs(n.x-CENTER_X)<1e-6 && Math.abs(n.y-GROUND)<1e-6).load = 2;
+    return design;
+  }
+  function simulate(design,settings={}) {
+    const sim=clone(design);
+    sim.material={...MATERIAL,...settings};
+    for(const key of Object.keys(MATERIAL)) if(!Number.isFinite(sim.material[key]) || sim.material[key]<=0) throw new Error('木材參數必須是正數。');
+    sim.EA=sim.material.young*AREA;sim.EI=sim.material.young*INERTIA;
+    sim.fragments=[];sim.firstBreak=null;
+    for(const node of sim.nodes) Object.assign(node,{vx:0,vy:0,fx:0,fy:0,baseMass:0});
+    for(const bar of sim.bars) {
+      // ponytail: 10 cm 細分支援互動；若需分析岸邊局部承托，需加入桿身連續接觸與更細網格。
+      const count=2*Math.ceil(bar.length/2),a=sim.nodes[bar.a],b=sim.nodes[bar.b];
+      const mass=bar.length*UNIT*AREA*sim.material.density/count;
+      Object.assign(bar,{broken:false,stress:0,path:[bar.a]});
+      for(let i=1;i<count;i++) {
+        bar.path.push(sim.nodes.length);
+        sim.nodes.push({x:a.x+(b.x-a.x)*i/count,y:a.y+(b.y-a.y)*i/count,vx:0,vy:0,fx:0,fy:0,baseMass:mass,load:0});
+      }
+      bar.path.push(bar.b);a.baseMass+=mass/2;b.baseMass+=mass/2;
+    }
+    for(const node of sim.nodes) node.initialY=node.y;
+    rebuildConstraints(sim);
+    return sim;
+  }
+  function rebuildConstraints(sim) {
+    const constraints=connectionLinks(sim);
+    for(const piece of [...sim.bars.filter(b=>!b.broken),...sim.fragments]) {
+      const path=piece.path,rest=piece.length/(path.length-1),source=sim.bars.indexOf(piece);
+      piece.axial=[];piece.bends=[];
+      for(let i=0;i<path.length-1;i++) {
+        const c={kind:'length',terms:[[path[i],-1],[path[i+1],1]],rest,compliance:rest*UNIT/sim.EA,source,position:i};
+        constraints.push(c);piece.axial.push(c);
+      }
+      for(let i=1;i<path.length-1;i++) {
+        const c={kind:'angle',edges:[path[i-1],path[i],path[i],path[i+1]],reference:0,compliance:rest*UNIT/sim.EI,source,position:i};
+        constraints.push(c);piece.bends.push(c);
+      }
+    }
+    initializeConstraints(constraints);
+    sim.constraints=constraints;
+  }
+  function initializeConstraints(constraints) {
+    for(const c of constraints) {
+      const entries=new Map();
+      const entry=i=>{if(!entries.has(i)) entries.set(i,{i,w:0,t:0,s1:0,s2:0,ax:0,ay:0,bx:0,by:0});return entries.get(i);};
+      for(const [i,w] of c.terms || []) entry(i).w+=w;
+      for(const [i,w] of c.tangent || []) entry(i).t+=w;
+      if(c.edges) {entry(c.edges[0]).s1++;entry(c.edges[1]).s1--;entry(c.edges[2]).s2--;entry(c.edges[3]).s2++;}
+      c.gradients=[...entries.values()];c.lambda=0;c.lambdaY=0;
+    }
+  }
+  function breakBar(sim,bar,index) {
+    if(bar.broken) return;
+    const source=sim.bars.indexOf(bar),mid=Math.max(1,Math.min(bar.path.length-2,index)),tipIndex=bar.path[mid],tip=sim.nodes[tipIndex];
+    bar.broken=true;bar.cutT=mid/(bar.path.length-1);
+    if(!sim.firstBreak) sim.firstBreak={bar:source,load:sim.nodes.reduce((sum,n)=>sum+n.load,0),position:bar.cutT};
+    // 在最先超出強度的截面切開，保留質量、速度及當下曲線；斷口沒有跨段彎曲約束。
+    tip.baseMass/=2;
+    const rightTip=sim.nodes.length;sim.nodes.push({...tip});
+    bar.fragmentStart=sim.fragments.length;
+    sim.fragments.push({a:bar.a,b:tipIndex,length:bar.length*bar.cutT,source,path:bar.path.slice(0,mid+1)},
+      {a:bar.b,b:rightTip,length:bar.length*(1-bar.cutT),source,path:[...bar.path.slice(mid+1).reverse(),rightTip]});
+  }
+  function prepareConstraint(sim,c) {
+    if(c.loadNode!==undefined && sim.nodes[c.loadNode].load<=0) return;
+    const vector=c.kind==='pin' || c.kind==='weld';
+    let value=0,valueY=0;
+    if(c.kind==='angle') {
+      const [a,b,p,q]=c.edges.map(i=>sim.nodes[i]);
+      const x1=(b.x-a.x)*UNIT,y1=(b.y-a.y)*UNIT,x2=(q.x-p.x)*UNIT,y2=(q.y-p.y)*UNIT;
+      const l1=Math.max(x1*x1+y1*y1,1e-16),l2=Math.max(x2*x2+y2*y2,1e-16);
+      value=Math.atan2(x1*y2-y1*x2,x1*x2+y1*y2)-c.reference;
+      value=Math.atan2(Math.sin(value),Math.cos(value));
+      for(const g of c.gradients) {g.ax=-g.s1*y1/l1-g.s2*y2/l2;g.ay=g.s1*x1/l1+g.s2*x2/l2;}
+    } else {
+      const d=connectionVector(sim.nodes,c),x=d.x*UNIT,y=d.y*UNIT;
+      if(vector) {
+        let ux=1,uy=0,length=1;
+        if(c.kind==='weld') {
+          const tangent=connectionVector(sim.nodes,{terms:c.tangent});
+          length=Math.max(Math.hypot(tangent.x,tangent.y)*UNIT,1e-12);
+          ux=tangent.x*UNIT/length;uy=tangent.y*UNIT/length;
+        }
+        const h=c.offset || 0;
+        value=x+h*uy;valueY=y-h*ux;
+        for(const g of c.gradients) {
+          g.ax=g.w-h*g.t*ux*uy/length;g.ay=h*g.t*(1-uy*uy)/length;
+          g.bx=-h*g.t*(1-ux*ux)/length;g.by=g.w+h*g.t*ux*uy/length;
+        }
+      } else {
+        const length=Math.max(Math.hypot(x,y),1e-12);
+        value=length-c.rest*UNIT;
+        for(const g of c.gradients) {g.ax=g.w*x/length;g.ay=g.w*y/length;}
+      }
+    }
+    c.value=value;c.valueY=valueY;
+  }
+  function solveConstraints(sim,dt) {
+    const rows=[];
+    for(const c of sim.constraints) {
+      if(c.loadNode!==undefined && sim.nodes[c.loadNode].load<=0) continue;
+      prepareConstraint(sim,c);
+      for(let axis=0;axis<(c.kind==='pin'||c.kind==='weld'?2:1);axis++) {
+        const key=axis?'lambdaY':'lambda',alpha=c.compliance/(dt*dt);
+        const terms=c.gradients.map(g=>({i:g.i,x:axis?g.bx:g.ax,y:axis?g.by:g.ay}));
+        rows.push({c,key,terms,alpha,value:axis?c.valueY:c.value});
+      }
+    }
+    for(const c of sim.contacts) {
+      const n=sim.nodes[c.i];
+      rows.push({c,key:'lambda',terms:[{i:c.i,x:c.x,y:c.y}],alpha:0,value:((c.x?n.x:n.y)-c.target)*UNIT});
+    }
+    for(const r of rows) {
+      const diagonal=r.alpha+r.terms.reduce((sum,g)=>sum+sim.nodes[g.i].invMass*(g.x*g.x+g.y*g.y),0);
+      r.inv=diagonal>1e-20?1/diagonal:0;
+      r.b=-r.value-r.alpha*r.c[r.key];r.delta=sim.firstSolve?(r.c[r.key==='lambda'?'previous':'previousY']||0):0;r.fixed=false;
+    }
+    sim.firstSolve=false;
+    for(let activePass=0;activePass<20;activePass++) {
+    for(const n of sim.nodes) {n.tx=0;n.ty=0;}
+    for(const r of rows) for(const g of r.terms) {const n=sim.nodes[g.i];n.tx+=g.x*r.delta;n.ty+=g.y*r.delta;}
+    for(const r of rows) {
+      if(r.fixed) {r.r=0;r.z=0;r.p=0;continue;}
+      r.r=r.b-r.alpha*r.delta;
+      for(const g of r.terms) {const n=sim.nodes[g.i];r.r-=n.invMass*(g.x*n.tx+g.y*n.ty);}
+      r.z=r.r*r.inv;r.p=r.z;
+    }
+    let rz=rows.reduce((sum,r)=>sum+r.r*r.z,0),initial=rz;
+    // 同時求解整個網絡，避免局部迭代把膠合梁變成過軟的彈簧鏈。
+    for(let iteration=0;iteration<Math.min(rows.length*2,240) && rz>Math.max(1e-28,initial*1e-14);iteration++) {
+      for(const n of sim.nodes) {n.tx=0;n.ty=0;}
+      for(const r of rows) for(const g of r.terms) {const n=sim.nodes[g.i];n.tx+=g.x*r.p;n.ty+=g.y*r.p;}
+      let denominator=0;
+      for(const r of rows) {
+        if(r.fixed) {r.ap=0;continue;}
+        r.ap=r.alpha*r.p;
+        for(const g of r.terms) {const n=sim.nodes[g.i];r.ap+=n.invMass*(g.x*n.tx+g.y*n.ty);}
+        denominator+=r.p*r.ap;
+      }
+      if(denominator<1e-30) break;
+      const scale=rz/denominator;
+      let next=0;
+      for(const r of rows) {r.delta+=scale*r.p;r.r-=scale*r.ap;r.z=r.r*r.inv;next+=r.r*r.z;}
+      for(const r of rows) r.p=r.z+next/rz*r.p;
+      rz=next;
+    }
+    let changed=false;
+    for(const r of rows) {
+      const c=r.c;if(!c.contact) continue;
+      const old=c[r.key],next=old+r.delta;
+      let clamped=next;
+      if(c.contact==='normal') clamped=Math.min(0,next);
+      else {
+        const normalRow=rows.find(other=>other.c===c.normal);
+        const limit=GROUND_FRICTION*Math.max(0,-c.normal.lambda-normalRow.delta);
+        clamped=r.fixed?r.slipSign*limit:Math.max(-limit,Math.min(limit,next));
+      }
+      if(Math.abs(clamped-next)>1e-12) {if(!r.fixed) r.slipSign=Math.sign(next);r.delta=clamped-old;r.fixed=true;changed=true;}
+    }
+    if(!changed) {
+      for(const n of sim.nodes) {n.tx=0;n.ty=0;}
+      for(const r of rows) for(const g of r.terms) {const n=sim.nodes[g.i];n.tx+=g.x*r.delta;n.ty+=g.y*r.delta;}
+      for(const r of rows) if(r.fixed) {
+        let residual=r.value;
+        for(const g of r.terms) {const n=sim.nodes[g.i];residual+=n.invMass*(g.x*n.tx+g.y*n.ty);}
+        if((r.c.contact==='normal' && residual>1e-9) || (r.c.contact==='friction' && residual*r.slipSign>1e-9)) {r.fixed=false;changed=true;}
+      }
+    }
+    if(!changed) break;
+    }
+    let correction=0;
+    for(const r of rows) {
+      const c=r.c,old=c[r.key];
+      const next=old+r.delta;
+      c[r.key]=next;
+      for(const g of r.terms) {const n=sim.nodes[g.i],scale=n.invMass*(next-old)/UNIT;n.x+=scale*g.x;n.y+=scale*g.y;correction=Math.max(correction,Math.abs(scale*g.x),Math.abs(scale*g.y));}
+    }
+    return correction;
+  }
+
+  function projectContacts(sim) {
+    for(const n of sim.nodes) {
+      if(!n.invMass) continue;
+      const oldBank=n.ox<=LEFT_EDGE || n.ox>=RIGHT_EDGE;
+      if(oldBank && Math.abs(n.oy-GROUND)<1e-7 && n.y>GROUND && Math.abs(n.x-n.ox)<=GROUND_FRICTION*(n.normal+n.y-GROUND)) n.x=n.ox;
+      if(n.ox>LEFT_EDGE && n.ox<RIGHT_EDGE && (n.x<=LEFT_EDGE || n.x>=RIGHT_EDGE)) {
+        const edge=n.x<=LEFT_EDGE?LEFT_EDGE:RIGHT_EDGE;
+        const crossingY=n.oy+(n.y-n.oy)*(edge-n.ox)/(n.x-n.ox);
+        if(crossingY>GROUND) {n.x=edge+(edge===LEFT_EDGE?1e-8:-1e-8);n.wall=true;}
+      }
+      const floor=n.x<=LEFT_EDGE || n.x>=RIGHT_EDGE?GROUND:12.8;
+      if(n.y>floor) {n.normal+=n.y-floor;n.y=floor;}
+      if(n.normal>0 && Math.abs(n.y-floor)<1e-7) {
+        const friction=Math.max(-GROUND_FRICTION*n.normal,Math.min(GROUND_FRICTION*n.normal,n.friction-(n.x-n.ox)));
+        n.x+=friction-n.friction;n.friction=friction;
+      }
+    }
+  }
+  function increaseLoad(sim,index,dt=DT) {
+    const node=sim.nodes[index];
+    if(!sim.firstBreak && canAddLoad(node)) node.load=Math.min(20,node.load+.5*dt);
+    return node.load;
+  }
+  // XPBD 的 compliance = 1/k，並按 dt² 縮放；不能用迭代次數充當木材剛度。
+  // 參考：https://mmacklin.com/xpbd.pdf。平面 Euler–Bernoulli 離散梁仍不包含三維扭轉與膠層破壞。
+  function step(sim,dt=DT) {
+    for(const n of sim.nodes) {
+      n.invMass=1/(n.baseMass+n.load) || 0;
+      if(!Number.isFinite(n.invMass)) n.invMass=0;
+      n.ox=n.x;n.oy=n.y;n.ovx=n.vx;n.ovy=n.vy;n.normal=0;n.friction=0;n.wall=false;
+      if(n.invMass) {n.x+=n.vx*dt;n.y+=n.vy*dt+9.81/UNIT*dt*dt;}
+    }
+    for(const c of sim.constraints) {c.previous=c.lambda;c.previousY=c.lambdaY;c.lambda=0;c.lambdaY=0;}
+    sim.firstSolve=true;
+    sim.contacts=[];
+    for(let i=0;i<sim.nodes.length;i++) {
+      const n=sim.nodes[i];if(!n.invMass) continue;
+      const floor=n.ox<=LEFT_EDGE||n.ox>=RIGHT_EDGE?GROUND:12.8;
+      if(n.y>=floor-1e-8) {
+        const normal={i,x:0,y:1,target:floor,lambda:0,previous:n.normalPrevious||0,contact:'normal'};
+        sim.contacts.push(normal,{i,x:1,y:0,target:n.ox,lambda:0,previous:n.frictionPrevious||0,contact:'friction',normal});
+      }
+    }
+    for(let pass=0;pass<6;pass++) if(solveConstraints(sim,dt)<1e-8) break;
+    for(const c of sim.contacts) if(c.contact==='friction' && Math.abs(c.lambda)<GROUND_FRICTION*Math.abs(c.normal.lambda)*(1-1e-5)) {
+      const n=sim.nodes[c.i];if(Math.abs(n.x-n.ox)<1e-7) n.x=n.ox;
+    }
+    projectContacts(sim);
+    for(const n of sim.nodes) {n.normalPrevious=0;n.frictionPrevious=0;}
+    for(const c of sim.contacts) sim.nodes[c.i][c.contact==='normal'?'normalPrevious':'frictionPrevious']=c.lambda;
+    for(const n of sim.nodes) {
+      if(!n.invMass) {n.vx=0;n.vy=0;n.fx=0;n.fy=0;continue;}
+      n.vx=(n.x-n.ox)/dt*Math.exp(-.5*dt);n.vy=(n.y-n.oy)/dt*Math.exp(-.5*dt);
+      if(n.wall) n.vx=0;
+      const floor=n.x<=LEFT_EDGE||n.x>=RIGHT_EDGE?GROUND:12.8;
+      if(Math.abs(n.y-floor)<1e-8 && n.vy>0) n.vy=0;
+      n.fx=(n.vx-n.ovx)*UNIT/dt/n.invMass;n.fy=(n.vy-n.ovy)*UNIT/dt/n.invMass;
+    }
+    let fractured=false;
+    for(const bar of sim.bars) if(!bar.broken) {
+      const force=bar.axial.map(c=>-c.lambda/(dt*dt));
+      const axialRatio=n=>Math.abs(n)/AREA/(n>=0?sim.material.tension:sim.material.compression);
+      let worst=0,cut=1;
+      for(let i=0;i<force.length;i++) if(axialRatio(force[i])>worst) {worst=axialRatio(force[i]);cut=Math.max(1,i);}
+      for(const c of bar.bends) {
+        const moment=Math.abs(c.lambda)/(dt*dt),n=(force[c.position-1]+force[c.position])/2;
+        const ratio=axialRatio(n)+moment*SIDE/2/INERTIA/sim.material.bending;
+        if(ratio>worst) {worst=ratio;cut=c.position;}
+      }
+      bar.stress=worst;
+      if(worst>=1) {breakBar(sim,bar,cut);fractured=true;}
+    }
+    if(fractured) rebuildConstraints(sim);
+    for(const n of sim.nodes) if(n.attachment && !n.load) {
+      const {bar,t}=n.attachment;Object.assign(n,barPoint(sim,bar,t));
+    }
+  }
+
+  return {UNIT,DT,MATERIAL,AREA,INERTIA,MAX_LENGTH,MAX_TOTAL,WOOD_WIDTH,LEFT_EDGE,RIGHT_EDGE,CENTER_X,GROUND,canAddLoad,distance,clone,totalLength,materialRows,empty,addBar,reinforce,moveNode,removeBar,barAt,barHit,loadHit,barPoint,placeLoad,connectTouching,glueBars,connectionLinks,sample,simulate,increaseLoad,step};
+})();
+</script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id), canvas = $('bridge'), ctx = canvas.getContext('2d');
+  let design = Bridge.sample(), simulation = null, running = false, tool = 'wood';
+  let start = null, hover = null, pointerDown = null, keyboard = {x:6,y:8}, keyboardActive = false;
+  let selectedLoad = design.nodes.findIndex(n => n.load), history = [], lastTime = 0, accumulator = 0;
+  let lastStats = 0, maxDrop = 0, selectedBar = -1, editNode = -1;
+  let autoLoading = false, glueFirst = -1;
+  const formatWeight=value=>String(Number(value.toFixed(2)));
+  const toolNames=['wood','edit','join','glue','reinforce','load','erase'];
+  const tell = text => { $('message').textContent = text; };
+  const model = () => simulation || design;
+  function remember(snapshot = design) { history.push({design:Bridge.clone(snapshot),selectedLoad}); if (history.length > 50) history.shift(); }
+  function cancelPointer() {
+    const active = pointerDown; pointerDown = null;
+    if (active?.before) design = active.before;
+    if (active && canvas.hasPointerCapture(active.id)) canvas.releasePointerCapture(active.id);
+  }
+  function setTool(value) {
+    cancelPointer(); tool = value; start = null; editNode = -1; glueFirst=-1;
+    if(tool==='load') keyboard.x=Bridge.CENTER_X;
+    for (const name of toolNames) $(name).setAttribute('aria-pressed',String(name === tool));
+    tell({wood:'點兩個位置或拖拉放木桿；先對齊方格，靠近木桿時沿桿移動，接近端點時吸附端點。中段接觸需按「接合」。按 Esc 取消。',edit:'拖動現有端點，先對齊方格，靠近其他木桿時貼到桿身或端點。中段接觸仍需按「接合」；膠合組合維持木材長度。',join:'點木桿交叉處，或端點碰到桿身的位置，以建立可轉動接合。',glue:'依次點兩條並排木桿，會先靠攏貼合，再固定位置和角度；接地木桿優先保持原位。',reinforce:'點木桿即可複製同長木桿並貼合加固；會計入 20 m 木材用量，可按「復原」。',load:'點中央虛線與木桿的交點掛重物；掛上後隨木桿移動。點已有重物可調整，設為 0 可卸下。',erase:'點重物可卸下；點接合圓點或膠合區中央可解除連接，其餘位置可移除木桿。'}[tool]);
+    draw();
+  }
+  function update() {
+    const current = model(), broken = current.bars.filter(b => b.broken).length;
+    $('bar-count').textContent = design.bars.length;
+    $('wood-used').textContent = `${Bridge.totalLength(design).toFixed(2)} / 20 m`;
+    const materialNames=['橋底（水平）','橋頂（水平）','橋身（直桿）','斜邊','其他水平桿'];
+    const materialTable=Bridge.materialRows(design).map(row=>`<tr><th scope="row">${materialNames[row.kind]}</th><td>${Number(row.length.toFixed(2))}</td><td>${row.count} 條</td><td>${Number(row.total.toFixed(1))}</td></tr>`).join('') || '<tr><td colspan="4">放置木桿後顯示材料用量。</td></tr>';
+    if($('material-rows').innerHTML!==materialTable) $('material-rows').innerHTML=materialTable;
+    $('material-total').textContent=`${Number((Bridge.totalLength(design)*100).toFixed(1))} cm`;
+    $('material-both').textContent=`${(Bridge.totalLength(design)*2).toFixed(2)} m`;
+    $('joint-count').textContent = `${design.joints.filter(j=>j.kind==='pin').length} / ${design.joints.filter(j=>j.kind==='glue').length}`;
+    $('total-load').textContent = `${formatWeight(design.nodes.reduce((sum,n) => sum+n.load,0))} kg`;
+    $('broken-count').textContent = broken;
+    $('first-break').textContent = simulation?.firstBreak ? `${formatWeight(simulation.firstBreak.load)} kg` : '—';
+    $('deflection').textContent = simulation ? `${(maxDrop*Bridge.UNIT*100).toFixed(2)} cm` : '—';
+    const status = !simulation ? '建造中' : broken ? `木桿斷裂${running ? '' : ' · 已暫停'}` : running ? '測試中' : '已暫停';
+    if ($('status').textContent !== status) $('status').textContent = status;
+    $('status').classList.toggle('failed',broken > 0);
+    $('test').textContent = running ? 'Ⅱ 暫停測試' : simulation ? '▶ 繼續測試' : '▶ 開始測試';
+    $('test').disabled = !design.bars.length;
+    $('reset').disabled = !simulation;
+    for (const id of ['wood','edit','join','glue','reinforce','erase','clear','example']) $(id).disabled = !!simulation;
+    for(const key of Object.keys(Bridge.MATERIAL)) $('mat-'+key).disabled=!!simulation;
+    $('auto-load').disabled = !design.bars.length || !Bridge.canAddLoad(current.nodes[selectedLoad]) || broken > 0;
+    $('auto-load').textContent = autoLoading ? '停止自動加重' : '連續加重測試';
+    $('auto-load').setAttribute('aria-pressed',String(autoLoading));
+    $('undo').disabled = !!simulation || !history.length;
+    if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
+    $('weight-value').textContent = formatWeight(Number($('weight').value));
+    $('weight').setAttribute('aria-valuetext',`${$('weight').value} 公斤`);
+    const target=design.nodes[selectedLoad];
+    const location=target?.attachment ? `木桿 ${target.attachment.bar+1} · 距起點 ${(design.bars[target.attachment.bar].length*target.attachment.t*Bridge.UNIT*100).toFixed(1)} cm` : `端點 ${selectedLoad+1}`;
+    $('load-target').textContent = selectedLoad < 0 ? '選「負重」後點中央虛線與木桿的交點。' : !Bridge.canAddLoad(current.nodes[selectedLoad]) ? '此位置已離開中央線；請重新選中央交點掛重物。' : `${location} · ${formatWeight(target.load)} kg；滑桿可即時調整。`;
+  }
+  function nearestNode(point, threshold = Math.max(0.3,14*24/canvas.clientWidth)) {
+    let nearest = -1, best = threshold;
+    model().nodes.forEach((node,i) => { if (i >= design.nodes.length || (tool==='edit' && node.attachment)) return; const d = Bridge.distance(node,point); if (d <= best) { nearest = i; best = d; } });
+    return nearest;
+  }
+  const nearestBar = point => Bridge.barAt(model(),point,Math.max(.2,12*24/canvas.clientWidth));
+  function nearestWeight(point) {
+    for(let i=design.nodes.length-1;i>=0;i--) {
+      const node=model().nodes[i];
+      if(node.load>0 && (Bridge.distance(node,point)<.15 || (Math.abs(point.x-node.x)<=.64 && point.y>=node.y+.68 && point.y<=node.y+1.54))) return i;
+    }
+    return -1;
+  }
+  function jointPoint(joint) {
+    const first=joint.links[0], last=joint.links[joint.links.length-1];
+    const a=Bridge.barPoint(model(),joint.a,(first.ta+last.ta)/2), b=Bridge.barPoint(model(),joint.b,(first.tb+last.tb)/2);
+    return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+  }
+  function nearestJoint(point) {
+    let index=-1,best=Math.max(.22,10*24/canvas.clientWidth);
+    model().joints.forEach((joint,i)=>{const d=Bridge.distance(point,jointPoint(joint));if(d<best){index=i;best=d;}});
+    return index;
+  }
+  // 指標幾何開始：方格位置可投影到桿身；靠近端點時以精確端點為準。
+  function snap(point) {
+    return {x:Math.round(point.x*2)/2,y:Math.round(point.y*2)/2};
+  }
+  function buildPoint(point, structure=design, excludedNode=-1) {
+    const grid=snap(point);
+    // 修改時排除相連木桿，避免端點被自己的木桿吸住。
+    const target=excludedNode<0 ? structure : {...structure,bars:structure.bars.filter(bar=>bar.a!==excludedNode && bar.b!==excludedNode)};
+    let endpoint=null,best=.18;
+    for(const bar of target.bars) for(const index of [bar.a,bar.b]) {
+      const node=target.nodes[index],distance=Bridge.distance(point,node);
+      if(distance<best) {endpoint=node;best=distance;}
+    }
+    if(endpoint) return {x:endpoint.x,y:endpoint.y};
+    // 滑鼠沿桿時保持貼合；方格落點已靠近木桿時亦可吸附。
+    const hit=Bridge.barHit(target,point,.24) || Bridge.barHit(target,grid,.24);
+    if(!hit) return grid;
+    const bar=target.bars[hit.bar];
+    const projected=Bridge.barHit({nodes:target.nodes,bars:[bar]},grid,Infinity);
+    return Bridge.barPoint(target,hit.bar,projected.t);
+  }
+  function isDrag(from,to,width) {
+    return Bridge.distance(from,to)>Math.min(.25,8*24/width);
+  }
+  // 指標幾何結束
+  function operate(point, dragging = false) {
+    if(!simulation && tool==='reinforce') {
+      const before=Bridge.clone(design),index=nearestBar(point),error=Bridge.reinforce(design,index);
+      if(!error) {remember(before);selectedBar=design.bars.length-1;}
+      tell(error || '已複製並貼合加固，木材用量已更新；可按「復原」。');
+      update();draw();return;
+    }
+    if (!simulation && tool==='join') {
+      const before=Bridge.clone(design),count=Bridge.connectTouching(design,point,Math.max(.3,14*24/canvas.clientWidth));
+      if(count) remember(before);
+      tell(count ? `已建立 ${count} 個接合。木桿可相對轉動，長桿仍保持完整。` : '此處沒有未接合的交叉位置或中段接觸；共用端點本來已相連。');
+      update();draw();return;
+    }
+    if (!simulation && tool==='glue') {
+      const index=nearestBar(point);
+      if(index<0) {tell('請點要膠合的木桿。');return;}
+      if(glueFirst<0) {glueFirst=index;tell(`已選木桿 ${index+1}，再點另一條並排木桿。`);}
+      else {
+        const before=Bridge.clone(design),error=Bridge.glueBars(design,glueFirst,index);
+        if(error) tell(error);
+        else {remember(before);glueFirst=-1;tell('已靠攏貼合並固定兩條木桿；可按「復原」。');}
+      }
+      update();draw();return;
+    }
+    if (tool === 'edit' && !simulation) {
+      editNode = nearestNode(point);
+      if (editNode >= 0) keyboard = {...design.nodes[editNode]};
+      tell(editNode < 0 ? '請選要修改的端點。' : `已選端點 ${editNode+1}；拖動或用方向鍵修改，Esc 結束。`);
+      update(); draw(); return;
+    }
+    if (tool === 'wood' && !simulation) {
+      const next = buildPoint(point);
+      if (!start) {
+        if (next.x < 4 || next.x > 20 || next.y < 1 || next.y > 11.5) { tell('請在方格範圍內搭橋。'); return; }
+        start = next; tell('已選起點，再點終點放木桿；每條最長 100 cm。');
+      } else {
+        const before = Bridge.clone(design), error = Bridge.addBar(design,start,next);
+        if (error) tell(error);
+        else { history.push({design:before,selectedLoad}); if (history.length > 50) history.shift(); start = null; tell('已放木桿。再選兩個端點，可繼續搭橋。'); }
+      }
+    } else if (tool === 'load') {
+      const existing=nearestWeight(point),hit=Bridge.loadHit(model(),point,Math.max(.2,12*24/canvas.clientWidth));
+      if(existing<0 && !hit) {tell('負重只可掛在中央虛線與木桿或碎段的交點。');return;}
+      autoLoading = false;
+      if(existing>=0) selectedLoad=existing;
+      else {
+        const before=Bridge.clone(design),index=Bridge.placeLoad(design,simulation,hit.bar,hit.t,Number($('weight').value));
+        if(index<0) {tell('最多可設 150 個負重位置，請先卸下部分重物。');return;}
+        if(!simulation) remember(before);
+        selectedLoad=index;
+      }
+      tell('已選負重位置，可拉動滑桿調整或啟動連續加重。');
+    } else if (tool === 'erase' && !simulation) {
+      const weightIndex=nearestWeight(point);
+      if(weightIndex>=0) {remember();design.nodes[weightIndex].load=0;selectedLoad=weightIndex;$('weight').value=0;tell('已卸下重物。');update();draw();return;}
+      const jointIndex=nearestJoint(point);
+      if(jointIndex>=0) {
+        remember();design.joints.splice(jointIndex,1);tell('已解除接合，木桿保留。');update();draw();return;
+      }
+      const nodeIndex = nearestNode(point);
+      if (nodeIndex >= 0 && design.nodes[nodeIndex].load) {
+        remember(); design.nodes[nodeIndex].load = 0; selectedLoad = nodeIndex; $('weight').value = 0; tell('已卸下重物。');
+      } else {
+        const index = nearestBar(point);
+        if (index < 0) { tell('請點要移除的木桿或負重節點。'); return; }
+        remember(); Bridge.removeBar(design,index); selectedLoad = -1; selectedBar = -1; tell('已移除木桿及不再連接的端點。');
+      }
+    }
+    update(); draw();
+  }
+  function line(a,b,color,width,dash=[]) {
+    ctx.beginPath(); ctx.moveTo(a.x*50,a.y*50); ctx.lineTo(b.x*50,b.y*50); ctx.strokeStyle=color; ctx.lineWidth=width; ctx.setLineDash(dash); ctx.stroke(); ctx.setLineDash([]);
+  }
+  function timberLine(structure,bar,color,width) {
+    const path=bar.path || [bar.a,bar.b];
+    ctx.beginPath();
+    path.forEach((i,j)=>{const p=structure.nodes[i];if(j) ctx.lineTo(p.x*50,p.y*50);else ctx.moveTo(p.x*50,p.y*50);});
+    ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineJoin='round';ctx.stroke();
+  }
+  function text(value,x,y,color='#526b76',size=13,align='center') {
+    ctx.font=`${size}px "Microsoft JhengHei",sans-serif`; ctx.textAlign=align; ctx.fillStyle=color; ctx.fillText(value,x,y);
+  }
+  // 長度標籤布局開始：用畫布的 CSS 尺寸布局，小螢幕也保持可讀字級。
+  function lengthLabels(structure,width) {
+    const labels=[],height=width*7/12;
+    const pieces=[...structure.bars.map((bar,i)=>({bar,name:`木桿 ${i+1}`})),...(structure.fragments||[]).map(bar=>({bar,name:`木桿 ${bar.source+1} 碎段`}))];
+    for(const {bar,name} of pieces) {
+      if(bar.broken) continue;
+      const path=bar.path || [bar.a,bar.b],middle=(path.length-1)/2,a=structure.nodes[path[Math.floor(middle)]],b=structure.nodes[path[Math.ceil(middle)]];
+      const px=(a.x+b.x)/2*width/24,py=(a.y+b.y)/2*width/24;
+      if(px<0 || px>width || py<0 || py>height) continue;
+      const value=`${Number((bar.length*Bridge.UNIT*100).toFixed(1))} cm`,w=value.length*6+10,h=18;
+      let x,y;
+      // 同位置的膠合木桿將標籤上下錯開，避免完全重疊。
+      // 窄畫布的上下空間不足時，向兩側排開並保留引線。
+      placement: for(let column=0;column<2*Math.ceil(width/(w+3))+1;column++) {
+        x=Math.max(1,Math.min(width-w-1,px-w/2+(column%2?1:-1)*Math.ceil(column/2)*(w+3)));
+        for(let slot=0;slot<16;slot++) {
+          y=Math.max(44,Math.min(height-h-1,py+(slot%2?7:-h-7)+(slot%2?1:-1)*Math.floor(slot/2)*(h+3)));
+          if(!labels.some(r=>x<r.x+r.w+2 && x+w+2>r.x && y<r.y+r.h+2 && y+h+2>r.y)) break placement;
+        }
+      }
+      labels.push({x,y,w,h,px,py,value,name});
+    }
+    return labels;
+  }
+  // 長度標籤布局結束
+  function updateLengthLabels(current) {
+    const labels=lengthLabels(current,canvas.clientWidth),container=$('wood-labels');
+    $('wood-label-leaders').setAttribute('d',labels.map(l=>`M${Math.max(l.x,Math.min(l.x+l.w,l.px))},${Math.max(l.y,Math.min(l.y+l.h,l.py))}L${l.px},${l.py}`).join(''));
+    while(container.children.length>labels.length) container.lastElementChild.remove();
+    labels.forEach((label,i)=>{
+      let element=container.children[i];
+      if(!element) {element=document.createElement('span');element.className='wood-length-label';container.append(element);}
+      if(element.textContent!==label.value) element.textContent=label.value;
+      element.setAttribute('aria-label',`${label.name}，${label.value}`);
+      element.style.left=`${label.x}px`;element.style.top=`${label.y}px`;element.style.width=`${label.w}px`;element.style.textAlign='center';
+    });
+  }
+  function draw() {
+    const current = model(), ratio = Math.min(window.devicePixelRatio || 1,2);
+    updateLengthLabels(current);
+    const width = Math.round(canvas.clientWidth*ratio), height = Math.round(canvas.clientWidth*7/12*ratio);
+    if (canvas.width !== width || canvas.height !== height) { canvas.width=width; canvas.height=height; }
+    ctx.setTransform(width/1200,0,0,height/700,0,0); ctx.clearRect(0,0,1200,700);
+    ctx.fillStyle='#edf5f7'; ctx.fillRect(0,0,1200,700);
+    for (let x=200;x<=1000;x+=25) for (let y=50;y<=575;y+=25) {
+      ctx.fillStyle=x%100===0&&y%100===0?'#abc4ce':'#c7dbe1'; ctx.beginPath(); ctx.arc(x,y,1.2,0,Math.PI*2); ctx.fill();
+    }
+    // 岸面承托接觸節點；橋樑沒有固定鉸點。
+    const leftEdge=Bridge.LEFT_EDGE*50, rightEdge=Bridge.RIGHT_EDGE*50;
+    for (const right of [false,true]) {
+      const x=right?rightEdge:0, bankWidth=right?1200-rightEdge:leftEdge;
+      ctx.fillStyle='#d3e2df'; ctx.fillRect(x,400,bankWidth,300);
+      ctx.fillStyle='#90b3a8'; ctx.fillRect(x,400,bankWidth,9);
+      ctx.strokeStyle='#bed2cc'; ctx.lineWidth=1;
+      for(let y=440;y<700;y+=32) {ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+bankWidth,y+20);ctx.stroke();}
+    }
+    ctx.fillStyle='#c5e1e8'; ctx.fillRect(leftEdge,632,rightEdge-leftEdge,68);
+    for(let x=leftEdge+25;x<rightEdge-35;x+=90) line({x:x/50,y:13.15},{x:(x+35)/50,y:13.15},'#9fc8d4',2);
+    line({x:Bridge.LEFT_EDGE,y:11.4},{x:Bridge.RIGHT_EDGE,y:11.4},'#a3bdc7',1,[4,5]);
+    for(const x of [Bridge.LEFT_EDGE,Bridge.RIGHT_EDGE]) line({x,y:11.25},{x,y:11.55},'#a3bdc7',1.5);
+    ctx.fillStyle='#edf5f7'; ctx.fillRect(535,554,130,29); text(`淨距 ${((Bridge.RIGHT_EDGE-Bridge.LEFT_EDGE)*Bridge.UNIT*100).toFixed(0)} cm`,600,574,'#526b76',14);
+    text('岸面承托',275,448,'#315950',13); text('岸面承托',925,448,'#315950',13);
+    line({x:Bridge.CENTER_X,y:1},{x:Bridge.CENTER_X,y:10.9},'#72a9a2',1.5,[5,7]);
+    text('負重中央線',Bridge.CENTER_X*50,37,'#176b67',14);
+    if (simulation) for (const bar of design.bars) line(design.nodes[bar.a],design.nodes[bar.b],'#b8ccd3',1.5,[5,6]);
+    for (const joint of current.joints) if(joint.kind==='glue') {
+      const seam=link=>{const a=Bridge.barPoint(current,joint.a,link.ta),b=Bridge.barPoint(current,joint.b,link.tb);return{x:(a.x+b.x)/2,y:(a.y+b.y)/2};};
+      const first=joint.links[0],last=joint.links.at(-1);
+      let previous=seam(first),previousLink=first;
+      for(let i=1;i<=16;i++) {
+        const link={ta:first.ta+(last.ta-first.ta)*i/16,tb:first.tb+(last.tb-first.tb)*i/16},next=seam(link);
+        const crossesCut=(current.bars[joint.a].broken && (previousLink.ta<=current.bars[joint.a].cutT)!==(link.ta<=current.bars[joint.a].cutT)) ||
+          (current.bars[joint.b].broken && (previousLink.tb<=current.bars[joint.b].cutT)!==(link.tb<=current.bars[joint.b].cutT));
+        if(!crossesCut) line(previous,next,'#72a9a2',1.5);
+        previous=next;previousLink=link;
+      }
+    }
+    if(glueFirst>=0) {
+      const bar=current.bars[glueFirst];line(current.nodes[bar.a],current.nodes[bar.b],'#d8aa34',16);
+    }
+    const selected = current.bars[selectedBar];
+    if (selected && !selected.broken) timberLine(current,selected,'#176b67',15);
+    for (const bar of current.bars) {
+      if (bar.broken) continue;
+      const stressed = simulation && bar.stress > .55;
+      ctx.lineCap='round'; timberLine(current,bar,stressed?'#a73e32':'#94633a',Bridge.WOOD_WIDTH*50);
+      timberLine(current,bar,stressed?'#df8060':'#d1a16a',Bridge.WOOD_WIDTH*50*.55); ctx.lineCap='butt';
+    }
+    for (const fragment of current.fragments || []) {
+      const a=current.nodes[fragment.path.at(-2)], b=current.nodes[fragment.b];
+      if (fragment.source === selectedBar) timberLine(current,fragment,'#176b67',14);
+      timberLine(current,fragment,'#94633a',Bridge.WOOD_WIDTH*50); timberLine(current,fragment,'#d1a16a',Bridge.WOOD_WIDTH*50*.55);
+      const length=Math.max(Bridge.distance(a,b),1e-8), ux=(b.x-a.x)/length, uy=(b.y-a.y)/length;
+      ctx.beginPath();ctx.moveTo(b.x*50-uy*4,b.y*50+ux*4);ctx.lineTo(b.x*50+ux*2,b.y*50+uy*2);ctx.lineTo(b.x*50+uy*4,b.y*50-ux*4);ctx.strokeStyle='#9b432f';ctx.lineWidth=2;ctx.stroke();
+    }
+    current.nodes.forEach((node,i) => {
+      if (i >= design.nodes.length) return;
+      if(node.attachment && !node.load && i!==selectedLoad) return;
+      const x=node.x*50,y=node.y*50;
+      if (i===selectedLoad || (tool==='edit' && i===editNode)) {ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.strokeStyle='#176b67';ctx.lineWidth=2;ctx.stroke();}
+      ctx.beginPath();ctx.arc(x,y,5.5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#795333';ctx.lineWidth=2;ctx.stroke();
+      if(node.load>0) {
+        line({x:node.x,y:node.y+.15},{x:node.x,y:node.y+.68},'#365864',2);
+        ctx.fillStyle='#365864';ctx.beginPath();ctx.roundRect(x-32,y+34,64,43,5);ctx.fill();
+        text(formatWeight(node.load),x,y+53,'#fff',16);text('kg',x,y+68,'#d7e8ec',10);
+        line({x:node.x,y:node.y+1.66},{x:node.x,y:node.y+2.03},'#176b67',2);
+        ctx.beginPath();ctx.moveTo(x-5,y+96);ctx.lineTo(x,y+102);ctx.lineTo(x+5,y+96);ctx.strokeStyle='#176b67';ctx.lineWidth=2;ctx.stroke();
+      }
+    });
+    for (const joint of current.joints) {
+      if(joint.kind==='glue' && (current.bars[joint.a].broken || current.bars[joint.b].broken)) continue;
+      const p=jointPoint(joint);
+      ctx.beginPath();ctx.arc(p.x*50,p.y*50,8,0,Math.PI*2);ctx.fillStyle='#176b67';ctx.fill();
+      text(joint.kind==='glue'?'=':'+',p.x*50,p.y*50+4,'#fff',13);
+    }
+    const previewStart = tool === 'wood' && (pointerDown && hover && isDrag(pointerDown.point,hover,canvas.clientWidth) ? buildPoint(pointerDown.point) : start);
+    if(!simulation && previewStart) {
+      const end = hover ? buildPoint(hover) : previewStart, length=Bridge.distance(previewStart,end);
+      line(previewStart,end,length>Bridge.MAX_LENGTH?'#c34e3c':'#176b67',4,[7,5]);
+      text(`${(length*Bridge.UNIT*100).toFixed(0)} cm`,(previewStart.x+end.x)*25,(previewStart.y+end.y)*25-16,'#176b67',15);
+      ctx.beginPath();ctx.arc(previewStart.x*50,previewStart.y*50,10,0,Math.PI*2);ctx.strokeStyle='#176b67';ctx.lineWidth=2;ctx.stroke();
+    }
+    const cursorPoint=keyboardActive?keyboard:hover;
+    const target=tool==='load' && cursorPoint?Bridge.loadHit(current,cursorPoint,Math.max(.2,12*24/canvas.clientWidth)):null;
+    let cursor=keyboardActive ? keyboard : hover && !simulation ? snap(hover) : null;
+    if(tool==='load') cursor=target ? Bridge.barPoint(current,target.bar,target.t) : null;
+    else if(!simulation && cursorPoint && (tool==='wood' || (tool==='edit' && !keyboardActive))) {
+      cursor=buildPoint(cursorPoint,design,tool==='edit'?editNode:-1);
+    }
+    if(cursor) {
+      line({x:cursor.x-.18,y:cursor.y},{x:cursor.x+.18,y:cursor.y},'#176b67',2);
+      line({x:cursor.x,y:cursor.y-.18},{x:cursor.x,y:cursor.y+.18},'#176b67',2);
+    }
+    if(!design.bars.length) {text('由岸上開始，點兩個位置放木桿。',600,235,'#526b76',20);text('橋腳放在地面上，不會鎖定位置。',600,268,'#526b76',15);}
+  }
+  for(const id of toolNames) $(id).addEventListener('click',()=>setTool(id));
+  $('undo').addEventListener('click',()=>{
+    if(!history.length || simulation) return;
+    cancelPointer();const previous=history.pop();design=previous.design;selectedLoad=previous.selectedLoad;start=null;selectedBar=-1;editNode=-1;glueFirst=-1;
+    if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
+    tell('已復原上一步。');update();draw();
+  });
+  for(const id of ['clear','example']) $(id).addEventListener('click',()=>{
+    cancelPointer();remember();design=id==='clear'?Bridge.empty():Bridge.sample();selectedLoad=design.nodes.findIndex(n=>n.load);start=null;selectedBar=-1;
+    if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
+    setTool('wood');tell(id==='clear'?'已清空。由岸上開始搭橋；可按「復原」取回設計。':'已載入範例橋，按「開始測試」觀察。');update();draw();
+  });
+  $('weight').addEventListener('pointerdown',()=>{if(!simulation && selectedLoad>=0) remember();});
+  $('weight').addEventListener('keydown',event=>{if(!simulation && selectedLoad>=0 && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(event.key)) remember();});
+  $('weight').addEventListener('input',()=>{
+    autoLoading=false;
+    if(selectedLoad>=0) {
+      if(Number($('weight').value)>0 && !Bridge.canAddLoad(model().nodes[selectedLoad])) {tell('此位置已離開中央線，請重新選中央交點掛重物。');update();draw();return;}
+      design.nodes[selectedLoad].load=Number($('weight').value);if(simulation) simulation.nodes[selectedLoad].load=design.nodes[selectedLoad].load;
+    }
+    update();draw();
+  });
+  function startTest() {
+    cancelPointer();
+    if(!simulation) {
+      const material={};
+      for(const key of Object.keys(Bridge.MATERIAL)) {
+        const input=$('mat-'+key);
+        if(!input.checkValidity()) {input.closest('details').open=true;input.reportValidity();tell('請先修正木材參考數值。');return false;}
+        material[key]=Number(input.value)*(key==='young'?1e9:key==='density'?1:1e6);
+      }
+      simulation=Bridge.simulate(design,material);maxDrop=0;setTool('load');
+    }
+    running=true;start=null;accumulator=0;lastTime=0;
+    return true;
+  }
+  $('test').addEventListener('click',()=>{
+    if(!design.bars.length) return;
+    if(running) running=false; else if(!startTest()) return;
+    tell(running?'測試中：可拉動負重滑桿加重，或暫停觀察。':'已暫停。可調整負重，或返回建造修改木桿。');update();draw();
+  });
+  $('auto-load').addEventListener('click',()=>{
+    if(autoLoading) {autoLoading=false;update();return;}
+    if(!design.bars.length || !Bridge.canAddLoad(model().nodes[selectedLoad]) || simulation?.firstBreak) return;
+    if(!startTest()) return;autoLoading=true;
+    tell('正在連續加重（每秒 0.5 kg）：首次斷裂後停止加重，繼續觀察碎段掉落。');update();draw();
+  });
+  $('reset').addEventListener('click',()=>{simulation=null;running=false;autoLoading=false;maxDrop=0;setTool('wood');tell('已還原橋形，可以修改木桿再測試。');update();draw();});
+  const pointFrom = event => {const rect=canvas.getBoundingClientRect();return{x:(event.clientX-rect.left)/rect.width*24,y:(event.clientY-rect.top)/rect.height*14};};
+  canvas.addEventListener('pointerdown',event=>{
+    if(!event.isPrimary || event.button!==0) return;
+    canvas.focus({preventScroll:true});keyboardActive=false;
+    pointerDown={point:pointFrom(event),id:event.pointerId};
+    canvas.setPointerCapture(event.pointerId);
+    selectedBar=nearestBar(pointerDown.point);draw();
+    if(tool==='edit' && !simulation) {
+      editNode=nearestNode(pointerDown.point);
+      if(editNode>=0) {pointerDown.before=Bridge.clone(design);tell('拖動端點；相連木桿會一起更新。');}
+      else tell('請拖動木桿的端點。');
+      draw();
+    }
+  });
+  canvas.addEventListener('pointermove',event=>{
+    hover=pointFrom(event);keyboardActive=false;
+    if(pointerDown?.before && (pointerDown.moved || isDrag(pointerDown.point,hover,canvas.clientWidth))) {
+      pointerDown.moved=true;
+      const error=Bridge.moveNode(design,editNode,buildPoint(hover,design,editNode));
+      tell(error || '放開以確認修改；按 Esc 取消。');update();
+    }
+    draw();
+  });
+  canvas.addEventListener('pointerup',event=>{
+    if(!pointerDown || event.pointerId!==pointerDown.id) return;
+    const end=pointFrom(event),drag=isDrag(pointerDown.point,end,canvas.clientWidth);
+    if(pointerDown.before) {
+      const before=pointerDown.before, moved=pointerDown.moved || drag;
+      const error=moved ? Bridge.moveNode(design,editNode,buildPoint(end,design,editNode)) : '';
+      if(error) design=before;
+      else if(Bridge.distance(before.nodes[editNode],design.nodes[editNode])>1e-8) remember(before);
+      keyboard={...design.nodes[editNode]};
+      tell(error ? `${error}已還原這次修改。` : moved ? '已更新端點及相連木桿，可按「復原」。' : '已選端點，可拖動或用方向鍵修改。');
+    } else if(drag && tool==='wood' && !simulation) {start=null;operate(pointerDown.point,true);if(start) operate(end,true);}
+    else operate(end);
+    pointerDown=null;canvas.releasePointerCapture(event.pointerId);update();draw();
+  });
+  canvas.addEventListener('pointercancel',()=>{cancelPointer();update();draw();});
+  canvas.addEventListener('lostpointercapture',()=>{if(pointerDown){cancelPointer();update();draw();}});
+  canvas.addEventListener('pointerleave',()=>{hover=null;draw();});
+  canvas.addEventListener('keydown',event=>{
+    const movement={ArrowLeft:[-.5,0],ArrowRight:[.5,0],ArrowUp:[0,-.5],ArrowDown:[0,.5]}[event.key];
+    if(movement) {
+      event.preventDefault();keyboardActive=true;
+      if(tool==='edit' && editNode>=0 && !simulation && !pointerDown) {
+        const before=Bridge.clone(design), node=design.nodes[editNode];
+        const error=Bridge.moveNode(design,editNode,{x:node.x+movement[0],y:node.y+movement[1]});
+        if(!error) remember(before);
+        keyboard={...design.nodes[editNode]};tell(error || '已修改端點及相連木桿，可按「復原」。');update();
+      } else {keyboard.x=tool==='load'?Bridge.CENTER_X:Math.max(4,Math.min(20,keyboard.x+movement[0]));keyboard.y=Math.max(1,Math.min(11.5,keyboard.y+movement[1]));}
+      hover={...keyboard};draw();
+    }
+    if(event.key==='Enter' || event.key===' ') {event.preventDefault();keyboardActive=true;operate(keyboard);}
+  });
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'){cancelPointer();start=null;editNode=-1;glueFirst=-1;tell('已取消進行中的操作。');update();draw();}});
+  canvas.addEventListener('blur',()=>{keyboardActive=false;draw();});
+  function frame(time) {
+    if(running) {
+      if(lastTime) accumulator+=Math.min((time-lastTime)/1000,.05)*($('slow').checked?.25:1);
+      while(accumulator>=Bridge.DT) {
+        Bridge.step(simulation);accumulator-=Bridge.DT;
+        for(const node of simulation.nodes) maxDrop=Math.max(maxDrop,node.y-node.initialY);
+        if(autoLoading) {
+          if(simulation.firstBreak) {
+            autoLoading=false;
+            tell(`第 ${simulation.firstBreak.bar+1} 條木桿首先斷裂，總負重 ${formatWeight(simulation.firstBreak.load)} kg。已停止加重。`);
+          } else {
+            const weight=Bridge.increaseLoad(simulation,selectedLoad);
+            design.nodes[selectedLoad].load=weight;
+            if(weight>=20) {autoLoading=false;tell('所選節點已達 20 kg 上限；模擬繼續。');}
+          }
+        }
+      }
+      draw();
+      if(time-lastStats>120) {update();lastStats=time;}
+    }
+    lastTime=time;requestAnimationFrame(frame);
+  }
+  document.addEventListener('visibilitychange',()=>{lastTime=0;accumulator=0;cancelPointer();update();draw();});
+  new ResizeObserver(draw).observe(canvas);
+  update();draw();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

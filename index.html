@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="用互動模擬探索框架結構，跟著步驟認識 LED 矩陣接線。">
+  <meta name="description" content="動手搭木橋測試承重，用互動模擬探索框架結構，跟著步驟認識 LED 矩陣接線。">
   <title>STEAM 實驗室</title>
   <style>
     :root { color-scheme:light; --paper:#f3f7f7; --ink:#16323b; --muted:#4f686e; --green:#12695c; --copper:#b44c32; --line:#cddadb; --white:#fff; }
@@ -39,8 +39,16 @@
   <main>
     <header><span class="brand">STEAM 實驗室</span><span class="hint">觀察 · 操作 · 理解</span></header>
     <h1>揀一個主題，動手試。</h1>
-    <p class="intro">推一推框架，或跟著接線步驟，睇清楚背後嘅原理。</p>
+    <p class="intro">搭橋試承重、推一推框架，或跟著接線步驟，睇清楚背後嘅原理。</p>
     <nav class="activities" aria-label="學習主題">
+      <a class="activity" href="F3/wood-bridge.html" aria-labelledby="bridge-title bridge-action">
+        <svg class="drawing" viewBox="0 0 480 192" aria-hidden="true">
+          <path d="M30 136H450M60 136L105 58L150 136L195 58L240 136L285 58L330 136L375 58L420 136M105 58H375" fill="none" stroke="#ba8450" stroke-width="5" stroke-linejoin="round"/>
+          <g class="joint"><circle cx="60" cy="136" r="5"/><circle cx="150" cy="136" r="5"/><circle cx="240" cy="136" r="5"/><circle cx="330" cy="136" r="5"/><circle cx="420" cy="136" r="5"/><circle cx="105" cy="58" r="5"/><circle cx="195" cy="58" r="5"/><circle cx="285" cy="58" r="5"/><circle cx="375" cy="58" r="5"/></g>
+          <path d="M240 141V154" stroke="#16323b" stroke-width="2"/><rect x="225" y="154" width="30" height="23" rx="3" fill="#12695c"/>
+        </svg>
+        <div class="copy"><span class="topic">F3 · 木工結構與力</span><h2 id="bridge-title">木橋實驗室</h2><p class="description">用木桿連接搭橋，掛上重物，試吓邊種結構撐得住、邊條木桿最先斷。</p><span class="action" id="bridge-action">開始搭橋 <span aria-hidden="true">↗</span></span></div>
+      </a>
       <a class="activity" href="F3/frame-bracing-standalone.html" aria-labelledby="frame-title frame-action">
         <svg class="drawing" viewBox="0 0 480 192" aria-hidden="true">
           <path class="frame" d="M62 146 H158 L130 50 H34 Z M288 146 H384 V50 H288 Z"/>
