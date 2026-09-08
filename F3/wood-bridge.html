@@ -163,7 +163,7 @@
       <p>選「加固」再點木桿，自動複製同長木桿並在旁邊貼合，不複製重物。優先向上或側面堆疊，避開地面；空間或剩餘木材不足時取消。可以重複加固，也可以按「復原」。手動放木桿及「膠水」工具仍可使用。</p>
       <p>共用端點本來已相連；木桿交叉或端點碰到桿身時，選「接合」再點接觸處才會接合，容許相對轉動。整條長木桿保持完整。選「膠水」依次點兩條平行、相隔最多一格且重疊至少 5 cm 的木桿，會先靠攏至表面貼合，再固定相對滑動和轉動。接地木桿優先保持原位，其餘情況以第一條為準；若現有接合阻止靠攏，整次操作會取消。「移除」點重物可卸下，點接合圓點或膠合區中央可解除連接，其餘位置可移除木桿。</p>
       <p>選「修改」拖動端點，相連木桿及重物一起更新；膠合組合會保持木材長度，解除膠合後才可改形。超出木材用量、端點重疊、移入地面或無法維持接合時，修改會取消。建造操作可復原。新負重只可掛在河口中央垂直線（距兩岸各 47.5 cm）與木桿或碎段的交點；掛上後隨木桿移動，不限制水平運動。已有重物可繼續調整重量；卸下後若位置已離開中央線，須重新選中央交點。最多 150 個中段負重位置，卸下後可重用。連續加重以每秒 0.5 kg 平滑增加，首斷或達 20 kg 時停止加重，慢速模式同步放慢。</p>
-      <p>鍵盤：Tab 選取搭建區，方向鍵移動游標，Enter 操作。「修改」模式中，Enter 選端點後用方向鍵移動，Esc 結束修改或取消未完成操作。「返回建造」還原測試前的橋形，保留設定的負重。</p>
+      <p>鍵盤：Tab 選取搭建區，方向鍵移動游標，Enter 操作。「修改」模式中，Enter 選端點後用方向鍵移動，Esc 結束修改或取消未完成操作。「返回建造」還原測試前的橋形，保留設定的負重。裝置較慢時，播放會自動放慢以維持操作回應，負重仍按模擬時間累加；切換分頁時暫停運算。</p>
       <p>兩岸淨距 95 cm，橋樑自由放在岸上，沒有固定鉸點。地面承托木桿的模擬點並提供有限摩擦力。木桿內部能彎曲；端點和手動接合仍可轉動。膠合木桿沿桿身一起彎曲，加固後下彎通常較少。最大下移包含木桿中段。</p>
       <p>拉伸、壓縮和彎曲應力合併超出強度時，木桿在最先失效的模擬截面切成兩段；保留當時的形狀與速度，斷口獨立移動，重物及接點跟隨所屬碎段。膠合可透過另一條完整木材繼續連接碎段。「首斷總負重」記錄第一次木桿斷裂時所有重物的合計。</p>
       <p>輕木截面固定為 6 × 6 mm，自重、拉伸剛度 EA 及彎曲剛度 EI 由同一組材料數值計算。預設密度下每米木材重 5.76 g。實際下彎以原比例顯示，沒有視覺放大。平面離散梁使用 <a href="https://mmacklin.com/xpbd.pdf" target="_blank" rel="noopener">XPBD</a> 全域求解；驗證採用 <a href="https://research.fs.usda.gov/treesearch/62251" target="_blank" rel="noopener">Wood Handbook 梁公式</a>。</p>
@@ -651,42 +651,73 @@ const Bridge = (() => {
     }
     c.value=value;c.valueY=valueY;
   }
-  // 節點包含繪圖、負重及碰撞狀態；PCG 熱迴圈只使用連續數值暫存。
+  // 節點包含繪圖、負重及碰撞狀態；求解熱迴圈只使用連續數值暫存。
   // WeakMap 讓暫存跟隨模擬釋放，也不混入設計複製／復原資料。
   const solverBuffers=new WeakMap();
   function solveLinearRows(rows,buffers) {
     const {tx,ty,mass,linear:w}=buffers,count=rows.length;
-    const {offset,node,gx,gy,alpha,inverse,rhs,delta,fixed,residual,z,direction,product}=w;
+    const {offset,node,gx,gy,alpha,inverse,rhs,delta,residual}=w;
+    const contactStart=rows.findIndex(r=>r.c.contact),start=w.ready?(contactStart<0?count:contactStart):0;
+    // 只儲存共享節點產生的非零項，以縮放後的稀疏 Cholesky 處理相依硬接合。
+    // ponytail: 極密接合仍會增加分解填充；屆時加入最小度數排序。
+    if(!w.ready) {
+      if(!w.matrix) {
+        const entries=()=>Array.from({length:w.delta.length},()=>({indices:[],values:[]}));
+        w.matrix=entries();w.columns=entries();w.factor=entries();w.diagonal=new Float64Array(w.delta.length);w.work=new Float64Array(w.delta.length);
+      }
+      for(let i=0;i<count;i++) {w.matrix[i].indices.length=w.matrix[i].values.length=0;w.columns[i].indices.length=w.columns[i].values.length=0;}
+      const adjacency=Array.from({length:mass.length},()=>[]),work=w.work;
+      for(let i=0;i<count;i++) for(let k=offset[i];k<offset[i+1];k++) adjacency[node[k]].push(i,gx[k],gy[k]);
+      for(let i=0;i<count;i++) {
+        work.fill(0);work[i]=alpha[i]*inverse[i];
+        for(let k=offset[i];k<offset[i+1];k++) {
+          const adjacent=adjacency[node[k]];
+          for(let p=0;p<adjacent.length;p+=3) {
+            const j=adjacent[p];if(j>i) break;
+            work[j]+=mass[node[k]]*(gx[k]*adjacent[p+1]+gy[k]*adjacent[p+2])*Math.sqrt(inverse[i]*inverse[j]);
+          }
+        }
+        for(let j=0;j<=i;j++) if(work[j]!==0) {w.matrix[i].indices.push(j);w.matrix[i].values.push(work[j]);}
+      }
+    // 同一次非線性修正的木材分解不變；移除舊的接觸尾段，按新固定／滑動狀態重算。
+    } else for(let i=0;i<count;i++) {const column=w.columns[i];while(column.indices.length && column.indices.at(-1)>=start) {column.indices.pop();column.values.pop();}}
+    const {matrix,factor,columns,diagonal,work}=w;
     tx.fill(0);ty.fill(0);
     for(let i=0;i<count;i++) {
-      delta[i]=rows[i].delta;fixed[i]=rows[i].fixed;
+      delta[i]=rows[i].delta;
       for(let k=offset[i];k<offset[i+1];k++) {tx[node[k]]+=gx[k]*delta[i];ty[node[k]]+=gy[k]*delta[i];}
     }
-    let rz=0;
     for(let i=0;i<count;i++) {
-      let value=fixed[i]?0:rhs[i]-alpha[i]*delta[i];
-      if(!fixed[i]) for(let k=offset[i];k<offset[i+1];k++) value-=mass[node[k]]*(gx[k]*tx[node[k]]+gy[k]*ty[node[k]]);
-      residual[i]=value;z[i]=value*inverse[i];direction[i]=z[i];rz+=value*z[i];
+      let value=rhs[i]-alpha[i]*delta[i];
+      for(let k=offset[i];k<offset[i+1];k++) value-=mass[node[k]]*(gx[k]*tx[node[k]]+gy[k]*ty[node[k]]);
+      residual[i]=rows[i].fixed?0:value*Math.sqrt(inverse[i]);
     }
-    const initial=rz;
-    // 與原求解相同的 PCG、累加次序及停止條件；只將熱迴圈改用數值陣列。
-    for(let iteration=0;iteration<Math.min(count*2,240) && rz>Math.max(1e-28,initial*1e-14);iteration++) {
-      tx.fill(0);ty.fill(0);
-      for(let i=0;i<count;i++) for(let k=offset[i];k<offset[i+1];k++) {tx[node[k]]+=gx[k]*direction[i];ty[node[k]]+=gy[k]*direction[i];}
-      let denominator=0;
-      for(let i=0;i<count;i++) {
-        let value=fixed[i]?0:alpha[i]*direction[i];
-        if(!fixed[i]) for(let k=offset[i];k<offset[i+1];k++) value+=mass[node[k]]*(gx[k]*tx[node[k]]+gy[k]*ty[node[k]]);
-        product[i]=value;denominator+=direction[i]*value;
+    for(let i=start;i<count;i++) {
+      work.fill(0);const row=factor[i];row.indices.length=row.values.length=0;
+      if(rows[i].fixed) {diagonal[i]=1;continue;}
+      const entries=matrix[i];for(let k=0;k<entries.indices.length;k++) work[entries.indices[k]]=entries.values[k];
+      const first=entries.indices[0]??i;
+      for(let k=first;k<i;k++) {
+        if(work[k]===0 || rows[k].fixed || diagonal[k]===0) continue;
+        const value=work[k]/diagonal[k];
+        const column=columns[k];for(let p=0;p<column.indices.length;p++) work[column.indices[p]]-=value*column.values[p];
+        work[i]-=value*value;
+        row.indices.push(k);row.values.push(value);
       }
-      if(denominator<1e-30) break;
-      const scale=rz/denominator;
-      let next=0;
-      for(let i=0;i<count;i++) {delta[i]+=scale*direction[i];residual[i]-=scale*product[i];z[i]=residual[i]*inverse[i];next+=residual[i]*z[i];}
-      for(let i=0;i<count;i++) direction[i]=z[i]+next/rz*direction[i];
-      rz=next;
+      // 正規化後的零樞紐代表重複約束；不加假剛度，也不除以捨入誤差。
+      diagonal[i]=work[i]>1e-12?Math.sqrt(work[i]):0;
+      for(let p=0;p<row.indices.length;p++) {const column=columns[row.indices[p]];column.indices.push(i);column.values.push(row.values[p]);}
     }
-    for(let i=0;i<count;i++) rows[i].delta=delta[i];
+    w.ready=true;
+    for(let i=0;i<count;i++) {
+      const row=factor[i];let value=residual[i];for(let p=0;p<row.indices.length;p++) value-=row.values[p]*residual[row.indices[p]];
+      residual[i]=diagonal[i]>0?value/diagonal[i]:0;
+    }
+    for(let i=count-1;i>=0;i--) {
+      const column=columns[i];let value=residual[i];for(let p=0;p<column.indices.length;p++) value-=column.values[p]*residual[column.indices[p]];
+      residual[i]=diagonal[i]>0?value/diagonal[i]:0;
+      rows[i].delta=delta[i]+residual[i]*Math.sqrt(inverse[i]);
+    }
   }
   function solveConstraints(sim,dt) {
     let buffers=solverBuffers.get(sim);
@@ -706,6 +737,8 @@ const Bridge = (() => {
         rows.push({c,key,terms,alpha,value:axis?c.valueY:c.value});
       }
     }
+    // 先消去各木桿的局部彈性約束，減少接合造成的填充。
+    rows.sort((a,b)=>(a.alpha===0)-(b.alpha===0));
     for(const c of sim.contacts) {
       const n=sim.nodes[c.i];
       rows.push({c,key:'lambda',terms:[{i:c.i,x:c.x,y:c.y}],alpha:0,value:((c.x?n.x:n.y)-c.target)*UNIT});
@@ -718,8 +751,8 @@ const Bridge = (() => {
     sim.firstSolve=false;
     const terms=rows.reduce((sum,r)=>sum+r.terms.length,0);
     if(!buffers.linear || buffers.linear.delta.length<rows.length || buffers.linear.node.length<terms) {
-      const w={offset:new Uint32Array(rows.length+1),node:new Uint32Array(terms),gx:new Float64Array(terms),gy:new Float64Array(terms),fixed:new Uint8Array(rows.length)};
-      for(const key of ['alpha','inverse','rhs','delta','residual','z','direction','product']) w[key]=new Float64Array(rows.length);
+      const w={offset:new Uint32Array(rows.length+1),node:new Uint32Array(terms),gx:new Float64Array(terms),gy:new Float64Array(terms)};
+      for(const key of ['alpha','inverse','rhs','delta','residual']) w[key]=new Float64Array(rows.length);
       buffers.linear=w;
     }
     const w=buffers.linear;let term=0;
@@ -727,7 +760,7 @@ const Bridge = (() => {
       w.offset[i]=term;w.alpha[i]=r.alpha;w.inverse[i]=r.inv;w.rhs[i]=r.b;
       for(const g of r.terms) {w.node[term]=g.i;w.gx[term]=g.x;w.gy[term]=g.y;term++;}
     });
-    w.offset[rows.length]=term;
+    w.offset[rows.length]=term;w.ready=false;
     for(let activePass=0;activePass<20;activePass++) {
     solveLinearRows(rows,buffers);
     let changed=false;
@@ -754,13 +787,15 @@ const Bridge = (() => {
     }
     if(!changed) break;
     }
-    let correction=0;
+    let correction=0;tx.fill(0);ty.fill(0);
     for(const r of rows) {
       const c=r.c,old=c[r.key];
       const next=old+r.delta;
       c[r.key]=next;
-      for(const g of r.terms) {const n=sim.nodes[g.i],scale=n.invMass*(next-old)/UNIT;n.x+=scale*g.x;n.y+=scale*g.y;correction=Math.max(correction,Math.abs(scale*g.x),Math.abs(scale*g.y));}
+      for(const g of r.terms) {const scale=mass[g.i]*(next-old)/UNIT;tx[g.i]+=scale*g.x;ty[g.i]+=scale*g.y;}
     }
+    // 用節點的合計修正判斷收斂，不能把互相抵消的內力修正當作橋形仍在變動。
+    for(let i=0;i<sim.nodes.length;i++) {sim.nodes[i].x+=tx[i];sim.nodes[i].y+=ty[i];correction=Math.max(correction,Math.abs(tx[i]),Math.abs(ty[i]));}
     return correction;
   }
 
@@ -851,7 +886,7 @@ const Bridge = (() => {
   let design = Bridge.sample(), simulation = null, running = false, tool = 'wood';
   let start = null, hover = null, pointerDown = null, keyboard = {x:6,y:8}, keyboardActive = false;
   let selectedLoad = design.nodes.findIndex(n => n.load), history = [], lastTime = 0, accumulator = 0;
-  let lastStats = 0, maxDrop = 0, editNode = -1;
+  let lastStats = 0, maxDrop = 0, editNode = -1, frameId = null;
   let autoLoading = false, glueFirst = -1;
   const formatWeight=value=>String(Number(value.toFixed(2)));
   const toolNames=['wood','edit','join','glue','reinforce','load','erase'];
@@ -902,6 +937,7 @@ const Bridge = (() => {
     const target=design.nodes[selectedLoad];
     const location=target?.attachment ? `木桿 ${target.attachment.bar+1} · 距起點 ${(design.bars[target.attachment.bar].length*target.attachment.t*Bridge.UNIT*100).toFixed(1)} cm` : `端點 ${selectedLoad+1}`;
     $('load-target').textContent = selectedLoad < 0 ? '選「負重」後點中央虛線與木桿的交點。' : !Bridge.canAddLoad(current.nodes[selectedLoad]) ? '此位置已離開中央線；請重新選中央交點掛重物。' : `${location} · ${formatWeight(target.load)} kg；滑桿可即時調整。`;
+    scheduleFrame();
   }
   function nearestNode(point, threshold = Math.max(0.3,14*24/canvas.clientWidth)) {
     let nearest = -1, best = threshold;
@@ -1236,10 +1272,18 @@ const Bridge = (() => {
   });
   document.addEventListener('keydown',event=>{if(event.key==='Escape'){cancelPointer();start=null;editNode=-1;glueFirst=-1;tell('已取消進行中的操作。');update();draw();}});
   canvas.addEventListener('blur',()=>{keyboardActive=false;draw();});
+  function scheduleFrame() {
+    if(running && !document.hidden) {
+      if(frameId===null) frameId=requestAnimationFrame(frame);
+    } else if(frameId!==null) {cancelAnimationFrame(frameId);frameId=null;}
+  }
   function frame(time) {
-    if(running) {
+    frameId=null;
+    if(running && !document.hidden) {
       if(lastTime) accumulator+=Math.min((time-lastTime)/1000,.05)*($('slow').checked?.25:1);
-      while(accumulator>=Bridge.DT) {
+      // 固定物理步長；每幀約 8 ms 後讓出主執行緒，不追算積欠時間。
+      const deadline=performance.now()+8;
+      while(accumulator>=Bridge.DT && performance.now()<deadline) {
         Bridge.step(simulation);accumulator-=Bridge.DT;
         for(const node of simulation.nodes) maxDrop=Math.max(maxDrop,node.y-node.initialY);
         if(autoLoading) {
@@ -1253,14 +1297,15 @@ const Bridge = (() => {
           }
         }
       }
+      accumulator%=Bridge.DT;
       draw();
       if(time-lastStats>120) {update();lastStats=time;}
     }
-    lastTime=time;requestAnimationFrame(frame);
+    lastTime=time;scheduleFrame();
   }
   document.addEventListener('visibilitychange',()=>{lastTime=0;accumulator=0;cancelPointer();update();draw();});
   new ResizeObserver(draw).observe(canvas);
-  update();draw();requestAnimationFrame(frame);
+  update();draw();
 })();
 </script>
 </body>

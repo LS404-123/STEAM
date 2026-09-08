@@ -43,6 +43,18 @@ const finer=model(source.replace('2*Math.ceil(bar.length/2)','4*Math.ceil(bar.le
 const refined=beam(finer,2);
 assert.ok(Math.abs(refined.actual-refined.expected)<Math.abs(double.actual-double.expected),'細分加密應接近複合梁理論值');
 
+// 重複的硬接合不會增加實物剛度；方程線性相依也須求得相同橋形。
+const original=B.sample(),redundant=B.clone(original);
+redundant.joints.push(...B.clone(original.joints.filter(j=>j.kind==='pin')));
+const reference=settle(B,B.simulate(original),.05),duplicated=settle(B,B.simulate(redundant),.05);
+assert.equal(duplicated.firstBreak,null,'重複接合不產生假斷裂');
+reference.nodes.forEach((n,i)=>assert.ok(B.distance(n,duplicated.nodes[i])*B.UNIT<1e-9,'相依硬接合的解須保持一致'));
+const stock=B.empty();B.addBar(stock,{x:7,y:8},{x:17,y:8});
+for(let i=1;i<20;i++) assert.equal(B.reinforce(stock,0),'');
+B.placeLoad(stock,null,0,.5,2);
+assert.equal(B.totalLength(stock),20);
+assert.equal(settle(B,B.simulate(stock),.05).firstBreak,null,'20 m 膠合組合保持有限解，不產生假斷裂');
+
 // 固定兩端的實驗夾具只存在此測試，產品中的岸面依然沒有固定鉸點。
 // 移除重力以隔離軸向材料試驗及 Euler 挫曲；其餘使用同一求解器。
 const zeroG=model(source.replace('9.81/UNIT*dt*dt','0'));
