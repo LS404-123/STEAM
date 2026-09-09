@@ -10,7 +10,7 @@ const elements=new Map();let layoutReads=0,canvasWidth=929;
 function element() {
   const attributes=new Map(),calls={},e={textContent:'',innerHTML:'',value:'2',checked:false,listeners:{},
     addEventListener(name,fn){this.listeners[name]=fn;},checkValidity(){return true;},classList:{toggle(){}},setAttribute(k,v){attributes.set(k,v);},getAttribute(k){return attributes.get(k);}};
-  e.context=new Proxy(calls,{get(target,key){return target[key]??((...args)=>{target['count:'+key]=(target['count:'+key]||0)+1;});}});
+  e.context=new Proxy(calls,{get(target,key){return target[key]??((...args)=>{target['count:'+key]=(target['count:'+key]||0)+1;if(key==='stroke') (target.strokes||=[]).push(target.strokeStyle);});}});
   e.getContext=()=>e.context;e.width=300;e.height=150;
   e.focus=()=>{};e.setPointerCapture=()=>{};e.releasePointerCapture=()=>{};e.hasPointerCapture=()=>false;
   e.getBoundingClientRect=()=>({left:0,top:0,width:canvasWidth,height:canvasWidth*7/12});
@@ -160,14 +160,30 @@ let breakTime=20000;frame(breakTime);
 for(let i=0;i<20 && !model().firstBreak;i++) {breakTime+=50;frame(breakTime);}
 assert.ok(model().firstBreak,'固定負重也須觸發實際斷裂');
 assert.equal(elements.get('slow').checked,false,'自動慢速保留使用者原本未勾選的偏好');
-assert.equal(elements.get('slow').hidden,true);assert.match(elements.get('slow-label').textContent,/斷裂.*¼/);
+assert.equal(elements.get('slow').hidden,true);assert.match(elements.get('slow-label').textContent,/斷裂.*1\/10/);
 assert.equal(elements.get('stress-note').hidden,false);assert.match(elements.get('stress-value').textContent,/木桿 \d+.*MPa/);
-assert.match(elements.get('message').textContent,/自動切換 ¼ 速/);
-const beforeAutoSlow=steps;breakTime+=20;frame(breakTime);
-assert.equal(steps-beforeAutoSlow,1,'首斷清除快轉積欠時間，20 ms 只推進四分一速度');
+assert.match(elements.get('message').textContent,/自動切換 1\/10 速/);
+const beforeAutoSlow=steps;breakTime+=50;frame(breakTime);
+assert.equal(steps-beforeAutoSlow,1,'首斷清除快轉積欠時間，50 ms 以十分一速度只推進一個物理步');
 click('test');assert.equal(frames.size,0);click('test');breakTime+=50;frame(breakTime);
-const beforeResume=steps;breakTime+=20;frame(breakTime);
+const beforeResume=steps;breakTime+=50;frame(breakTime);
 assert.equal(steps-beforeResume,1,'暫停再繼續仍保持斷裂慢速');
 click('reset');assert.equal(elements.get('stress-note').hidden,true);assert.equal(elements.get('slow').hidden,false);
 assert.equal(elements.get('slow').checked,false,'返回建造後恢復原慢速偏好');
+click('example');elements.get('slow').checked=true;click('test');breakTime+=50;frame(breakTime);
+const beforeManual=steps;breakTime+=50;frame(breakTime);
+assert.equal(model().firstBreak,null);
+assert.equal(steps-beforeManual,1,'未斷裂時手動慢播同樣使用十分一速度');
+click('test');
+for(const force of [1,-1,0]) {
+  model().bars.forEach(bar=>{bar.axialForces=bar.axial.map(()=>force);bar.stress=1;});
+  calls.strokes=[];context.renderer.draw();
+  assert.equal(calls.strokes.includes('#267ac2'),force>0,'受拉才顯示藍色');
+  assert.equal(calls.strokes.includes('#c34e3c'),force<0,'受壓才顯示紅色，不能由接近斷裂判斷');
+}
+model().bars[0].axialForces[0]=1;model().bars[0].axialForces[1]=-1;
+calls.strokes=[];context.renderer.draw();
+assert.ok(calls.strokes.includes('#267ac2') && calls.strokes.includes('#c34e3c'),'同一木桿可分段顯示拉、壓');
+click('reset');calls.strokes=[];context.renderer.draw();
+assert.ok(!calls.strokes.includes('#267ac2') && !calls.strokes.includes('#c34e3c'),'返回建造後恢復木色');
 console.log('通過：繪製快取與排程、單一測試入口、加重／暫停／首斷／上限、重疊選取、加固／膠合／刪除／卸重、復原及滑鼠／鍵盤修改。');

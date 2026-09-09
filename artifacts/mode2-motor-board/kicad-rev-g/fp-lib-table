@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "BoardF") (type "KiCad") (uri "${KIPRJMOD}/BoardF.pretty") (options "") (descr "F 版封裝"))
+)

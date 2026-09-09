@@ -1,0 +1,21 @@
+{
+  "checked_pin_connections": 81,
+  "button_sequences": 1024,
+  "length_per_sequence": 10,
+  "rc_scenarios_2V": 28,
+  "erc_violations": 0,
+  "limits": "原理圖／PCB／指定邏輯與 RC 模型檢查；尚未實機測試。商品圖片不代表即時庫存。",
+  "board_mm": [
+    28.0,
+    28.0
+  ],
+  "board_components": 22,
+  "copper_layers": 2,
+  "back_components": 0,
+  "pcb_violations": 0,
+  "unconnected_items": 0,
+  "schematic_parity": 0,
+  "right_angle_bends": 0,
+  "vias": 36,
+  "tracks": 155
+}

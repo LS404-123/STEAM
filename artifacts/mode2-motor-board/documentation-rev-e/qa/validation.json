@@ -1,0 +1,14 @@
+{
+  "preserved_template_parts": 20,
+  "sections": 1,
+  "images": 5,
+  "pinmap_check": "pass",
+  "source_sha256": {
+    "mode2-motor.kicad_sch": "5c503b17c5d2360a6e8b21376e0676181c52633d4527efd5fea935114b6af69a",
+    "mode2-motor.kicad_pcb": "78f5d268e942d65479147a80e9a407f956db03064be994f4989fd88f07ff8a3f"
+  },
+  "reference_sha256": "13504f6c221a42c1726460a9e865e563355539ff97d702d6c9b2267b4b261d76",
+  "pdf_pages": 11,
+  "visual_review": "已逐頁檢視 11 頁，無空白頁、孤立尾頁、文字或表格截斷；原理圖另附向量 PDF。",
+  "renderer": "Word 原生 PDF 匯出及 Poppler PNG；內建 render_docx 因未提供 LibreOffice 無法執行。"
+}

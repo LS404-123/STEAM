@@ -1,0 +1,229 @@
+[
+  {
+    "ref": "P1",
+    "value": "電池螺絲端子",
+    "footprint": "",
+    "pins": {
+      "1": "BATT+",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "S0",
+    "value": "PCB SPDT 電源開關",
+    "footprint": "",
+    "pins": {
+      "1": "BATT+",
+      "2": "VCC",
+      "3": "DISCH"
+    }
+  },
+  {
+    "ref": "R6",
+    "value": "100R / 0.25W",
+    "footprint": "",
+    "pins": {
+      "1": "DISCH",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "C4",
+    "value": "100uF / 6.3V",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "R5",
+    "value": "100k",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "POR_RC"
+    }
+  },
+  {
+    "ref": "C7",
+    "value": "100nF",
+    "footprint": "",
+    "pins": {
+      "1": "POR_RC",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "D1",
+    "value": "BAT54WS",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "POR_RC"
+    }
+  },
+  {
+    "ref": "C1",
+    "value": "100nF / 16V",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "C2",
+    "value": "100nF / 16V",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "C3",
+    "value": "100nF / 16V",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "U1",
+    "value": "SN74HC14DR",
+    "footprint": "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",
+    "pins": {
+      "1": "DB1",
+      "2": "CLK1",
+      "3": "DB2",
+      "4": "CLK2",
+      "5": "POR_RC",
+      "6": "POR_INV",
+      "9": "POR_INV",
+      "8": "RESET_N",
+      "11": "GND",
+      "13": "GND",
+      "14": "VCC",
+      "7": "GND"
+    }
+  },
+  {
+    "ref": "U2",
+    "value": "SN74HC74DR",
+    "footprint": "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",
+    "pins": {
+      "1": "RESET_N",
+      "2": "NOT_REV",
+      "3": "CLK1",
+      "4": "VCC",
+      "5": "RUN",
+      "7": "GND",
+      "8": "NOT_REV",
+      "9": "REV",
+      "10": "VCC",
+      "11": "CLK2",
+      "12": "RUN",
+      "13": "RUN",
+      "14": "VCC"
+    }
+  },
+  {
+    "ref": "U3",
+    "value": "DRV8212DSGR",
+    "footprint": "Package_SON:Texas_DSG0008A_WSON-8-1EP_2x2mm_P0.5mm_EP0.9x1.6mm",
+    "pins": {
+      "1": "VCC",
+      "2": "M2",
+      "3": "M1",
+      "4": "GND",
+      "5": "RUN",
+      "6": "REV",
+      "7": "VCC",
+      "8": "VCC",
+      "9": "GND"
+    }
+  },
+  {
+    "ref": "P2",
+    "value": "SW1 螺絲端子",
+    "footprint": "",
+    "pins": {
+      "1": "SW1",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "R1",
+    "value": "100k",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "SW1"
+    }
+  },
+  {
+    "ref": "R3",
+    "value": "1k",
+    "footprint": "",
+    "pins": {
+      "1": "SW1",
+      "2": "DB1"
+    }
+  },
+  {
+    "ref": "C5",
+    "value": "220nF",
+    "footprint": "",
+    "pins": {
+      "1": "DB1",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "P3",
+    "value": "SW2 螺絲端子",
+    "footprint": "",
+    "pins": {
+      "1": "SW2",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "R2",
+    "value": "100k",
+    "footprint": "",
+    "pins": {
+      "1": "VCC",
+      "2": "SW2"
+    }
+  },
+  {
+    "ref": "R4",
+    "value": "1k",
+    "footprint": "",
+    "pins": {
+      "1": "SW2",
+      "2": "DB2"
+    }
+  },
+  {
+    "ref": "C6",
+    "value": "220nF",
+    "footprint": "",
+    "pins": {
+      "1": "DB2",
+      "2": "GND"
+    }
+  },
+  {
+    "ref": "P4",
+    "value": "馬達螺絲端子",
+    "footprint": "",
+    "pins": {
+      "1": "M1",
+      "2": "M2"
+    }
+  }
+]

@@ -58,7 +58,8 @@
     .materials tfoot { font-weight:700; }
     .materials p { margin:10px 0 0; }
     .swatch { display:inline-block; width:18px; height:5px; border-radius:3px; background:var(--wood); }
-    .swatch.high { background:var(--red); }
+    .swatch.compression { background:var(--red); }
+    .swatch.tension { background:#267ac2; }
     aside { display:flex; flex-direction:column; gap:21px; padding:23px 21px; border-left:1px solid var(--line); }
     h2 { margin:0 0 12px; font-size:14px; }
     .material { display:flex; gap:13px; align-items:center; }
@@ -133,7 +134,7 @@
         <button id="glue-confirm" hidden>膠合這兩條</button><button id="cancel-glue" hidden>取消膠合</button>
       </div>
       <p id="message" role="status">點兩個位置或拖拉放木桿；中段接觸需按「接合」。Esc 取消。</p>
-      <div class="legend"><span><i class="swatch"></i>木桿</span><span><i class="swatch high"></i>接近斷裂</span><span>● 接合　▤ 膠合</span><span>◎ 最高應力　× 首斷</span><span>每小格 5 cm</span><span>虛線：原設計</span></div>
+      <div class="legend"><span><i class="swatch"></i>未測試／軸力極小</span><span><i class="swatch compression"></i>紅色：受壓</span><span><i class="swatch tension"></i>藍色：受拉</span><span>● 接合　▤ 膠合</span><span>◎ 最高應力　× 首斷</span><span>每小格 5 cm</span><span>虛線：原設計</span></div>
       <details id="materials" class="materials" aria-label="木橋材料計算" open><summary>材料明細 · 長度與用量</summary>
         <table>
           <caption>材料計算 · 正視圖（單面）</caption>
@@ -157,7 +158,7 @@
         <label class="slow-control"><input id="auto-load" type="checkbox" aria-describedby="test-mode-note">連續加重</label>
         <p id="test-mode-note" class="small">固定負重；勾選後每秒增加 0.5 kg。</p>
         <button id="test" class="primary">▶ 開始測試</button>
-        <label class="slow-control"><input id="slow" type="checkbox"><span id="slow-label">慢速播放（¼ 速）</span></label><button id="reset" disabled>↶ 返回建造</button>
+        <label class="slow-control"><input id="slow" type="checkbox"><span id="slow-label">慢速播放（1/10 速）</span></label><button id="reset" disabled>↶ 返回建造</button>
         <p class="small">二維物理估算；實物承重須以木材及膠合試驗校準。</p>
       </section>
       <section class="rule results"><p id="status" role="status">建造中</p><dl class="readouts"><dt>木桿數量</dt><dd id="bar-count">18</dd><dt>木材用量</dt><dd id="wood-used">— / 20 m</dd><dt>接合／膠合</dt><dd id="joint-count">0 / 0</dd><dt>總負重</dt><dd id="total-load">2 kg</dd><dt>最大下移</dt><dd id="deflection">—</dd><dt>已斷木桿</dt><dd id="broken-count">0</dd><dt>首斷總負重</dt><dd id="first-break">—</dd></dl></section>
@@ -180,12 +181,12 @@
       <p id="keyboard-help">點起點、終點，或直接拖拉放木桿。位置先對齊 5 cm 方格；靠近已有木桿時，把方格位置投影到桿身，沿桿移動。接近任一木桿端點時優先吸附該端點，即使端點不在方格上。按木桿可作為新木桿的起點，中段接觸需按「接合」才連接。每條最多 100 cm，全部木材合計最多 20 m；重疊及膠合的木材也分別計算。刪除或縮短木桿可退回用量。</p>
       <p>用「選取」點木桿，確認高亮目標後按「加固」，自動複製同長木桿並貼合，不複製重物。優先向上或側面堆疊，避開地面；空間或剩餘木材不足時取消。可以重複加固，也可以按「復原」。物件重疊時，用畫布下方的選單切換木桿、端點、接合或重物，再執行操作。</p>
       <p>共用端點本來已相連；木桿交叉或端點碰到桿身時，選「接合」再點接觸處才會接合，容許相對轉動。整條長木桿保持完整。手動膠合：選取第一條木桿，在「更多」按「與另一木桿膠合」，再選第二條並確認。兩條木桿須平行、相隔最多一格且重疊至少 5 cm；會先靠攏至表面貼合，再固定相對滑動和轉動。接地木桿優先保持原位，其餘情況以第一條為準；若現有接合阻止靠攏，整次操作會取消。選取重物後可卸下；選接點或膠合區中央後可解除連接；選木桿後會刪除整組膠合木桿，加固層亦一併移除；普通接點相連的其他木桿會保留。按一次「復原」可取回整組。</p>
-      <p>用「選取」拖動一個端點，可調整木桿長度及角度，相連木桿及重物一起更新。靠近另一木桿末端時會吸附，放開即建立可轉動接點；移開則取消預覽，按 Esc 可取消整次拖動。膠合組合會保持木材長度，解除膠合後才可改形。超出木材用量、木桿過短、移入地面或無法維持接合時，修改會取消。建造操作可復原。新負重只可掛在河口中央垂直線（距兩岸各 47.5 cm）與木桿或碎段的交點；掛上後隨木桿移動，不限制水平運動。已有重物可繼續調整重量；卸下後若位置已離開中央線，須重新選中央交點。最多 150 個中段負重位置，卸下後可重用。勾選「連續加重」後按開始測試，以每秒 0.5 kg 增加；首斷或達 20 kg 時停止加重；不論有否勾選慢速，首次斷裂後都自動以 ¼ 速播放，並用紅色 × 標示首斷位置。取消勾選只停止加重；按「暫停測試」才暫停整個模擬。</p>
+      <p>用「選取」拖動一個端點，可調整木桿長度及角度，相連木桿及重物一起更新。靠近另一木桿末端時會吸附，放開即建立可轉動接點；移開則取消預覽，按 Esc 可取消整次拖動。膠合組合會保持木材長度，解除膠合後才可改形。超出木材用量、木桿過短、移入地面或無法維持接合時，修改會取消。建造操作可復原。新負重只可掛在河口中央垂直線（距兩岸各 47.5 cm）與木桿或碎段的交點；掛上後隨木桿移動，不限制水平運動。已有重物可繼續調整重量；卸下後若位置已離開中央線，須重新選中央交點。最多 150 個中段負重位置，卸下後可重用。勾選「連續加重」後按開始測試，以每秒 0.5 kg 增加；首斷或達 20 kg 時停止加重；不論有否勾選慢速，首次斷裂後都自動以 1/10 速播放，並用紅色 × 標示首斷位置。取消勾選只停止加重；按「暫停測試」才暫停整個模擬。</p>
       <p>鍵盤：Tab 選取搭建區，方向鍵移動游標，Enter 操作。「選取」模式中，Enter 選端點後用方向鍵移動；重疊時按 Tab 到選單切換目標，再回到搭建區。Esc 結束修改或取消未完成操作。「返回建造」還原測試前的橋形，保留設定的負重。裝置較慢時，播放會自動放慢以維持操作回應，負重仍按模擬時間累加；切換分頁時暫停運算。</p>
-      <p>兩岸淨距 95 cm，橋樑自由放在岸上，沒有固定鉸點。地面承托木桿的模擬點並提供有限摩擦力。木桿內部能彎曲；端點和手動接合仍可轉動。膠合木桿沿桿身一起彎曲，加固後下彎通常較少。最大下移包含木桿中段。橙色圓圈標示未斷木桿當下的最高應力位置，顯示軸向與彎曲疊加的最大應力（MPa）；斷裂當步也會保留該處標示。</p>
+      <p>兩岸淨距 95 cm，橋樑自由放在岸上，沒有固定鉸點。地面承托木桿的模擬點並提供有限摩擦力。木桿內部能彎曲；端點和手動接合仍可轉動。膠合木桿沿桿身一起彎曲，加固後下彎通常較少。最大下移包含木桿中段。測試時木桿以紅色表示受壓、藍色表示受拉；軸力極小時保留木色，同一木桿各段受力不同時會分段上色。顏色表示沿桿長的軸力方向，不代表彎曲截面上下表面的應力。橙色圓圈標示未斷木桿當下的最高應力位置，顯示軸向與彎曲疊加的最大應力（MPa）；斷裂當步也會保留該處標示。</p>
       <p>拉伸、壓縮和彎曲應力合併超出強度時，木桿在最先失效的模擬截面切成兩段；保留當時的形狀與速度，斷口獨立移動，重物及接點跟隨所屬碎段。膠合可透過另一條完整木材繼續連接碎段。「首斷總負重」記錄第一次木桿斷裂時所有重物的合計。</p>
       <p>輕木截面固定為 6 × 6 mm，自重、拉伸剛度 EA 及彎曲剛度 EI 由同一組材料數值計算。預設密度下每米木材重 5.76 g。實際下彎以原比例顯示，沒有視覺放大。平面離散梁使用 <a href="https://mmacklin.com/xpbd.pdf" target="_blank" rel="noopener">XPBD</a> 全域求解；驗證採用 <a href="https://research.fs.usda.gov/treesearch/62251" target="_blank" rel="noopener">Wood Handbook 梁公式</a>。</p>
-      <p>重力加速度為 9.81 m/s²，不加入空氣阻力或整體速度衰減。地面摩擦係數假設為 0.6，法向碰撞採不回彈近似。斷裂後按相連物件分組檢查能量，空中保留質心動量；碰撞求解產生的額外能量以數值耗散及縮短步長處理。這部分不是實測木材阻尼，撞擊瞬間應力與碎段軌跡只能作定性觀察。¼ 速只改播放速度，不改重力、材料或物理步長。</p>
+      <p>重力加速度為 9.81 m/s²，不加入空氣阻力或整體速度衰減。地面摩擦係數假設為 0.6，法向碰撞採不回彈近似。斷裂後按相連物件分組檢查能量，空中保留質心動量；碰撞求解產生的額外能量以數值耗散及縮短步長處理。這部分不是實測木材阻尼，撞擊瞬間應力與碎段軌跡只能作定性觀察。1/10 速只改播放速度，不改重力、材料或物理步長。</p>
       <p>這是二維近似，並非真實承重認證。「首斷總負重」是模型估算。預設為輕木參考值，並非這批木材的實測值；密度、含水量、木紋方向及缺陷會影響實際表現。普通接合視為鉸接；膠合視為完全黏結、傳遞滑動與轉動的約束，並無實測膠水強度。拉、壓、彎曲採簡化線性失效判據。不計三維扭轉、木材缺陷、剪切破壞、桿身互撞、膠水剝離和碎段再次斷裂。木桿每段最多 10 cm，以細分節點承托；接近岸邊的局部接觸和斷裂位置仍有離散誤差。</p>
     </details>
   </div>
@@ -963,8 +964,10 @@ const Bridge = (() => {
     }
     let fractured=false;sim.peakStress=null;
     const recordStress=(bar,t,value)=>{if(!sim.peakStress || value>sim.peakStress.value) sim.peakStress={bar,t,value};};
-    for(const [index,bar] of sim.bars.entries()) if(!bar.broken) {
+    for(const [index,bar] of [...sim.bars,...sim.fragments].entries()) if(!bar.broken) {
       const force=bar.axial.map(c=>-c.lambda/(dt*dt));
+      bar.axialForces=force; // 保留已接受步長的軸力，包含縮短步長後的結果；正值受拉、負值受壓。
+      if(index>=sim.bars.length) continue;
       const axialRatio=n=>Math.abs(n)/AREA/(n>=0?sim.material.tension:sim.material.compression);
       let worst=0,cut=1;
       for(let i=0;i<force.length;i++) {
@@ -1031,9 +1034,9 @@ const Bridge = (() => {
     $('stress-note').hidden=!simulation?.peakStress;
     if(simulation?.peakStress) $('stress-value').textContent=`木桿 ${simulation.peakStress.bar+1} · ${(simulation.peakStress.value/1e6).toFixed(2)} MPa`;
     $('slow').hidden=$('slow').disabled=!!simulation?.firstBreak;
-    $('slow-label').textContent=simulation?.firstBreak?'斷裂慢速播放（¼ 速）':'慢速播放（¼ 速）';
+    $('slow-label').textContent=simulation?.firstBreak?'斷裂慢速播放（1/10 速）':'慢速播放（1/10 速）';
     $('deflection').textContent = simulation ? `${(maxDrop*Bridge.UNIT*100).toFixed(2)} cm` : '—';
-    const status = !simulation ? '建造中' : simulation.unstable ? '碰撞求解未收斂 · 已暫停' : broken ? `木桿斷裂${running ? ' · ¼ 速' : ' · 已暫停'}` : running ? '測試中' : '已暫停';
+    const status = !simulation ? '建造中' : simulation.unstable ? '碰撞求解未收斂 · 已暫停' : broken ? `木桿斷裂${running ? ' · 1/10 速' : ' · 已暫停'}` : running ? '測試中' : '已暫停';
     if ($('status').textContent !== status) $('status').textContent = status;
     $('status').classList.toggle('failed',broken > 0);
     $('test').textContent = running ? 'Ⅱ 暫停測試' : simulation ? '▶ 繼續測試' : '▶ 開始測試';
@@ -1043,7 +1046,7 @@ const Bridge = (() => {
     for(const key of Object.keys(Bridge.MATERIAL)) $('mat-'+key).disabled=!!simulation;
     $('auto-load').disabled = !design.bars.length || !Bridge.canAddLoad(current.nodes[selectedLoad]) || broken > 0 || current.nodes[selectedLoad]?.load>=20;
     if($('auto-load').disabled) $('auto-load').checked=false;
-    $('test-mode-note').textContent = broken ? '已停止加重；自動以 ¼ 速觀察斷裂及跌落。' : current.nodes[selectedLoad]?.load>=20 ? '所選重物已達 20 kg。' : !Bridge.canAddLoad(current.nodes[selectedLoad]) ? '先選中央交點掛重物。' : $('auto-load').checked ? '每秒 +0.5 kg；首斷或 20 kg 停止加重。' : '固定負重；首次斷裂後自動慢速。';
+    $('test-mode-note').textContent = broken ? '已停止加重；自動以 1/10 速觀察斷裂及跌落。' : current.nodes[selectedLoad]?.load>=20 ? '所選重物已達 20 kg。' : !Bridge.canAddLoad(current.nodes[selectedLoad]) ? '先選中央交點掛重物。' : $('auto-load').checked ? '每秒 +0.5 kg；首斷或 20 kg 停止加重。' : '固定負重；首次斷裂後自動慢速。';
     $('undo').disabled = !!simulation || !history.length;
     if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
     $('weight-value').textContent = formatWeight(Number($('weight').value));
@@ -1239,15 +1242,18 @@ const Bridge = (() => {
     }
     if(!simulation && selected?.kind==='bar') for(const index of woodStack(selected.index)) timberLine(current,current.bars[index],'#72a9a2',12);
     if(simulation?.peakStress && !current.bars[simulation.peakStress.bar].broken) timberLine(current,current.bars[simulation.peakStress.bar],'#f2d293',10);
-    for (const bar of current.bars) {
+    for (const bar of [...current.bars,...(current.fragments || [])]) {
       if (bar.broken) continue;
-      const stressed = simulation && bar.stress > .55;
-      ctx.lineCap='round'; timberLine(current,bar,stressed?'#a73e32':'#94633a',Bridge.WOOD_WIDTH*50);
-      timberLine(current,bar,stressed?'#df8060':'#d1a16a',Bridge.WOOD_WIDTH*50*.55); ctx.lineCap='butt';
+      ctx.lineCap='round'; timberLine(current,bar,'#94633a',Bridge.WOOD_WIDTH*50);
+      timberLine(current,bar,'#d1a16a',Bridge.WOOD_WIDTH*50*.55);
+      // 按各段軸力上色，不把同一木桿內的拉、壓互相平均抵消；忽略小於 0.0001 N 的數值雜訊。
+      if(simulation) for(const [i,force] of (bar.axialForces || []).entries()) if(Math.abs(force)>1e-4) {
+        line(current.nodes[bar.path[i]],current.nodes[bar.path[i+1]],force>0?'#267ac2':'#c34e3c',Math.max(Bridge.WOOD_WIDTH*50,2.5*1200/canvasWidth));
+      }
+      ctx.lineCap='butt';
     }
     for (const fragment of current.fragments || []) {
       const a=current.nodes[fragment.path.at(-2)], b=current.nodes[fragment.b];
-      timberLine(current,fragment,'#94633a',Bridge.WOOD_WIDTH*50); timberLine(current,fragment,'#d1a16a',Bridge.WOOD_WIDTH*50*.55);
       const length=Math.max(Bridge.distance(a,b),1e-8), ux=(b.x-a.x)/length, uy=(b.y-a.y)/length;
       ctx.beginPath();ctx.moveTo(b.x*50-uy*4,b.y*50+ux*4);ctx.lineTo(b.x*50+ux*2,b.y*50+uy*2);ctx.lineTo(b.x*50+uy*4,b.y*50-ux*4);ctx.strokeStyle='#9b432f';ctx.lineWidth=2;ctx.stroke();
     }
@@ -1454,7 +1460,7 @@ const Bridge = (() => {
   function frame(time) {
     frameId=null;
     if(running && !document.hidden) {
-      if(lastTime) accumulator+=Math.min((time-lastTime)/1000,.05)*(simulation.firstBreak || $('slow').checked?.25:1);
+      if(lastTime) accumulator+=Math.min((time-lastTime)/1000,.05)*(simulation.firstBreak || $('slow').checked?.1:1);
       // 固定物理步長；每幀約 8 ms 後讓出主執行緒，不追算積欠時間。
       const deadline=performance.now()+8;
       while(accumulator>=Bridge.DT && performance.now()<deadline) {
@@ -1464,7 +1470,7 @@ const Bridge = (() => {
         if(simulation.unstable) {running=false;accumulator=0;tell('碰撞後未能穩定求解，已保留最後有效橋形並暫停。請返回建造調整。');update();break;}
         if(simulation.firstBreak && !hadBreak) {
           $('auto-load').checked=false;accumulator=0;
-          tell(`第 ${simulation.firstBreak.bar+1} 條木桿首先斷裂，總負重 ${formatWeight(simulation.firstBreak.load)} kg。已自動切換 ¼ 速；紅色 × 標示首斷位置。`);
+          tell(`第 ${simulation.firstBreak.bar+1} 條木桿首先斷裂，總負重 ${formatWeight(simulation.firstBreak.load)} kg。已自動切換 1/10 速；紅色 × 標示首斷位置。`);
           update();break;
         }
         if($('auto-load').checked) {

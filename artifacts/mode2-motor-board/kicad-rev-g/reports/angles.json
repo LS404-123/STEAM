@@ -1,0 +1,59 @@
+{
+  "board": "D:\\vibe_coding\\STEAM\\artifacts\\mode2-motor-board\\kicad-rev-g\\mode2-no-firmware.kicad_pcb",
+  "right_angle_bends": [],
+  "pad_or_branch_junctions": [
+    {
+      "net": "/VCC",
+      "layer": "F.Cu",
+      "xy_mm": [
+        30.05,
+        21.7
+      ],
+      "pads": []
+    },
+    {
+      "net": "/VCC",
+      "layer": "F.Cu",
+      "xy_mm": [
+        17.2,
+        29.0
+      ],
+      "pads": [
+        "R2.1"
+      ]
+    },
+    {
+      "net": "/POR_RC",
+      "layer": "F.Cu",
+      "xy_mm": [
+        24.0,
+        32.15
+      ],
+      "pads": [
+        "R5.2"
+      ]
+    },
+    {
+      "net": "/RUN",
+      "layer": "F.Cu",
+      "xy_mm": [
+        22.5,
+        18.75
+      ],
+      "pads": [
+        "U2.12"
+      ]
+    },
+    {
+      "net": "/DB2",
+      "layer": "F.Cu",
+      "xy_mm": [
+        12.5,
+        23.75
+      ],
+      "pads": [
+        "C6.1"
+      ]
+    }
+  ]
+}

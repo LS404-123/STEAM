@@ -1,0 +1,423 @@
+(kicad_sch(version 20250114)(generator "eeschema")(uuid 8d0a09ec-cfd3-5407-9954-c5467271c317)(paper "A4")
+ (title_block(title "模式二馬達控制板")(date "2026-09-09")(rev "C 原型")(company "STEAM"))
+ (lib_symbols (symbol "Mode2:PMOS"
+		(pin_names
+			(offset 0)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(duplicate_pin_numbers_are_jumpers no)
+		(property "Reference" "Q"
+			(at 5.08 1.905 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "PMOS"
+			(at 5.08 0 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 5.08 2.54 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "P-MOSFET transistor, gate/source/drain"
+			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "ki_keywords" "transistor PMOS P-MOS P-MOSFET"
+			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(symbol "PMOS_0_1"
+			(polyline
+				(pts
+					(xy 0.254 1.905) (xy 0.254 -1.905)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.254 0) (xy -2.54 0)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 2.286) (xy 0.762 1.27)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 1.778) (xy 3.302 1.778) (xy 3.302 -1.778) (xy 0.762 -1.778)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 0.508) (xy 0.762 -0.508)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 -1.27) (xy 0.762 -2.286)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(circle
+				(center 1.651 0)
+				(radius 2.794)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 2.286 0) (xy 1.27 0.381) (xy 1.27 -0.381) (xy 2.286 0)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type outline)
+				)
+			)
+			(polyline
+				(pts
+					(xy 2.54 2.54) (xy 2.54 1.778)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(circle
+				(center 2.54 1.778)
+				(radius 0.254)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type outline)
+				)
+			)
+			(circle
+				(center 2.54 -1.778)
+				(radius 0.254)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type outline)
+				)
+			)
+			(polyline
+				(pts
+					(xy 2.54 -2.54) (xy 2.54 0) (xy 0.762 0)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 2.921 -0.381) (xy 3.683 -0.381)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 3.302 -0.381) (xy 2.921 0.254) (xy 3.683 0.254) (xy 3.302 -0.381)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "PMOS_1_1"
+			(pin input line
+				(at -5.08 0 0)
+				(length 2.54)
+				(name "G"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 2.54 -5.08 90)
+				(length 2.54)
+				(name "S"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 2.54 5.08 270)
+				(length 2.54)
+				(name "D"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "3"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)(symbol "Mode2:MCU"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "U" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "MCU" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "MCU_0_1" (rectangle (start -12.7 -12.7)(end 12.7 12.7)(stroke(width .254)(type default))(fill(type background)))) (symbol "MCU_1_1" (pin power_in line (at 0 15.24 270)(length 2.54)(name "VDD" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin power_in line (at 0 -15.24 90)(length 2.54)(name "GND" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "8" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin input line (at -15.24 5.08 0)(length 2.54)(name "PA6 / SW1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin input line (at -15.24 0 0)(length 2.54)(name "PA7 / SW2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "3" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin bidirectional line (at -15.24 -7.62 0)(length 2.54)(name "PA0 / UPDI" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "6" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin output line (at 15.24 5.08 180)(length 2.54)(name "PA1 / IN1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "4" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin output line (at 15.24 0 180)(length 2.54)(name "PA2 / IN2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "5" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin input line (at 15.24 -7.62 180)(length 2.54)(name "PA3 / ADC" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "7" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:Driver"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "U" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "Driver" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "Driver_0_1" (rectangle (start -10.16 -12.7)(end 10.16 12.7)(stroke(width .254)(type default))(fill(type background)))) (symbol "Driver_1_1" (pin power_in line (at 0 15.24 270)(length 2.54)(name "VM" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin power_in line (at 0 -15.24 90)(length 2.54)(name "GND" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "4" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin power_in line (at 5.08 -15.24 90)(length 2.54)(name "EP" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "9" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin input line (at -12.7 5.08 0)(length 2.54)(name "IN1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "6" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin input line (at -12.7 0 0)(length 2.54)(name "IN2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "5" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin output line (at -12.7 -7.62 0)(length 2.54)(name "IPROPI" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "8" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin output line (at 12.7 5.08 180)(length 2.54)(name "OUT1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin output line (at 12.7 0 180)(length 2.54)(name "OUT2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "3" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin input line (at 12.7 -7.62 180)(length 2.54)(name "GAINSEL" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "7" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:R"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "R" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "R" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "R_0_1" (rectangle (start -1.016 -2.54)(end 1.016 2.54)(stroke(width .254)(type default))(fill(type background)))) (symbol "R_1_1" (pin passive line (at 0 5.08 270)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 0 -5.08 90)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:C"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "C" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "C" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "C_0_1" (polyline (pts (xy -2.54 0.762)(xy 2.54 0.762))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy -2.54 -0.762)(xy 2.54 -0.762))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy 0 2.54)(xy 0 0.762))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy 0 -2.54)(xy 0 -0.762))(stroke(width .254)(type default))(fill(type none)))) (symbol "C_1_1" (pin passive line (at 0 5.08 270)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 0 -5.08 90)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:CP"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "C" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "CP" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "CP_0_1" (polyline (pts (xy -2.54 0.762)(xy 2.54 0.762))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy -2.54 -0.762)(xy 2.54 -0.762))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy 0 2.54)(xy 0 0.762))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy 0 -2.54)(xy 0 -0.762))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy -3.5 2.5)(xy -1.8 2.5))(stroke(width .254)(type default))(fill(type none)))(polyline (pts (xy -2.65 1.65)(xy -2.65 3.35))(stroke(width .254)(type default))(fill(type none)))) (symbol "CP_1_1" (pin passive line (at 0 5.08 270)(length 2.54)(name "+" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 0 -5.08 90)(length 2.54)(name "-" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:Switch"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "S" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "Switch" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "Switch_0_1" (polyline (pts (xy 2.54 0)(xy -1.8 -0.8))(stroke(width .254)(type default))(fill(type none)))(circle(center -2.54 0)(radius .3)(stroke(width .15)(type default))(fill(type none)))(circle(center -2.54 -5.08)(radius .3)(stroke(width .15)(type default))(fill(type none)))(circle(center 2.54 0)(radius .3)(stroke(width .15)(type default))(fill(type none)))) (symbol "Switch_1_1" (pin passive line (at -5.08 0 0)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 5.08 0 180)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at -5.08 -5.08 0)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "3" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 5.08 -5.08 180)(length 2.54)(name "CASE" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "4" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:Conn2"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "P" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "Conn2" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "Conn2_0_1" (rectangle (start -2.54 -5.08)(end 2.54 5.08)(stroke(width .254)(type default))(fill(type background)))) (symbol "Conn2_1_1" (pin passive line (at 5.08 2.54 180)(length 2.54)(name "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 5.08 -2.54 180)(length 2.54)(name "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:Conn2L"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "P" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "Conn2L" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "Conn2L_0_1" (rectangle (start -2.54 -5.08)(end 2.54 5.08)(stroke(width .254)(type default))(fill(type background)))) (symbol "Conn2L_1_1" (pin passive line (at -5.08 2.54 0)(length 2.54)(name "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at -5.08 -2.54 0)(length 2.54)(name "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:Conn3"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "P" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "Conn3" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "Conn3_0_1" (rectangle (start -2.54 -7.62)(end 2.54 7.62)(stroke(width .254)(type default))(fill(type background)))) (symbol "Conn3_1_1" (pin passive line (at 5.08 5.08 180)(length 2.54)(name "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 5.08 0.0 180)(length 2.54)(name "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 5.08 -5.08 180)(length 2.54)(name "3" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "3" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:Flag" (power) (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "#FLG" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "Flag" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "Flag_0_1" (polyline (pts (xy 0 0)(xy 0 2.54)(xy -1.27 2.54)(xy 0 3.81)(xy 1.27 2.54)(xy 0 2.54))(stroke(width .254)(type default))(fill(type none)))) (symbol "Flag_1_1" (pin power_out line (at 0 0 90)(length 0)(name "pwr" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:ExternalSW"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "S" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "ExternalSW" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "ExternalSW_0_1" (polyline (pts (xy 0 2.54)(xy 2.0 -1.4))(stroke(width .254)(type default))(fill(type none)))) (symbol "ExternalSW_1_1" (pin passive line (at 0 5.08 270)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 0 -5.08 90)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))(symbol "Mode2:Motor"  (pin_names (offset .8)) (in_bom yes)(on_board yes)
+      (property "Reference" "M" (at 0 17.78 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (property "Value" "Motor" (at 0 15.24 0) (effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+      (symbol "Motor_0_1" (circle(center 0 0)(radius 3.0)(stroke(width .254)(type default))(fill(type none)))(text "M"(at 0 0 0)(effects (font (face "Microsoft JhengHei") (size 2 2)) ))) (symbol "Motor_1_1" (pin passive line (at 0 5.08 270)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "1" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))(pin passive line (at 0 -5.08 90)(length 2.54)(name "~" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) ))(number "2" (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) )))))) (text "模式二固定版｜2 粒 AA · 板上電源開關 · 無 LED／模式跳線" (at 17.78 17.78 0) (effects (font (face "Microsoft JhengHei") (size 2.0 2.0)) (justify left top))(uuid f085b0e9-5665-597b-b859-7ad383ca145f))(text "電源及去耦" (at 17.78 22.86 0) (effects (font (face "Microsoft JhengHei") (size 1.4 1.4)) (justify left top))(uuid 0d771aaa-2cba-56fb-a6d3-c1ac8cff5d89))(symbol(lib_id "Mode2:Conn2")(at 25.4 33.02 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 469aadd9-9c7f-5f79-b63b-78869b04eac3)
+    (property "Reference" "P1"(at 23 42 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "電池 XH-2"(at 23 44.5 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:XH2"(at 25.4 33.02 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "P1")(unit 1)))))(wire(pts(xy 30.48 30.48)(xy 38.1 30.48))(stroke(width 0)(type default))(uuid 77f0e6fe-cc27-5ac1-9727-f218b6353426))(label "BATT+" (at 38.1 30.48 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 2f794885-a5e6-51e1-8297-f9cf943b7029))(wire(pts(xy 30.48 35.56)(xy 30.48 50.8))(stroke(width 0)(type default))(uuid a3973931-0d35-511c-be08-e8c82cd1c3f9))(label "GND" (at 30.48 50.8 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 5619d080-fe0c-5f4a-b2e8-a6000f0cf4bd))(symbol(lib_id "Mode2:Switch")(at 50.8 33.02 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 8784beba-f9c8-5724-a6c0-e5fe30400b96)
+    (property "Reference" "S0"(at 50.8 24.13 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "MSK12C02"(at 50.8 26.67 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:MSK12C02"(at 50.8 33.02 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "S0")(unit 1)))))(wire(pts(xy 45.72 33.02)(xy 40.64 33.02))(stroke(width 0)(type default))(uuid 3faedeaa-57e5-5c64-80f2-349fb044fd43))(label "BATT+" (at 40.64 33.02 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 15ca410f-b28a-523a-946f-1cfec0fdc64d))(wire(pts(xy 45.72 38.1)(xy 45.72 48.26))(stroke(width 0)(type default))(uuid 8690bc1f-9ab0-5920-a79a-0761edec79f2))(label "GND" (at 45.72 48.26 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 3db7a2f9-7eee-5130-9ed2-10aa99f49f1d))(wire(pts(xy 55.88 38.1)(xy 55.88 43.18))(stroke(width 0)(type default))(uuid da2359e9-2dfc-5a39-b40b-a20491995513))(label "GND" (at 55.88 43.18 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 32fb1baa-4374-576d-86ff-821007bfb006))(wire(pts(xy 55.88 33.02)(xy 60.96 33.02))(stroke(width 0)(type default))(uuid 4086eb4b-cb02-5751-b582-390e9ce49572))(wire(pts(xy 60.96 33.02)(xy 60.96 38.1))(stroke(width 0)(type default))(uuid ea7bcc61-4216-5dbb-b253-3884767a3c3a))(label "GDRV" (at 60.96 33.02 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 5b4501d3-f08c-55e2-b5a9-612a4944c537))(symbol(lib_id "Mode2:R")(at 60.96 43.18 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 9b0cff1f-3dc8-551e-a125-6740a87802f8)
+    (property "Reference" "R2"(at 66 40.64 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "1k"(at 66 43.18 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:R0603"(at 60.96 43.18 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "R2")(unit 1)))))(wire(pts(xy 60.96 48.26)(xy 68.58 48.26))(stroke(width 0)(type default))(uuid d43a7487-0359-5d81-85ff-ec47e5786a84))(wire(pts(xy 68.58 48.26)(xy 78.74 48.26))(stroke(width 0)(type default))(uuid b7b5a757-59f1-5e8d-a578-78d252fbb613))(wire(pts(xy 78.74 48.26)(xy 78.74 40.64))(stroke(width 0)(type default))(uuid e207be65-ba9d-57b3-9962-82bca96439db))(label "GATE" (at 71.12 48.26 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid c9693f2d-8423-54d3-91d2-40085dd8495f))(symbol(lib_id "Mode2:R")(at 68.58 55.88 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 438b1e78-39f9-529a-a03f-b111037fc73f)
+    (property "Reference" "R3"(at 75 54.61 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "100k"(at 75 57.15 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:R0603"(at 68.58 55.88 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "R3")(unit 1)))))(wire(pts(xy 68.58 48.26)(xy 68.58 50.8))(stroke(width 0)(type default))(uuid 176601b3-34a1-5d98-92d4-30dd7422a683))(junction(at 68.58 48.26)(diameter 0)(color 0 0 0 0)(uuid 4b4a1923-a81d-592e-885e-82082b517109))(wire(pts(xy 68.58 60.96)(xy 68.58 63.5))(stroke(width 0)(type default))(uuid 0c5b4855-d1c3-53ab-aaf0-a96b9e296444))(label "BATT+" (at 68.58 63.5 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid d66201d2-3225-544b-a8db-951d15f04ba1))(symbol(lib_id "Mode2:PMOS")(at 83.82 40.64 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 4b804099-0aa4-596a-ace3-0a8ff2abed79)
+    (property "Reference" "Q1"(at 100 38.1 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "DMP2035U-7"(at 100 40.64 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:SOT23"(at 83.82 40.64 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "Q1")(unit 1)))))(wire(pts(xy 86.36 45.72)(xy 86.36 50.8))(stroke(width 0)(type default))(uuid 11851f40-9358-592b-81b8-951678e63c57))(label "BATT+" (at 86.36 50.8 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid a5eb52e8-ccd6-5814-b4ed-4ea912cb5392))(wire(pts(xy 86.36 35.56)(xy 86.36 30.48))(stroke(width 0)(type default))(uuid d0c47ece-870f-5542-9bb2-c976a46c0e6e))(wire(pts(xy 86.36 30.48)(xy 116.84 30.48))(stroke(width 0)(type default))(uuid 458557a7-f099-5cba-a6e2-e989ccad48f7))(wire(pts(xy 116.84 30.48)(xy 149.86 30.48))(stroke(width 0)(type default))(uuid db3be717-2811-595e-b2c6-950ada035600))(wire(pts(xy 149.86 30.48)(xy 182.88 30.48))(stroke(width 0)(type default))(uuid 5b66077c-f319-5a08-a502-355813d724fa))(wire(pts(xy 182.88 30.48)(xy 208.28 30.48))(stroke(width 0)(type default))(uuid 7239628b-a0cd-58e0-9bc7-edf0135bf8c0))(label "VBAT" (at 198.12 30.48 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 67e9cf1c-6b0a-5497-9935-82c096122c09))(symbol(lib_id "Mode2:CP")(at 116.84 43.18 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 2410b648-f6f6-5597-bf83-99cea7f7d8ea)
+    (property "Reference" "C3"(at 124.84 41.91 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "100uF 6.3V"(at 124.84 44.45 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:CP5"(at 116.84 43.18 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "C3")(unit 1)))))(wire(pts(xy 116.84 30.48)(xy 116.84 38.1))(stroke(width 0)(type default))(uuid 6ab299b1-8a33-5d72-8ae8-90d2446d4e6c))(junction(at 116.84 30.48)(diameter 0)(color 0 0 0 0)(uuid ddfd2396-eee1-5c15-8a60-404551b069ec))(wire(pts(xy 116.84 48.26)(xy 116.84 53.34))(stroke(width 0)(type default))(uuid 88809600-ad8c-5292-b4a3-80809bd13fdf))(label "GND" (at 116.84 53.34 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid e4a79897-6b85-5b05-bb7a-29afeb7d13fb))(symbol(lib_id "Mode2:C")(at 149.86 43.18 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 2c168f10-2f79-5794-b9d4-fce9c80c8937)
+    (property "Reference" "C1"(at 157.86 41.91 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "100nF 16V"(at 157.86 44.45 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:C0603"(at 149.86 43.18 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "C1")(unit 1)))))(wire(pts(xy 149.86 30.48)(xy 149.86 38.1))(stroke(width 0)(type default))(uuid f5e3a94e-017c-5910-9952-69263dc41bd1))(junction(at 149.86 30.48)(diameter 0)(color 0 0 0 0)(uuid fb19ec41-a8cf-51fe-9c57-5a7d9502005f))(wire(pts(xy 149.86 48.26)(xy 149.86 53.34))(stroke(width 0)(type default))(uuid 667d4ac4-1bd4-514c-acd1-ba5c7d6d5758))(label "GND" (at 149.86 53.34 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 277d614a-9b2e-5618-8e7b-35c7c93e0ef1))(symbol(lib_id "Mode2:C")(at 182.88 43.18 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 8fe1a60d-7002-56b9-8c6d-12532686da20)
+    (property "Reference" "C2"(at 190.88 41.91 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "100nF 16V"(at 190.88 44.45 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:C0603"(at 182.88 43.18 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "C2")(unit 1)))))(wire(pts(xy 182.88 30.48)(xy 182.88 38.1))(stroke(width 0)(type default))(uuid a67f4951-ccf9-55f6-82c0-3fd75c6fa4e5))(junction(at 182.88 30.48)(diameter 0)(color 0 0 0 0)(uuid 1537581c-78fa-5784-8f20-9b667311d06f))(wire(pts(xy 182.88 48.26)(xy 182.88 53.34))(stroke(width 0)(type default))(uuid 93fcc38c-ca8f-52e7-9a2e-7f682c5ccbfe))(label "GND" (at 182.88 53.34 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 82cd07a7-a83f-5c00-9266-3c85bfd4d8c1))(text "S0：1-2 關機；2-3 開機。\nQ1 承受馬達電流，S0 只控制閘極。" (at 20.32 54.61 0) (effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) (justify left top))(uuid 285830f1-ac72-5dd7-af74-984ce68c32b2))(symbol(lib_id "Mode2:Flag")(at 208.28 30.48 0)(unit 1)(in_bom no)(on_board no)(dnp no)(uuid 79f289c1-e390-5825-9af3-ee2aa8a5368e)
+    (property "Reference" "#FLG01"(at 221 28 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "Flag"(at 221 30 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" ""(at 208.28 30.48 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "#FLG01")(unit 1)))))(symbol(lib_id "Mode2:Flag")(at 208.28 53.34 0)(unit 1)(in_bom no)(on_board no)(dnp no)(uuid e43233fd-fb31-56dc-bc53-b10a3fe295d6)
+    (property "Reference" "#FLG02"(at 221 50 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "Flag"(at 221 53 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" ""(at 208.28 53.34 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "#FLG02")(unit 1)))))(label "GND" (at 208.28 53.34 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 67bc6ece-84d1-50b2-9e19-47a1b7c82749))(text "C1 靠近 U1；C2、C3 靠近 U2。C3 正極接 VBAT。" (at 116.84 56.0 0) (effects (font (face "Microsoft JhengHei") (size 1.15 1.15)) (justify left top))(uuid 47af6687-7f89-5d86-8f43-6e3fbb71d723))(symbol(lib_id "Mode2:MCU")(at 106.68 81.28 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 2895dd97-5361-5f7d-8f69-e59ffcf3e159)
+    (property "Reference" "U1"(at 91.44 60.96 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "ATtiny202-SSNR"(at 91.44 63.5 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:SOIC8"(at 106.68 81.28 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "U1")(unit 1)))))(symbol(lib_id "Mode2:Driver")(at 182.88 81.28 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 40657270-d582-563d-b273-ba63df589874)
+    (property "Reference" "U2"(at 165.1 60.96 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "DRV8213DSGR"(at 165.1 63.5 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:WSON8"(at 182.88 81.28 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "U2")(unit 1)))))(wire(pts(xy 106.68 66.04)(xy 106.68 60.96))(stroke(width 0)(type default))(uuid 66454f10-9da0-50d7-9b77-eef6ba7b860b))(label "VBAT" (at 106.68 60.96 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 50432d70-cb51-5e05-8be1-2ea3f52fb7cb))(wire(pts(xy 106.68 96.52)(xy 106.68 101.6))(stroke(width 0)(type default))(uuid 6b051d21-ca27-53de-b58e-5828b52448e1))(label "GND" (at 106.68 101.6 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 3c2766ad-cec6-591d-8c33-a3d62d836407))(wire(pts(xy 182.88 66.04)(xy 182.88 60.96))(stroke(width 0)(type default))(uuid c5a7362e-b35c-5c01-8958-0fff52fe1a3f))(label "VBAT" (at 182.88 60.96 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid c3b6612d-d930-5ab9-91fe-df96ac2e270d))(wire(pts(xy 182.88 96.52)(xy 182.88 101.6))(stroke(width 0)(type default))(uuid b81543bb-761e-51a8-be83-c622c168c6d5))(label "GND" (at 182.88 101.6 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 2a129da9-42c1-5d21-af99-412b19a1417a))(wire(pts(xy 187.96 96.52)(xy 187.96 106.68))(stroke(width 0)(type default))(uuid d1897917-bb51-5cf3-a215-f8ad0064e214))(label "GND" (at 187.96 106.68 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid cab70a41-4e35-5b53-9a4f-c1a8bb286782))(wire(pts(xy 121.92 76.2)(xy 170.18 76.2))(stroke(width 0)(type default))(uuid d01211b0-aa5e-5e32-ba67-b1115cff7f3a))(label "IN1" (at 139.7 76.2 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid f3701fbb-4c69-5900-b5f0-b5f1d9c9802d))(wire(pts(xy 121.92 81.28)(xy 170.18 81.28))(stroke(width 0)(type default))(uuid a8648078-bcec-5188-9e40-685b28e266f6))(label "IN2" (at 139.7 81.28 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid a53d256b-1860-5e93-9f13-b4f43d552fe3))(wire(pts(xy 121.92 88.9)(xy 152.4 88.9))(stroke(width 0)(type default))(uuid e87fdb74-1451-5d7a-83a6-4056d3575dc3))(wire(pts(xy 152.4 88.9)(xy 170.18 88.9))(stroke(width 0)(type default))(uuid 419b991e-92bb-579d-b006-fdd2b730dcd2))(label "ISENSE" (at 137.16 88.9 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 3da76110-5e7f-5e2b-a420-0bcd6dff1b8f))(junction(at 152.4 88.9)(diameter 0)(color 0 0 0 0)(uuid 15261746-a76c-5629-ade4-6c68e97d5fdf))(symbol(lib_id "Mode2:R")(at 152.4 106.68 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 7b9b4016-e67a-55c4-90dc-e7c7eefa468b)
+    (property "Reference" "R1"(at 162 105.41 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "1.24k 1%"(at 162 107.95 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:R0603"(at 152.4 106.68 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "R1")(unit 1)))))(wire(pts(xy 152.4 88.9)(xy 152.4 101.6))(stroke(width 0)(type default))(uuid 4725f840-fc1a-5810-b7c1-2506908d5dfd))(wire(pts(xy 152.4 111.76)(xy 152.4 116.84))(stroke(width 0)(type default))(uuid 96cb236e-1304-587f-b547-85a7a2e93e1a))(label "GND" (at 152.4 116.84 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 7ae5e682-7322-5c62-b9ac-3df332e6cf4b))(wire(pts(xy 195.58 88.9)(xy 205.74 88.9))(stroke(width 0)(type default))(uuid ae2a9e3f-23b0-594e-be8c-0235357d1788))(label "GND" (at 205.74 88.9 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 36d7cd40-032d-5f94-b55c-468f2aaa15e3))(text "GAINSEL、EP（9 腳）接地。\n限流約 2 A（原型初值）。" (at 165.1 114.3 0) (effects (font (face "Microsoft JhengHei") (size 1.15 1.15)) (justify left top))(uuid f1d201f1-037e-5262-a530-ea799b772a04))(wire(pts(xy 91.44 76.2)(xy 81.28 76.2))(stroke(width 0)(type default))(uuid 2ddadb5b-258d-518e-8710-6537ca7bbe94))(label "SW1" (at 81.28 76.2 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 97a68764-3349-576f-9870-3eed41d3bf84))(wire(pts(xy 91.44 81.28)(xy 81.28 81.28))(stroke(width 0)(type default))(uuid fed6107b-879d-55f5-91b2-87fc034801c2))(label "SW2" (at 81.28 81.28 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 601e2037-a8f5-5920-9e8b-f819fad2c326))(wire(pts(xy 91.44 88.9)(xy 81.28 88.9))(stroke(width 0)(type default))(uuid 8f8be10a-a5dc-5ce3-8139-c7bf67b0af4d))(label "UPDI" (at 81.28 88.9 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid b13d3107-d4e9-504f-9778-805ca3059900))(symbol(lib_id "Mode2:Conn2")(at 38.1 76.2 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 4191d49d-d70b-542a-ac96-fdf20af809fe)
+    (property "Reference" "P2"(at 35.56 65.2 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "SW1 PH-2 插座"(at 35.56 67.7 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:PH2"(at 38.1 76.2 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "P2")(unit 1)))))(wire(pts(xy 43.18 73.66)(xy 55.88 73.66))(stroke(width 0)(type default))(uuid f0c8b4b2-76f9-5438-9c2f-64cd6ce82f3a))(label "SW1" (at 55.88 73.66 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid ca1c0d60-7a08-5e5c-b764-8bd7f88e1310))(wire(pts(xy 43.18 78.74)(xy 55.88 78.74))(stroke(width 0)(type default))(uuid cc2540a8-2cff-580a-8ef1-9dfd9c77b7b0))(label "GND" (at 55.88 78.74 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 1e535663-77a7-5555-8d17-b28b5ec19ed8))(symbol(lib_id "Mode2:Conn2")(at 38.1 99.06 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 7dbd4f14-049f-56ce-b2e9-fac7c5d1abde)
+    (property "Reference" "P3"(at 35.56 88.06 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "SW2 PH-2 插座"(at 35.56 90.56 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:PH2"(at 38.1 99.06 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "P3")(unit 1)))))(wire(pts(xy 43.18 96.52)(xy 55.88 96.52))(stroke(width 0)(type default))(uuid efb4202b-a5c6-55a0-8e9d-0ed26006a533))(label "SW2" (at 55.88 96.52 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 89baa8ba-007a-5772-b856-3123c1a48d06))(wire(pts(xy 43.18 101.6)(xy 55.88 101.6))(stroke(width 0)(type default))(uuid 7d032795-e808-5973-ba13-6bbdf186008d))(label "GND" (at 55.88 101.6 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid f012d081-ae7d-5541-aa04-f7190d6945ae))(text "PH 2.0 mm 兩針插座，配 PHR-2 插頭。\n只接 COM、NO；NC 不接。\nU1 啟用內置上拉及軟件去彈跳。" (at 20.32 113.03 0) (effects (font (face "Microsoft JhengHei") (size 1.15 1.15)) (justify left top))(uuid 481e80bd-ff63-53e9-b5a5-90987e3f5b85))(symbol(lib_id "Mode2:Conn2L")(at 228.6 78.74 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid f86a7774-4294-5433-afc4-fc6469102cc7)
+    (property "Reference" "P4"(at 231.14 68.58 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "馬達 XH-2"(at 231.14 71.12 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:XH2"(at 228.6 78.74 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "P4")(unit 1)))))(wire(pts(xy 195.58 76.2)(xy 223.52 76.2))(stroke(width 0)(type default))(uuid ce292be4-0063-5dcd-835c-02ba091f6a39))(label "OUT1" (at 208.28 76.2 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid c9e5739c-8b90-599e-9888-09ba63778597))(wire(pts(xy 195.58 81.28)(xy 223.52 81.28))(stroke(width 0)(type default))(uuid dc7cd034-ccdb-5aa8-be02-e81e0d0e2150))(label "OUT2" (at 208.28 81.28 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 6b8d93aa-cb08-5dd5-9e95-7a4ede34dd44))(symbol(lib_id "Mode2:Conn3")(at 93.98 124.46 0)(unit 1)(in_bom yes)(on_board yes)(dnp no)(uuid 7ca4c573-c7c0-5d99-8e63-16af2ef5e29b)
+    (property "Reference" "P5"(at 83.82 123.19 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "UPDI 燒錄"(at 83.82 125.73 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" "Mode2:Prog3"(at 93.98 124.46 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "P5")(unit 1)))))(wire(pts(xy 99.06 119.38)(xy 109.22 119.38))(stroke(width 0)(type default))(uuid 50bdf0ec-36ef-5d01-af0c-ba6e392a0398))(label "VBAT" (at 109.22 119.38 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 02c59085-0b40-5b18-b82a-55cde6613563))(wire(pts(xy 99.06 124.46)(xy 109.22 124.46))(stroke(width 0)(type default))(uuid 94d47c18-401d-5685-8caf-30812746e45d))(label "UPDI" (at 109.22 124.46 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid c17f12d7-d3ef-53a6-8d3c-d2d27ed97f11))(wire(pts(xy 99.06 129.54)(xy 109.22 129.54))(stroke(width 0)(type default))(uuid ff853a6a-ece4-5a21-a72e-17768a03a24d))(label "GND" (at 109.22 129.54 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 196ed77d-4a69-5804-96a9-0baa6d3204f8))(text "P5：焊孔間距 2.54 mm。燒錄時只用一個供電來源。" (at 119.38 127.0 0) (effects (font (face "Microsoft JhengHei") (size 1.15 1.15)) (justify left top))(uuid eeeaee27-b193-5946-9e02-86496916799a))(text "板外接線（以下元件不裝在 PCB）" (at 20.32 134.62 0) (effects (font (face "Microsoft JhengHei") (size 1.4 1.4)) (justify left top))(uuid b7f63d67-8533-5c95-ba88-2a1cebec2d0b))(symbol(lib_id "Mode2:ExternalSW")(at 35.56 149.86 0)(unit 1)(in_bom no)(on_board no)(dnp no)(uuid 9dfcc680-36e7-54d6-b1d9-f76eb88b5033)
+    (property "Reference" "S1"(at 50.56 148.59 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "SW1 微動開關"(at 50.56 151.13 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" ""(at 35.56 149.86 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "S1")(unit 1)))))(wire(pts(xy 35.56 144.78)(xy 35.56 139.7))(stroke(width 0)(type default))(uuid ce1bd068-6a99-5e44-9cb2-f07919ec6924))(label "SW1" (at 35.56 139.7 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 1f83e6cd-b3d7-506f-9143-76b55f09db8d))(wire(pts(xy 35.56 154.94)(xy 35.56 160.02))(stroke(width 0)(type default))(uuid 64cda801-ee43-5bfc-9855-469f282b6d58))(label "GND" (at 35.56 160.02 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 34a6d53a-d655-5013-937f-05e2386ae1ac))(symbol(lib_id "Mode2:ExternalSW")(at 99.06 149.86 0)(unit 1)(in_bom no)(on_board no)(dnp no)(uuid 7196629b-8173-57d2-a3a7-4086354eb22e)
+    (property "Reference" "S2"(at 114.06 148.59 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "SW2 微動開關"(at 114.06 151.13 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" ""(at 99.06 149.86 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "S2")(unit 1)))))(wire(pts(xy 99.06 144.78)(xy 99.06 139.7))(stroke(width 0)(type default))(uuid b9a02570-ae43-5959-8e32-a98c9728f3ca))(label "SW2" (at 99.06 139.7 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 9066d560-f35a-5090-a74e-43be4f5c839e))(wire(pts(xy 99.06 154.94)(xy 99.06 160.02))(stroke(width 0)(type default))(uuid 3bb77c8b-96dd-56f3-9a5f-29e2af444329))(label "GND" (at 99.06 160.02 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 628c6441-260b-5f44-a769-e8a5582bfe35))(symbol(lib_id "Mode2:Motor")(at 203.2 149.86 0)(unit 1)(in_bom no)(on_board no)(dnp no)(uuid ae6ebc53-6423-58c0-a67c-9b9da62dafc0)
+    (property "Reference" "M1"(at 188 148.59 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "FA-130 馬達"(at 188 151.13 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" ""(at 203.2 149.86 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "M1")(unit 1)))))(symbol(lib_id "Mode2:C")(at 233.68 149.86 0)(unit 1)(in_bom no)(on_board no)(dnp no)(uuid d52db5ee-ff8b-5792-b1c3-c04446444d13)
+    (property "Reference" "C4"(at 247 148.59 0)(effects (font (face "Microsoft JhengHei") (size 1.27 1.27)) ))
+    (property "Value" "100nF 陶瓷"(at 247 151.13 0)(effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) ))
+    (property "Footprint" ""(at 233.68 149.86 0)(effects(font(size 1 1))(hide yes)))
+    (instances(project "mode2-motor"(path "/8d0a09ec-cfd3-5407-9954-c5467271c317"(reference "C4")(unit 1)))))(wire(pts(xy 203.2 139.7)(xy 233.68 139.7))(stroke(width 0)(type default))(uuid ea18b4c1-43a8-59d1-b201-c22a913362e6))(label "OUT1" (at 213.36 139.7 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid cea752db-9d10-52c7-a97c-8af0f99a9bf1))(wire(pts(xy 203.2 160.02)(xy 233.68 160.02))(stroke(width 0)(type default))(uuid 5e2b2a17-29eb-530e-9ead-6a37b1093439))(label "OUT2" (at 213.36 160.02 0) (effects (font (face "Microsoft JhengHei") (size 1.0 1.0)) (justify left bottom))(uuid 6e4b3f44-ce36-57e7-bc8f-eae507c47b26))(wire(pts(xy 203.2 139.7)(xy 203.2 144.78))(stroke(width 0)(type default))(uuid 7d630db9-80b1-566d-a24e-06336fbcbffd))(wire(pts(xy 203.2 154.94)(xy 203.2 160.02))(stroke(width 0)(type default))(uuid 877e8579-3774-5e28-b242-6ed3f150ec72))(wire(pts(xy 233.68 139.7)(xy 233.68 144.78))(stroke(width 0)(type default))(uuid dd4550df-dd3b-5d51-9f2e-4d28002579ae))(wire(pts(xy 233.68 154.94)(xy 233.68 160.02))(stroke(width 0)(type default))(uuid 6655c8f1-8923-5979-9963-f7ed10a68616))(text "C4 直接焊在馬達兩端，使用無極性陶瓷電容。" (at 177.8 162.56 0) (effects (font (face "Microsoft JhengHei") (size 1.15 1.15)) (justify left top))(uuid 52c12366-eb31-51ee-aa16-2086a0d0606e))(text "同名標籤代表電氣相連；#FLG 是電氣檢查標記，不是實體元件。" (at 20.32 170.18 0) (effects (font (face "Microsoft JhengHei") (size 1.15 1.15)) (justify left top))(uuid 5fdeccde-cfaf-57f6-8923-274f6e5f2e61))(text "需要另行燒錄韌體：SW1 → 正轉；SW2 → 反轉；SW1 → 停止／鎖定 3 秒。\n僅適用 2 粒 AA；不接 3 粒 AA。此為待實機驗證原型，限流不等於堵轉自動停機。" (at 20.32 184.15 0) (effects (font (face "Microsoft JhengHei") (size 1.1 1.1)) (justify left top))(uuid a8af7144-e87d-5415-a5df-59f79e125cbb)) (embedded_fonts no))

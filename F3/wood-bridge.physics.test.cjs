@@ -77,6 +77,7 @@ for(const mode of ['tension','compression','bending']) for(const ratio of [.99,1
   zeroG.step(sim);
   close(bar.stress,ratio,1e-7,`${mode} 應使用其材料強度計算失效比例`);
   assert.equal(bar.broken,ratio>1,`${mode} 超過材料強度才斷裂`);
+  if(mode!=='bending') assert.ok(bar.axialForces.every(force=>mode==='tension'?force>0:force<0),'顏色使用的軸力須保留拉正、壓負的方向');
 }
 const specimen=zeroG.empty();zeroG.addBar(specimen,{x:7,y:6},{x:17,y:6});
 const axial=zeroG.simulate(specimen),extension=1e-5;
@@ -103,6 +104,7 @@ for(const angle of [0,.7,2.4]) {
 const falling=B.empty();B.addBar(falling,{x:9,y:3},{x:15,y:3});
 const free=settle(B,B.simulate(falling),.1);
 assert.ok(free.bars[0].stress<1e-6,'共同自由落體不把重力錯算成彎曲');
+assert.ok(free.bars[0].axialForces.every(force=>Math.abs(force)<1e-4),'自由落體不應誤顯示拉、壓顏色');
 // 沒有空氣阻力時，不同密度／步長均須給出 g；水平平移不可被數值阻尼拖慢。
 for(const dt of [B.DT,B.DT/2]) for(const density of [80,320]) {
   const sim=B.simulate(falling,{density}),duration=.2,steps=Math.round(duration/dt);
@@ -153,6 +155,7 @@ for(let i=0;i<4/B.DT;i++) {
   assert.ok(peakSpeed<20,'碎段不能因碰撞修正而高速飛走');
 }
 assert.ok(rubble.firstBreak && rubble.fragments.length>=2,'重載須實際斷裂');
+assert.ok(rubble.fragments.every(piece=>piece.axialForces?.length===piece.path.length-1 && piece.axialForces.every(Number.isFinite)),'碎段須更新每一段的軸力顏色資料');
 close(rubble.nodes.reduce((sum,n)=>sum+n.baseMass,0),massBefore,1e-10,'斷裂跌落保留木材質量');
 assert.ok(rubble.nodes.find(n=>n.load===20).y>12.7,'重物須落到底部');
 assert.ok(Math.max(...rubble.nodes.map(n=>Math.hypot(n.vx,n.vy)*B.UNIT))<1,'落地後速度應降低');

@@ -1,0 +1,4 @@
+(sym_lib_table
+ (version 7)
+ (lib (name "Hardware") (type "KiCad") (uri "${KIPRJMOD}/Hardware.kicad_sym") (options "") (descr "免程式候選原理圖"))
+)

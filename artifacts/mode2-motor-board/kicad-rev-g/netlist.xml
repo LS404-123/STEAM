@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>D:\vibe_coding\STEAM\artifacts\mode2-motor-board\kicad-rev-g\mode2-no-firmware.kicad_sch</source>
+    <date>2026-09-09T22:30:11</date>
+    <tool>Eeschema 10.0.6</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>免韌體模式二原理圖</title>
+        <company/>
+        <rev>G 原型</rev>
+        <date>2026-09-09</date>
+        <source>mode2-no-firmware.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>100nF / 16V</value>
+      <footprint>BoardF:C0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:C0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="C" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>67e85861-e7bb-5ecc-81d4-1cb451dbf7e0</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C2">
+      <value>100nF / 16V</value>
+      <footprint>BoardF:C0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:C0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="C" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>be8d2b5b-abe3-592e-8e8a-37d49f6c427e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C3">
+      <value>100nF / 16V</value>
+      <footprint>BoardF:C0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:C0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="C" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>3ece4e28-3bc0-5658-8c67-09031bc0bd6e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C4">
+      <value>100uF / 6.3V</value>
+      <footprint>BoardF:CP5</footprint>
+      <fields>
+        <field name="Footprint">BoardF:CP5</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="CP" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>5a09c72e-1b5b-541d-9fc2-9e506999e63e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C5">
+      <value>220nF</value>
+      <footprint>BoardF:C0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:C0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="C" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b20d1d0c-22db-53d2-bdfa-0b465569692c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C6">
+      <value>220nF</value>
+      <footprint>BoardF:C0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:C0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="C" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f850f81f-7c23-5b21-bcd3-02941752000b</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C7">
+      <value>100nF</value>
+      <footprint>BoardF:C0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:C0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="C" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>995c8dd5-89a3-58ff-a1fe-c0d664a8ceb3</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C8">
+      <value>100nF（板外）</value>
+      <fields>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="C" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>30e93ee8-8d79-529d-be63-f7e2c7d9a39b</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="D1">
+      <value>BAT54WS</value>
+      <footprint>BoardF:SOD323</footprint>
+      <fields>
+        <field name="Footprint">BoardF:SOD323</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="D" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>0831f0ef-2211-5bda-849a-23bba92783b7</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="2"/>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="M1">
+      <value>FA-130（板外）</value>
+      <fields>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="Motor" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>387469a0-b8b9-5154-bde1-609c8c9a4256</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="P1">
+      <value>電池螺絲端子</value>
+      <footprint>BoardF:KF128_2P</footprint>
+      <fields>
+        <field name="Footprint">BoardF:KF128_2P</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="Conn" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c12e1171-e8f9-5a52-a7c0-71bc9c3c2e11</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="P2">
+      <value>SW1 螺絲端子</value>
+      <footprint>BoardF:KF128_2P</footprint>
+      <fields>
+        <field name="Footprint">BoardF:KF128_2P</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="Conn" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>12d7bc55-14e6-5012-bcce-65fe4fe9babe</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="P3">
+      <value>SW2 螺絲端子</value>
+      <footprint>BoardF:KF128_2P</footprint>
+      <fields>
+        <field name="Footprint">BoardF:KF128_2P</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="Conn" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c2f9027e-0ff5-55ad-bb45-3cc987781ac3</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="P4">
+      <value>馬達螺絲端子</value>
+      <footprint>BoardF:KF128_2P</footprint>
+      <fields>
+        <field name="Footprint">BoardF:KF128_2P</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="Conn" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>4ed24bf2-854b-5e32-aae5-4025e5e1f502</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R1">
+      <value>100k</value>
+      <footprint>BoardF:R0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:R0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="R" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>247e8188-220c-58df-a198-75e4f47971f9</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R2">
+      <value>100k</value>
+      <footprint>BoardF:R0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:R0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="R" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>15ae9658-9793-5281-94c3-96170bbcac65</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R3">
+      <value>1k</value>
+      <footprint>BoardF:R0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:R0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="R" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>0834b1c5-5f97-57b4-a4a8-d66d86b39042</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R4">
+      <value>1k</value>
+      <footprint>BoardF:R0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:R0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="R" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b5f13f9a-1e8a-5a9a-ba55-2b3c437f63ac</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R5">
+      <value>100k</value>
+      <footprint>BoardF:R0603</footprint>
+      <fields>
+        <field name="Footprint">BoardF:R0603</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="R" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7013e079-191b-5a09-9707-229d599b04c4</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R6">
+      <value>100R / 0.25W</value>
+      <footprint>BoardF:R1206</footprint>
+      <fields>
+        <field name="Footprint">BoardF:R1206</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="R" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>485624c6-f603-5a6c-aca5-4e30ea97a12c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="S0">
+      <value>1101M2S3CQE2</value>
+      <footprint>BoardF:CK1101</footprint>
+      <fields>
+        <field name="Footprint">BoardF:CK1101</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="SPDT" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c4f4a0bf-0ee3-5096-8580-98d1ed4aa4dd</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="3"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="S1">
+      <value>SW1（板外）</value>
+      <fields>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="SW" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>035134b5-64a5-5254-b27d-a40c270e94bd</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="S2">
+      <value>SW2（板外）</value>
+      <fields>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="SW" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b5789c1a-825e-5091-a134-0e90b1ab698f</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U1">
+      <value>SN74HC14DR</value>
+      <footprint>BoardF:SOIC14</footprint>
+      <fields>
+        <field name="Footprint">BoardF:SOIC14</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="HC14" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>a08230c2-de09-5563-95ef-08f98d3774c9</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="3"/>
+            <pin num="5"/>
+            <pin num="9"/>
+            <pin num="11"/>
+            <pin num="13"/>
+            <pin num="14"/>
+            <pin num="7"/>
+            <pin num="2"/>
+            <pin num="4"/>
+            <pin num="6"/>
+            <pin num="8"/>
+            <pin num="10"/>
+            <pin num="12"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U2">
+      <value>SN74HC74DR</value>
+      <footprint>BoardF:SOIC14</footprint>
+      <fields>
+        <field name="Footprint">BoardF:SOIC14</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="HC74" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>1d71d49d-a552-54f7-98bd-355c230d58bd</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="12"/>
+            <pin num="11"/>
+            <pin num="10"/>
+            <pin num="13"/>
+            <pin num="14"/>
+            <pin num="7"/>
+            <pin num="5"/>
+            <pin num="6"/>
+            <pin num="9"/>
+            <pin num="8"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U3">
+      <value>DRV8212DSGR</value>
+      <footprint>BoardF:WSON8</footprint>
+      <fields>
+        <field name="Footprint">BoardF:WSON8</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Hardware" part="DRV8212" description=""/>
+      <property name="Sheetname" value="mode2-no-firmware"/>
+      <property name="Sheetfile" value="mode2-no-firmware.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>0006983e-e161-5dbf-9d14-21343496c815</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="6"/>
+            <pin num="5"/>
+            <pin num="7"/>
+            <pin num="8"/>
+            <pin num="4"/>
+            <pin num="1"/>
+            <pin num="9"/>
+            <pin num="2"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Hardware" part="C">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">C</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="CP">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">CP</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="+" type="passive"/>
+        <pin num="2" name="-" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="Conn">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">Conn</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="D">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">D</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="DRV8212">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">DRV8212</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="VM" type="power_in"/>
+        <pin num="2" name="OUT1" type="output"/>
+        <pin num="3" name="OUT2" type="output"/>
+        <pin num="4" name="GND" type="power_in"/>
+        <pin num="5" name="EN" type="input"/>
+        <pin num="6" name="PH" type="input"/>
+        <pin num="7" name="MODE" type="input"/>
+        <pin num="8" name="VCC" type="power_in"/>
+        <pin num="9" name="EP" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="HC14">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">HC14</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="1A" type="input"/>
+        <pin num="2" name="1Y" type="output"/>
+        <pin num="3" name="2A" type="input"/>
+        <pin num="4" name="2Y" type="output"/>
+        <pin num="5" name="3A" type="input"/>
+        <pin num="6" name="3Y" type="output"/>
+        <pin num="7" name="GND" type="power_in"/>
+        <pin num="8" name="4Y" type="output"/>
+        <pin num="9" name="4A" type="input"/>
+        <pin num="10" name="5Y" type="output"/>
+        <pin num="11" name="5A" type="input"/>
+        <pin num="12" name="6Y" type="output"/>
+        <pin num="13" name="6A" type="input"/>
+        <pin num="14" name="VCC" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="HC74">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">HC74</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="1CLR_n" type="input"/>
+        <pin num="2" name="1D" type="input"/>
+        <pin num="3" name="1CLK" type="input"/>
+        <pin num="4" name="1PRE_n" type="input"/>
+        <pin num="5" name="1Q" type="output"/>
+        <pin num="6" name="1Q_n" type="output"/>
+        <pin num="7" name="GND" type="power_in"/>
+        <pin num="8" name="2Q_n" type="output"/>
+        <pin num="9" name="2Q" type="output"/>
+        <pin num="10" name="2PRE_n" type="input"/>
+        <pin num="11" name="2CLK" type="input"/>
+        <pin num="12" name="2D" type="input"/>
+        <pin num="13" name="2CLR_n" type="input"/>
+        <pin num="14" name="VCC" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="Motor">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">Motor</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="M1" type="passive"/>
+        <pin num="2" name="M2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="R">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">R</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="SPDT">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">SPDT</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="ON" type="passive"/>
+        <pin num="2" name="COM" type="passive"/>
+        <pin num="3" name="OFF" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Hardware" part="SW">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">SW</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <pins>
+        <pin num="1" name="NO" type="passive"/>
+        <pin num="2" name="COM" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Hardware">
+      <uri>${KIPRJMOD}/Hardware.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/BATT+" class="Default">
+      <node ref="P1" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="S0" pin="1" pinfunction="ON_1" pintype="passive"/>
+    </net>
+    <net code="2" name="/CLK1" class="Default">
+      <node ref="U1" pin="2" pinfunction="1Y_2" pintype="output"/>
+      <node ref="U2" pin="3" pinfunction="1CLK_3" pintype="input"/>
+    </net>
+    <net code="3" name="/CLK2" class="Default">
+      <node ref="U1" pin="4" pinfunction="2Y_4" pintype="output"/>
+      <node ref="U2" pin="11" pinfunction="2CLK_11" pintype="input"/>
+    </net>
+    <net code="4" name="/DB1" class="Default">
+      <node ref="C5" pin="1" pintype="passive"/>
+      <node ref="R3" pin="2" pintype="passive"/>
+      <node ref="U1" pin="1" pinfunction="1A_1" pintype="input"/>
+    </net>
+    <net code="5" name="/DB2" class="Default">
+      <node ref="C6" pin="1" pintype="passive"/>
+      <node ref="R4" pin="2" pintype="passive"/>
+      <node ref="U1" pin="3" pinfunction="2A_3" pintype="input"/>
+    </net>
+    <net code="6" name="/DISCH" class="Default">
+      <node ref="R6" pin="1" pintype="passive"/>
+      <node ref="S0" pin="3" pinfunction="OFF_3" pintype="passive"/>
+    </net>
+    <net code="7" name="/GND" class="Default">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="C2" pin="2" pintype="passive"/>
+      <node ref="C3" pin="2" pintype="passive"/>
+      <node ref="C4" pin="2" pinfunction="-_2" pintype="passive"/>
+      <node ref="C5" pin="2" pintype="passive"/>
+      <node ref="C6" pin="2" pintype="passive"/>
+      <node ref="C7" pin="2" pintype="passive"/>
+      <node ref="P1" pin="2" pinfunction="2_2" pintype="passive"/>
+      <node ref="P2" pin="2" pinfunction="2_2" pintype="passive"/>
+      <node ref="P3" pin="2" pinfunction="2_2" pintype="passive"/>
+      <node ref="R6" pin="2" pintype="passive"/>
+      <node ref="S1" pin="2" pinfunction="COM_2" pintype="passive"/>
+      <node ref="S2" pin="2" pinfunction="COM_2" pintype="passive"/>
+      <node ref="U1" pin="11" pinfunction="5A_11" pintype="input"/>
+      <node ref="U1" pin="13" pinfunction="6A_13" pintype="input"/>
+      <node ref="U1" pin="7" pinfunction="GND_7" pintype="power_in"/>
+      <node ref="U2" pin="7" pinfunction="GND_7" pintype="power_in"/>
+      <node ref="U3" pin="4" pinfunction="GND_4" pintype="power_in"/>
+      <node ref="U3" pin="9" pinfunction="EP_9" pintype="power_in"/>
+    </net>
+    <net code="8" name="/M1" class="Default">
+      <node ref="C8" pin="1" pintype="passive"/>
+      <node ref="M1" pin="1" pinfunction="M1_1" pintype="passive"/>
+      <node ref="P4" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U3" pin="3" pinfunction="OUT2_3" pintype="output"/>
+    </net>
+    <net code="9" name="/M2" class="Default">
+      <node ref="C8" pin="2" pintype="passive"/>
+      <node ref="M1" pin="2" pinfunction="M2_2" pintype="passive"/>
+      <node ref="P4" pin="2" pinfunction="2_2" pintype="passive"/>
+      <node ref="U3" pin="2" pinfunction="OUT1_2" pintype="output"/>
+    </net>
+    <net code="10" name="/NOT_REV" class="Default">
+      <node ref="U2" pin="2" pinfunction="1D_2" pintype="input"/>
+      <node ref="U2" pin="8" pinfunction="2Q_n_8" pintype="output"/>
+    </net>
+    <net code="11" name="/POR_INV" class="Default">
+      <node ref="U1" pin="6" pinfunction="3Y_6" pintype="output"/>
+      <node ref="U1" pin="9" pinfunction="4A_9" pintype="input"/>
+    </net>
+    <net code="12" name="/POR_RC" class="Default">
+      <node ref="C7" pin="1" pintype="passive"/>
+      <node ref="D1" pin="2" pinfunction="A_2" pintype="passive"/>
+      <node ref="R5" pin="2" pintype="passive"/>
+      <node ref="U1" pin="5" pinfunction="3A_5" pintype="input"/>
+    </net>
+    <net code="13" name="/RESET_N" class="Default">
+      <node ref="U1" pin="8" pinfunction="4Y_8" pintype="output"/>
+      <node ref="U2" pin="1" pinfunction="1CLR_n_1" pintype="input"/>
+    </net>
+    <net code="14" name="/REV" class="Default">
+      <node ref="U2" pin="9" pinfunction="2Q_9" pintype="output"/>
+      <node ref="U3" pin="6" pinfunction="PH_6" pintype="input"/>
+    </net>
+    <net code="15" name="/RUN" class="Default">
+      <node ref="U2" pin="12" pinfunction="2D_12" pintype="input"/>
+      <node ref="U2" pin="13" pinfunction="2CLR_n_13" pintype="input"/>
+      <node ref="U2" pin="5" pinfunction="1Q_5" pintype="output"/>
+      <node ref="U3" pin="5" pinfunction="EN_5" pintype="input"/>
+    </net>
+    <net code="16" name="/SW1" class="Default">
+      <node ref="P2" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="R3" pin="1" pintype="passive"/>
+      <node ref="S1" pin="1" pinfunction="NO_1" pintype="passive"/>
+    </net>
+    <net code="17" name="/SW2" class="Default">
+      <node ref="P3" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="R2" pin="2" pintype="passive"/>
+      <node ref="R4" pin="1" pintype="passive"/>
+      <node ref="S2" pin="1" pinfunction="NO_1" pintype="passive"/>
+    </net>
+    <net code="18" name="/VCC" class="Default">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="C2" pin="1" pintype="passive"/>
+      <node ref="C3" pin="1" pintype="passive"/>
+      <node ref="C4" pin="1" pinfunction="+_1" pintype="passive"/>
+      <node ref="D1" pin="1" pinfunction="K_1" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="R2" pin="1" pintype="passive"/>
+      <node ref="R5" pin="1" pintype="passive"/>
+      <node ref="S0" pin="2" pinfunction="COM_2" pintype="passive"/>
+      <node ref="U1" pin="14" pinfunction="VCC_14" pintype="power_in"/>
+      <node ref="U2" pin="10" pinfunction="2PRE_n_10" pintype="input"/>
+      <node ref="U2" pin="14" pinfunction="VCC_14" pintype="power_in"/>
+      <node ref="U2" pin="4" pinfunction="1PRE_n_4" pintype="input"/>
+      <node ref="U3" pin="1" pinfunction="VM_1" pintype="power_in"/>
+      <node ref="U3" pin="7" pinfunction="MODE_7" pintype="input"/>
+      <node ref="U3" pin="8" pinfunction="VCC_8" pintype="power_in"/>
+    </net>
+    <net code="19" name="unconnected-(U1-5Y-Pad10)" class="Default">
+      <node ref="U1" pin="10" pinfunction="5Y_10" pintype="output+no_connect"/>
+    </net>
+    <net code="20" name="unconnected-(U1-6Y-Pad12)" class="Default">
+      <node ref="U1" pin="12" pinfunction="6Y_12" pintype="output+no_connect"/>
+    </net>
+    <net code="21" name="unconnected-(U2-1Q_n-Pad6)" class="Default">
+      <node ref="U2" pin="6" pinfunction="1Q_n_6" pintype="output+no_connect"/>
+    </net>
+  </nets>
+</export>

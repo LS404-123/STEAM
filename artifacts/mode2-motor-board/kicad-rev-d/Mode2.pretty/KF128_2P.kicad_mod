@@ -1,0 +1,124 @@
+(footprint "KF128_2P"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "KEFA KF128-2.54-2P C474920; 2021-03-13; wire entry +Y; height 8.8mm")
+	(property "Reference" "REF**"
+		(at 1.27 -4.3 0)
+		(layer "F.SilkS")
+		(uuid "9b1124f6-186a-4758-b221-83c46e61f987")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Value" "KF128-2.54-2P"
+		(at 1.27 4 0)
+		(layer "F.Fab")
+		(uuid "7bc324ce-e6d5-456a-adc0-322ab7a41676")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "53ca5b2f-7a98-4bb2-87ed-0de790a11142")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "68e956bc-57c7-45b7-879e-5ef0a73ec3f4")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -1.39 2.3)
+		(end 3.93 2.3)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "57730e68-81d2-482b-bf96-ca8d167776a0")
+	)
+	(fp_rect
+		(start -1.39 -3.42)
+		(end 3.93 3.12)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "dea7f13a-19ad-4aff-a13b-c4b212153590")
+	)
+	(fp_rect
+		(start -1.72 -3.85)
+		(end 4.26 3.55)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "397b5078-6400-4cc0-8efc-0898423a4834")
+	)
+	(fp_rect
+		(start -1.27 -3.3)
+		(end 3.81 3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "835f9a5b-eb9d-4ad8-a4ea-df5bc2f36d11")
+	)
+	(pad "1" thru_hole rect
+		(at 0 0)
+		(size 2.1 2.1)
+		(drill 1.3)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8a8c548a-7aed-484f-9d69-18fdd0def93d")
+	)
+	(pad "2" thru_hole circle
+		(at 2.54 0)
+		(size 2.1 2.1)
+		(drill 1.3)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "b19a0ce4-d36f-481f-9bc9-02f4b8e28df4")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/models/KF128-2.54-2P-envelope.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

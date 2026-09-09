@@ -1,0 +1,8 @@
+{
+  "checked_pin_connections": 81,
+  "button_sequences": 1024,
+  "length_per_sequence": 10,
+  "rc_scenarios_2V": 28,
+  "erc_violations": 0,
+  "limits": "邏輯及指定 RC 波形模型；非 SPICE、非馬達瞬態／EMI／實機驗證；淘寶庫存未核實。"
+}
