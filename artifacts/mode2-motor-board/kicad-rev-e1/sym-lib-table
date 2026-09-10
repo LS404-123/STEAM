@@ -1,4 +1,0 @@
-(sym_lib_table
- (version 7)
- (lib (name "Mode2") (type "KiCad") (uri "${KIPRJMOD}/Mode2.kicad_sym") (options "") (descr "此專案符號；接腳依原廠資料表"))
-)
