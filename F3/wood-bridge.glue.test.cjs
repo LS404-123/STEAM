@@ -47,11 +47,22 @@ const floating=zeroG.simulate(hub);for(let i=0;i<12;i++) zeroG.step(floating);
 assert.ok(!floating.firstBreak && floating.nodes.every(n=>Math.hypot(n.vx,n.vy)<1e-5),'膠合鏈不產生假力或假斷裂');
 
 const sample=B.sample(true);assert.ok(sample.joints.every(j=>j.kind==='glue'),'介面範例橋也採用膠合');
-for(const load of [2,20]) {
+for(const load of [.2,20]) {
   const d=B.clone(sample);d.nodes.find(n=>n.load).load=load;
   const sim=B.simulate(d);
   for(let i=0;i<(load===20?4:1)/B.DT;i++) B.step(sim);
   assert.ok(!sim.unstable && sim.nodes.every(n=>[n.x,n.y,n.vx,n.vy].every(Number.isFinite)),'膠合範例受載及斷裂保持有限解');
   assert.equal(!!sim.firstBreak,load===20);
 }
+const baseline=B.simulate(sample),reinforced=B.clone(sample),braced=B.clone(sample);
+assert.equal(B.reinforce(reinforced,0),'','入門橋底可由學生加固');
+add(braced,{x:8,y:6},{x:12,y:8});add(braced,{x:12,y:8},{x:16,y:6});
+const variants=[baseline,B.simulate(reinforced),B.simulate(braced)];
+for(const sim of variants) {
+  for(let i=0;i<3/B.DT;i++) B.step(sim);
+  assert.ok(!sim.firstBreak && !sim.unstable,'原橋、加固和加斜撐均能承受初始負重');
+}
+const drop=sim=>sim.nodes.find(n=>n.load).y-B.GROUND;
+assert.ok(drop(baseline)>0,'入門橋有可觀察的下彎');
+for(const improved of variants.slice(1)) assert.ok(drop(improved)<drop(baseline)*.8,'加固或加斜撐後，相同負重的下彎應明顯減少');
 console.log('通過：自動膠合、固定角度、端點／桿身／交叉、拖動、解除、刪除及膠合範例受載。');

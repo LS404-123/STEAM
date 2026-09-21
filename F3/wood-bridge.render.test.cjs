@@ -3,6 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 const html=fs.readFileSync(__dirname+'/wood-bridge.html','utf8');
+assert.equal(Number(html.match(/<input id="weight"[^>]*max="([^"]+)"/)[1]),60,'手動滑桿上限為 60 kg');
 const scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
 const Bridge=new Function(scripts[0]+';return Bridge;')();
 const elements=new Map();let layoutReads=0,canvasWidth=929;
@@ -26,6 +27,8 @@ const context={Bridge,document,window:{devicePixelRatio:1,matchMedia:()=>({match
 vm.runInNewContext(scripts[1].replace('  update();draw();\n})();','  globalThis.renderer={draw,model,operate};update();draw();\n})();'),context);
 const canvas=elements.get('bridge'),calls=canvas.context;
 assert.ok(context.renderer.model().joints.every(j=>j.kind==='glue'),'預設範例橋的接點均採用膠合');
+assert.equal(context.renderer.model().bars.length,7,'頁面預設載入 7 條木桿的入門橋');
+assert.equal(Number(elements.get('weight').value),.2,'入門橋預設滑桿顯示 0.2 kg');
 let arcs=calls['count:arc'];
 assert.ok(arcs>700,'首次繪製包含完整方格背景');
 layoutReads=0;context.renderer.draw();
@@ -66,11 +69,13 @@ context.renderer.model().firstBreak={bar:0,load:fixedWeight,position:.5};frame(1
 assert.equal(elements.get('auto-load').checked,false,'首斷後取消連續加重');
 assert.equal(frames.size,1,'首斷後繼續播放碎段');
 click('reset');
-elements.get('weight').value=19.99999;elements.get('weight').listeners.input();
+elements.get('weight').value=59.99999;elements.get('weight').listeners.input();
+assert.equal(elements.get('auto-load').disabled,false,'超過 20 kg 仍可啟用連續加重');
 autoLoad(true);click('test');frame(12000);frame(12050);
-assert.equal(context.renderer.model().nodes.find(n=>n.load).load,20,'連續加重準確停在 20 kg');
+assert.equal(context.renderer.model().nodes.find(n=>n.load).load,60,'連續加重準確停在 60 kg');
 assert.equal(elements.get('auto-load').checked,false);
 click('reset');
+assert.equal(elements.get('auto-load').disabled,true,'達 60 kg 後停用連續加重');
 
 // 選取只標示目標；必須按明確操作才改動模型，重疊物件可逐一選取。
 const {operate,model}=context.renderer;
@@ -158,6 +163,8 @@ for(const key of ['ArrowUp','ArrowUp','ArrowUp','ArrowUp','ArrowRight','ArrowRig
 assert.equal(model().joints.length,1,'鍵盤修改亦可接合末端');
 assert.equal(model().joints[0].kind,'glue','鍵盤修改也使用自動膠合');
 click('example');elements.get('slow').checked=false;
+assert.equal(model().bars.length,7,'範例橋按鈕還原 7 條木桿的入門橋');
+assert.equal(Number(elements.get('weight').value),.2,'重新載入範例恢復 0.2 kg 負重');
 elements.get('weight').value=20;elements.get('weight').listeners.input();click('test');
 let breakTime=20000;frame(breakTime);
 for(let i=0;i<20 && !model().firstBreak;i++) {breakTime+=50;frame(breakTime);}

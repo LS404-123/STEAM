@@ -133,7 +133,7 @@
         <details id="more-actions"><summary>更多</summary><button id="glue">與另一木桿膠合…</button></details>
         <button id="glue-confirm" hidden>膠合這兩條</button><button id="cancel-glue" hidden>取消膠合</button>
       </div>
-      <p id="message" role="status">點兩個位置或拖拉放木桿；接觸處自動膠合並固定角度。Esc 取消。</p>
+      <p id="message" role="status">先測試入門橋，再試加斜撐或選取木桿按「加固」，比較相同負重下的變形。</p>
       <div class="legend"><span><i class="swatch"></i>未測試／軸力極小</span><span><i class="swatch compression"></i>紅色：受壓</span><span><i class="swatch tension"></i>藍色：受拉</span><span>● 接合　▤ 膠合</span><span>◎ 最高應力　× 首斷</span><span>每小格 5 cm</span><span>虛線：原設計</span></div>
       <details id="materials" class="materials" aria-label="木橋材料計算" open><summary>材料明細 · 長度與用量</summary>
         <table>
@@ -143,15 +143,15 @@
           <tfoot><tr><th colspan="3" scope="row">單面木條總長</th><td id="material-total">—</td></tr><tr><th colspan="3" scope="row">正反兩面（同樣設計 × 2）</th><td id="material-both">—</td></tr></tfoot>
         </table>
         <p class="small">斜邊長度 = √（水平距離² ＋ 垂直距離²）。各列為單條長度 × 數量；長度顯示至小數兩位，小計至一位，合計按未取整的原長計算。測試變形不改變材料用量。</p>
-        <p class="small">工作紙把 8 條斜桿約作 18 cm，單面合計 515 cm；此表使用實際幾何長度。畫布及 20 m 上限按單面計，正反兩面用量未計橫向連接木材。</p>
+        <p class="small">入門橋共 7 條木桿，單面用量約 285 cm；可自行加斜撐或加固。畫布及 20 m 上限按單面計，正反兩面用量未計橫向連接木材。</p>
       </details>
     </section>
     <aside aria-label="測試控制">
       <section>
         <div class="load-heading"><h2><label for="weight">中央線負重</label></h2><span aria-hidden="true">↓</span></div>
-        <div class="load-value"><output id="weight-value" for="weight">2</output> <small>kg</small></div>
-        <input id="weight" type="range" min="0" max="20" step="0.01" value="2">
-        <div class="range-labels"><span>0 kg</span><span>20 kg</span></div>
+        <div class="load-value"><output id="weight-value" for="weight">0.2</output> <small>kg</small></div>
+        <input id="weight" type="range" min="0" max="60" step="0.01" value="0.2">
+        <div class="range-labels"><span>0 kg</span><span>60 kg</span></div>
         <p id="load-target" class="small">已選中央節點，可直接調整負重。</p>
       </section>
       <section class="test-section">
@@ -161,7 +161,7 @@
         <label class="slow-control"><input id="slow" type="checkbox"><span id="slow-label">慢速播放（1/10 速）</span></label><button id="reset" disabled>↶ 返回建造</button>
         <p class="small">二維物理估算；實物承重須以木材及膠合試驗校準。</p>
       </section>
-      <section class="rule results"><p id="status" role="status">建造中</p><dl class="readouts"><dt>木桿數量</dt><dd id="bar-count">18</dd><dt>木材用量</dt><dd id="wood-used">— / 20 m</dd><dt>接合／膠合</dt><dd id="joint-count">0 / 0</dd><dt>總負重</dt><dd id="total-load">2 kg</dd><dt>最大下移</dt><dd id="deflection">—</dd><dt>已斷木桿</dt><dd id="broken-count">0</dd><dt>首斷總負重</dt><dd id="first-break">—</dd></dl></section>
+      <section class="rule results"><p id="status" role="status">建造中</p><dl class="readouts"><dt>木桿數量</dt><dd id="bar-count">7</dd><dt>木材用量</dt><dd id="wood-used">— / 20 m</dd><dt>接合／膠合</dt><dd id="joint-count">0 / 0</dd><dt>總負重</dt><dd id="total-load">0.2 kg</dd><dt>最大下移</dt><dd id="deflection">—</dd><dt>已斷木桿</dt><dd id="broken-count">0</dd><dt>首斷總負重</dt><dd id="first-break">—</dd></dl></section>
       <section class="material-section rule"><h2>建造材料</h2><div class="material"><div class="timber" aria-hidden="true"></div><p><strong>6 × 6 mm 輕木（Balsa）</strong><br><span class="small">每條最長 100 cm · 總共 20 m</span></p></div>
         <details class="calibration"><summary>輕木（Balsa）· 材料校準</summary>
           <p>預設為中密度乾燥輕木，木紋沿桿長。密度取 160 kg/m³；彈性模數、順紋抗壓及抗彎強度參照<a href="https://doi.org/10.1007/s00107-015-0983-0" target="_blank" rel="noopener">輕木試驗研究</a>的中密度組，取整數作教學參考。</p>
@@ -177,11 +177,11 @@
   </div>
   <div class="help">
     <details><summary>操作與模型說明</summary>
-      <p>預設及「範例橋」採用工作紙橋形：100 cm 橋底兩條膠合、80 cm 橋頂一條、13 cm 直桿七條，以及八條斜桿。橋頂分成六個等寬格，斜桿向中央下方排列；外側斜桿約 16.4 cm、內側約 18.6 cm。水平長梁保持完整，中段接點不會把長梁切成獨立木條。橋身高度按主橋底至橋頂的中心線計算。</p>
+      <p>預設及「範例橋」採用 7 條木桿的入門橋：100 cm 橋底一條、80 cm 橋頂一條、20 cm 直桿三條，以及兩條約 22.36 cm 的外側斜桿。接觸處採用膠合，中央掛 0.2 kg 負重；橋底未加固，兩個內側框格留給學生加斜撐。先測試原橋，再比較加斜撐或加固後的變形與首斷負重。水平長梁保持完整，中段接點不會把長梁切成獨立木條。橋身高度按橋底至橋頂的中心線計算。</p>
       <p id="keyboard-help">點起點、終點，或直接拖拉放木桿。位置先對齊 5 cm 方格；靠近已有木桿時，把方格位置投影到桿身，沿桿移動。接近任一木桿端點時優先吸附該端點，即使端點不在方格上。按木桿可作為新木桿的起點，接觸處會自動膠合，固定相對角度。每條最多 100 cm，全部木材合計最多 20 m；重疊及膠合的木材也分別計算。刪除或縮短木桿可退回用量。</p>
       <p>用「選取」點木桿，確認高亮目標後按「加固」，自動複製同長木桿並貼合，不複製重物。優先向上或側面堆疊，避開地面；空間或剩餘木材不足時取消。可以重複加固，也可以按「復原」。物件重疊時，用畫布下方的選單切換木桿、端點、接合或重物，再執行操作。</p>
       <p>放置或拖動木桿後，端點相接、端點碰到桿身及交叉處會自動膠合，固定接觸位置與相對角度；木桿本身仍能彎曲。選取膠合可解除連接，兩條木桿便可分離。若想改成可轉動接點，解除膠合後選「接合」再點接觸處。整條長木桿保持完整。手動膠合：選取第一條木桿，在「更多」按「與另一木桿膠合」，再選第二條並確認。兩條木桿須平行、相隔最多一格且重疊至少 5 cm；會先靠攏至表面貼合，再固定相對滑動和轉動。接地木桿優先保持原位，其餘情況以第一條為準；若現有接合阻止靠攏，整次操作會取消。選取重物後可卸下；選接點或膠合區中央後可解除連接；選木桿後會刪除整組膠合木桿，加固層亦一併移除；透過接點或單點膠合相連的其他木桿會保留。按一次「復原」可取回整組。</p>
-      <p>用「選取」拖動一個端點，可調整木桿長度及角度，相連木桿及重物一起更新。靠近另一木桿末端時會吸附，放開即膠合並固定相對角度；移開則取消預覽，按 Esc 可取消整次拖動。膠合組合會保持木材長度，解除膠合後才可改形。超出木材用量、木桿過短、移入地面或無法維持接合時，修改會取消。建造操作可復原。新負重只可掛在河口中央垂直線（距兩岸各 47.5 cm）與木桿或碎段的交點；掛上後隨木桿移動，不限制水平運動。已有重物可繼續調整重量；卸下後若位置已離開中央線，須重新選中央交點。最多 150 個中段負重位置，卸下後可重用。勾選「連續加重」後按開始測試，以每秒 0.5 kg 增加；首斷或達 20 kg 時停止加重；不論有否勾選慢速，首次斷裂後都自動以 1/10 速播放，並用紅色 × 標示首斷位置。取消勾選只停止加重；按「暫停測試」才暫停整個模擬。</p>
+      <p>用「選取」拖動一個端點，可調整木桿長度及角度，相連木桿及重物一起更新。靠近另一木桿末端時會吸附，放開即膠合並固定相對角度；移開則取消預覽，按 Esc 可取消整次拖動。膠合組合會保持木材長度，解除膠合後才可改形。超出木材用量、木桿過短、移入地面或無法維持接合時，修改會取消。建造操作可復原。新負重只可掛在河口中央垂直線（距兩岸各 47.5 cm）與木桿或碎段的交點；掛上後隨木桿移動，不限制水平運動。已有重物可繼續調整重量；卸下後若位置已離開中央線，須重新選中央交點。最多 150 個中段負重位置，卸下後可重用。勾選「連續加重」後按開始測試，以每秒 0.5 kg 增加；首斷或達 60 kg 時停止加重；不論有否勾選慢速，首次斷裂後都自動以 1/10 速播放，並用紅色 × 標示首斷位置。取消勾選只停止加重；按「暫停測試」才暫停整個模擬。</p>
       <p>鍵盤：Tab 選取搭建區，方向鍵移動游標，Enter 操作。「選取」模式中，Enter 選端點後用方向鍵移動；重疊時按 Tab 到選單切換目標，再回到搭建區。Esc 結束修改或取消未完成操作。「返回建造」還原測試前的橋形，保留設定的負重。裝置較慢時，播放會自動放慢以維持操作回應，負重仍按模擬時間累加；切換分頁時暫停運算。</p>
       <p>兩岸淨距 95 cm，橋樑自由放在岸上，沒有固定鉸點。地面承托木桿的模擬點並提供有限摩擦力。木桿內部能彎曲；預設膠合固定相對角度；用「接合」建立的接點可轉動。膠合木桿沿桿身一起彎曲，加固後下彎通常較少。最大下移包含木桿中段。測試時木桿以紅色表示受壓、藍色表示受拉；軸力極小時保留木色，同一木桿各段受力不同時會分段上色。顏色表示沿桿長的軸力方向，不代表彎曲截面上下表面的應力。橙色圓圈標示未斷木桿當下的最高應力位置，顯示軸向與彎曲疊加的最大應力（MPa）；斷裂當步也會保留該處標示。</p>
       <p>拉伸、壓縮和彎曲應力合併超出強度時，木桿在最先失效的模擬截面切成兩段；保留當時的形狀與速度，斷口獨立移動，重物及接點跟隨所屬碎段。膠合可透過另一條完整木材繼續連接碎段。「首斷總負重」記錄第一次木桿斷裂時所有重物的合計。</p>
@@ -262,7 +262,7 @@ const Bridge = (() => {
     for(const node of design.nodes) if(node.attachment) Object.assign(node,barPoint(design,node.attachment.bar,node.attachment.t));
   }
   function placeLoad(design,sim,bar,t,weight) {
-    if(!design.bars[bar] || !Number.isFinite(t) || t<0 || t>1 || !Number.isFinite(weight) || weight<0 || weight>20) return -1;
+    if(!design.bars[bar] || !Number.isFinite(t) || t<0 || t>1 || !Number.isFinite(weight) || weight<0 || weight>60) return -1;
     const timber=design.bars[bar];
     let index=t<=1e-6?timber.a:t>=1-1e-6?timber.b:design.nodes.findIndex(n=>n.attachment?.bar===bar && Math.abs(n.attachment.t-t)*timber.length<1e-6 && (!sim?.bars[bar].broken || (n.attachment.t<=sim.bars[bar].cutT)===(t<=sim.bars[bar].cutT)));
     if(index<0) {
@@ -595,18 +595,14 @@ const Bridge = (() => {
   function sample(autoGlue=false) {
     const design = empty();
     const add=(a,b)=>addBar(design,a,b,autoGlue);
-    const left=CENTER_X-5,right=CENTER_X+5,top=GROUND-1.3,x=i=>left+1+i*8/6;
+    const left=CENTER_X-5,right=CENTER_X+5,top=GROUND-2;
     add({x:left,y:GROUND},{x:right,y:GROUND});
-    reinforce(design,0);
-    add({x:x(0),y:top},{x:x(6),y:top});
-    for(let i=0;i<=6;i++) add({x:x(i),y:top},{x:x(i),y:GROUND});
-    add({x:left,y:GROUND},{x:x(0),y:top});
-    for(let i=0;i<6;i++) {
-      add({x:x(i),y:i<3?top:GROUND},{x:x(i+1),y:i<3?GROUND:top});
-    }
-    add({x:x(6),y:top},{x:right,y:GROUND});
+    add({x:left+1,y:top},{x:right-1,y:top});
+    for(const x of [left+1,CENTER_X,right-1]) add({x,y:top},{x,y:GROUND});
+    add({x:left,y:GROUND},{x:left+1,y:top});
+    add({x:right-1,y:top},{x:right,y:GROUND});
     if(!autoGlue) connectTouching(design);
-    design.nodes.find(n => Math.abs(n.x-CENTER_X)<1e-6 && Math.abs(n.y-GROUND)<1e-6).load = 2;
+    design.nodes.find(n => Math.abs(n.x-CENTER_X)<1e-6 && Math.abs(n.y-GROUND)<1e-6).load = .2;
     return design;
   }
   function simulate(design,settings={}) {
@@ -884,7 +880,7 @@ const Bridge = (() => {
   }
   function increaseLoad(sim,index,dt=DT) {
     const node=sim.nodes[index];
-    if(!sim.firstBreak && canAddLoad(node)) node.load=Math.min(20,node.load+.5*dt);
+    if(!sim.firstBreak && canAddLoad(node)) node.load=Math.min(60,node.load+.5*dt);
     return node.load;
   }
   function mechanicalEnergy(sim,group) {
@@ -1065,9 +1061,9 @@ const Bridge = (() => {
     $('reset').disabled = !simulation;
     for (const id of ['wood','edit','join','clear','example']) $(id).disabled = !!simulation;
     for(const key of Object.keys(Bridge.MATERIAL)) $('mat-'+key).disabled=!!simulation;
-    $('auto-load').disabled = !design.bars.length || !Bridge.canAddLoad(current.nodes[selectedLoad]) || broken > 0 || current.nodes[selectedLoad]?.load>=20;
+    $('auto-load').disabled = !design.bars.length || !Bridge.canAddLoad(current.nodes[selectedLoad]) || broken > 0 || current.nodes[selectedLoad]?.load>=60;
     if($('auto-load').disabled) $('auto-load').checked=false;
-    $('test-mode-note').textContent = broken ? '已停止加重；自動以 1/10 速觀察斷裂及跌落。' : current.nodes[selectedLoad]?.load>=20 ? '所選重物已達 20 kg。' : !Bridge.canAddLoad(current.nodes[selectedLoad]) ? '先選中央交點掛重物。' : $('auto-load').checked ? '每秒 +0.5 kg；首斷或 20 kg 停止加重。' : '固定負重；首次斷裂後自動慢速。';
+    $('test-mode-note').textContent = broken ? '已停止加重；自動以 1/10 速觀察斷裂及跌落。' : current.nodes[selectedLoad]?.load>=60 ? '所選重物已達 60 kg。' : !Bridge.canAddLoad(current.nodes[selectedLoad]) ? '先選中央交點掛重物。' : $('auto-load').checked ? '每秒 +0.5 kg；首斷或 60 kg 停止加重。' : '固定負重；首次斷裂後自動慢速。';
     $('undo').disabled = !!simulation || !history.length;
     if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
     $('weight-value').textContent = formatWeight(Number($('weight').value));
@@ -1377,7 +1373,7 @@ const Bridge = (() => {
   for(const id of ['clear','example']) $(id).addEventListener('click',()=>{
     cancelPointer();remember();design=id==='clear'?Bridge.empty():Bridge.sample(true);selectedLoad=design.nodes.findIndex(n=>n.load);start=null;
     if(selectedLoad>=0) $('weight').value=design.nodes[selectedLoad].load;
-    setTool('wood');tell(id==='clear'?'已清空。由岸上開始搭橋；可按「復原」取回設計。':'已載入範例橋，按「開始測試」觀察。');update();draw();
+    setTool('wood');tell(id==='clear'?'已清空。由岸上開始搭橋；可按「復原」取回設計。':'已載入入門橋。先測試，再試加斜撐或加固，比較相同負重下的變形。');update();draw();
   });
   $('weight').addEventListener('pointerdown',()=>{if(!simulation && selectedLoad>=0) remember();});
   $('weight').addEventListener('keydown',event=>{if(!simulation && selectedLoad>=0 && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(event.key)) remember();});
@@ -1406,7 +1402,7 @@ const Bridge = (() => {
   $('test').addEventListener('click',()=>{
     if(!design.bars.length) return;
     if(running) running=false; else if(!startTest()) return;
-    tell(running?($('auto-load').checked?'測試中：每秒加重 0.5 kg，首斷或 20 kg 停止加重。':'測試中：保持負重，可勾選連續加重或暫停觀察。'):'已暫停。可調整負重，或返回建造修改木桿。');update();draw();
+    tell(running?($('auto-load').checked?'測試中：每秒加重 0.5 kg，首斷或 60 kg 停止加重。':'測試中：保持負重，可勾選連續加重或暫停觀察。'):'已暫停。可調整負重，或返回建造修改木桿。');update();draw();
   });
   $('auto-load').addEventListener('change',()=>{
     update();
@@ -1501,7 +1497,7 @@ const Bridge = (() => {
           } else {
             const weight=Bridge.increaseLoad(simulation,selectedLoad);
             design.nodes[selectedLoad].load=weight;
-            if(weight>=20) {$('auto-load').checked=false;tell('所選節點已達 20 kg 上限；模擬繼續。');}
+            if(weight>=60) {$('auto-load').checked=false;tell('所選節點已達 60 kg 上限；模擬繼續。');}
           }
         }
       }
