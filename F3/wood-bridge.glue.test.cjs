@@ -22,6 +22,21 @@ assert.equal(moved.joints.length,0,'在別處新增或修改不重新黏上已�
 const zeroG=new Function(source.replace('9.81/UNIT*dt*dt','0')+';return Bridge;')();
 const elbow=B.empty();add(elbow,{x:6,y:4},{x:10,y:4});add(elbow,{x:10,y:4},{x:10,y:7});
 assert.notEqual(elbow.bars[0].b,elbow.bars[1].a,'接觸端點保持獨立，解除膠合後可以分離');
+const edited=B.clone(elbow),editNode=edited.bars[0].b;
+const attachedLoad=B.placeLoad(edited,null,0,.5,.2);
+assert.equal(B.moveNode(edited,editNode,{x:10.1,y:3.9},true),'','膠合端點可改變相連木桿的長度及角度');
+assert.ok(B.distance(edited.nodes[editNode],edited.nodes[edited.bars[1].a])<1e-7,'修改後仍保持端點相連');
+assert.deepEqual(edited.nodes[edited.bars[0].a],elbow.nodes[elbow.bars[0].a],'不必移動另一端來維持原長');
+assert.deepEqual(edited.nodes[edited.bars[1].b],elbow.nodes[elbow.bars[1].b],'相連木桿的另一端保持原位');
+assert.ok(edited.bars.every((bar,i)=>Math.abs(bar.length-elbow.bars[i].length)>1e-3),'相連木桿長度按新形狀更新');
+assert.notEqual(edited.joints[0].angle,elbow.joints[0].angle,'膠合角度更新為修改後的角度');
+assert.ok(B.distance(edited.nodes[attachedLoad],B.barPoint(edited,0,.5))<1e-10,'中段重物跟隨修改且保持重量');
+assert.equal(edited.nodes[attachedLoad].load,.2);
+const editedSim=zeroG.simulate(edited);for(let i=0;i<12;i++) zeroG.step(editedSim);
+assert.ok(!editedSim.firstBreak && editedSim.nodes.every(n=>Math.hypot(n.vx,n.vy)<1e-5),'開始測試時不能被舊膠合角度拉回或產生假應力');
+const invalidEdit=JSON.stringify(edited);
+assert.ok(B.moveNode(edited,editNode,{x:19,y:4},true),'超長修改仍須拒絕');
+assert.equal(JSON.stringify(edited),invalidEdit,'無效修改保留原來形狀、接合及負重');
 for(const glued of [true,false]) {
   const d=B.clone(elbow);if(!glued) d.joints[0].kind='pin';
   const sim=zeroG.simulate(d),first=sim.bars[0],second=sim.bars[1];
@@ -47,6 +62,14 @@ const floating=zeroG.simulate(hub);for(let i=0;i<12;i++) zeroG.step(floating);
 assert.ok(!floating.firstBreak && floating.nodes.every(n=>Math.hypot(n.vx,n.vy)<1e-5),'膠合鏈不產生假力或假斷裂');
 
 const sample=B.sample(true);assert.ok(sample.joints.every(j=>j.kind==='glue'),'介面範例橋也採用膠合');
+const editedSample=B.clone(sample),sampleTip=editedSample.bars[1].a;
+assert.equal(B.moveNode(editedSample,sampleTip,{x:8.1,y:5.9},true),'','預設橋頂端可移動 1 cm，不再帶動整橋進入地面');
+assert.equal(editedSample.nodes[sampleTip].x,8.1);assert.equal(editedSample.nodes[sampleTip].y,5.9);
+assert.equal(editedSample.joints.length,sample.joints.length,'修改預設橋保留原有接合');
+for(const joint of editedSample.joints) {
+  const link=joint.links[0];
+  assert.ok(B.distance(B.barPoint(editedSample,joint.a,link.ta),B.barPoint(editedSample,joint.b,link.tb))<1e-7,'所有膠合位置仍然相連');
+}
 for(const load of [.2,20]) {
   const d=B.clone(sample);d.nodes.find(n=>n.load).load=load;
   const sim=B.simulate(d);
