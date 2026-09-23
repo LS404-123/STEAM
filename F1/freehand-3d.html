@@ -46,6 +46,9 @@
     .viewport svg { display:block; width:100%; height:100%; }
     #model { touch-action:none; cursor:grab; }
     #model:active { cursor:grabbing; }
+    .cube-node { cursor:pointer; }
+    .cube-node:focus-visible { outline:none; stroke:#6941c6; stroke-width:8; }
+    .manual-point { cursor:pointer; }
     .projection { background:#fff; }
     .controls { display:flex; align-items:center; flex-wrap:wrap; gap:12px 20px; padding:17px 24px; border-top:1px solid var(--line); }
     .switch { display:inline-flex; align-items:center; gap:10px; cursor:pointer; font-size:14px; font-weight:700; }
@@ -87,12 +90,12 @@
       <section class="board" aria-label="立體模型與平面投影">
         <div class="board-head"><div><h2 id="shapeTitle">圖 1</h2><p id="shapeDescription"></p></div><span class="badge">固定鏡頭 · 正投影</span></div>
         <div class="views" id="views">
-          <div class="view"><div class="view-title"><span>3D 模型</span><small>上下左右拖動</small></div><div class="viewport"><svg id="model" viewBox="0 0 500 500" role="img" aria-label="可旋轉的立體模型" tabindex="0"></svg></div></div>
+          <div class="view"><div class="view-title"><span>3D 模型</span><small>拖動旋轉 · 按橙點選取</small></div><div class="viewport"><svg id="model" viewBox="0 0 500 500" role="group" aria-label="可旋轉及選點的立體模型" tabindex="0"></svg></div></div>
           <div class="view"><div class="view-title"><span>2D 螢幕投影</span><small>與左邊角度同步</small></div><div class="viewport projection"><svg id="projection" viewBox="0 0 500 500" role="img" aria-label="目前模型的平面投影"></svg></div></div>
           <svg id="transfer" class="transfer" aria-hidden="true" focusable="false"></svg>
         </div>
-        <div class="controls"><label class="switch"><input id="gridToggle" type="checkbox" checked><span class="track" aria-hidden="true"></span>顯示方格框及節點</label><label class="switch"><input id="pointsToggle" type="checkbox"><span class="track" aria-hidden="true"></span>顯示模型對齊點</label><button id="demo" class="reset demo" type="button">開始分步示範</button><button id="nextStep" class="reset" type="button" disabled>下一步</button><button id="reset" class="reset" type="button">重設角度</button><span class="instruction">左右轉向 · 上下傾斜 · 方向鍵亦可操作</span></div>
-        <div class="note">紫色點標出模型頂點與橙色方格節點重合的位置；一般檢視時，右邊只畫物件輪廓與轉折邊。示範可按「下一步」逐段觀看。<span id="demoStatus" role="status" aria-live="polite"></span></div>
+        <div class="controls"><label class="switch"><input id="gridToggle" type="checkbox" checked><span class="track" aria-hidden="true"></span>顯示方格框及節點</label><label class="switch"><input id="pointsToggle" type="checkbox"><span class="track" aria-hidden="true"></span>顯示已選對齊點</label><button id="demo" class="reset demo" type="button">開始分步示範</button><button id="nextStep" class="reset" type="button" disabled>下一步</button><button id="reset" class="reset" type="button">重設角度</button><span class="instruction">左右轉向 · 上下傾斜 · 方向鍵亦可操作</span></div>
+        <div class="note">按左邊橙色節點可選擇或取消紫色對齊點，右邊會即時同步；開關可暫時隱藏已選點。示範可按「下一步」逐段觀看。<span id="demoStatus" role="status" aria-live="polite"></span></div>
       </section>
     </div>
   </main>
@@ -147,6 +150,7 @@
     const title=document.getElementById('shapeTitle'), desc=document.getElementById('shapeDescription');
     const picker=document.getElementById('shapes'), demoButton=document.getElementById('demo'), nextButton=document.getElementById('nextStep'), demoStatus=document.getElementById('demoStatus');
     let selected=0, yaw=0, pitch=0, dragging=null, demoStep=0;
+    const chosen=shapes.map(()=>new Set());
     const camera=[-1,-1,1], camLength=Math.hypot(...camera), view=camera.map(v=>v/camLength);
     const right=[-Math.SQRT1_2,Math.SQRT1_2,0];
     const up=[view[2]*right[1],-view[2]*right[0],view[1]*right[0]-view[0]*right[1]];
@@ -279,7 +283,7 @@
         return `<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#193943" stroke-width="2.2" stroke-linecap="round"/>`;
       }).join('')).join('');
     }
-    function cage(toScreen,showNodes=true,color='#276b7c') {
+    function cage(toScreen,showNodes=true,color='#276b7c',interactive=false) {
       const [cx,cy,cz]=[[2.5,1.5,1.5],[1.5,2.5,1.5],[1.5,1.5,2.5]].map(p=>dot(rotate(p),view));
       const front=([x,y,z])=>(x===0&&cx<0)||(x===3&&cx>0)||(y===0&&cy<0)||(y===3&&cy>0)||(z===0&&cz<0)||(z===3&&cz>0);
       const lines=[[],[]], dots=[[],[]];
@@ -294,7 +298,8 @@
       }
       for(let x=0;showNodes&&x<=3;x++) for(let y=0;y<=3;y++) for(let z=0;z<=3;z++) {
         const [sx,sy]=toScreen(projected([x,y,z]));
-        dots[front([x,y,z])?1:0].push(`<circle cx="${num(sx)}" cy="${num(sy)}" r="2.7"/>`);
+        const key=[x,y,z].join(','), hit=interactive?` class="cube-node" data-node="${key}" role="button" tabindex="0" aria-label="方格節點 ${key}" aria-pressed="${chosen[selected].has(key)}" stroke="transparent" stroke-width="16" pointer-events="all"`:'';
+        dots[front([x,y,z])?1:0].push(`<circle cx="${num(sx)}" cy="${num(sy)}" r="2.7"${hit}/>`);
       }
       return [0,1].map(i=>`<g stroke="${color}" stroke-linecap="round" stroke-dasharray="1 6" opacity="${i?.82:.36}">${lines[i].join('')}</g><g fill="#ce6747" opacity="${i?.9:.45}">${dots[i].join('')}</g>`);
     }
@@ -323,7 +328,7 @@
     }
     function render() {
       const shape=shapes[selected], faces=shape.profile?rampFaces(shape.profile):cubeFaces(shape.blocks), toScreen=frame();
-      const vertexKeys=pointsToggle.checked?modelVertices(faces):null;
+      const vertexKeys=demoStep>=2&&pointsToggle.checked?modelVertices(faces):null;
       const edges=projectionEdges(faces);
       const visible=faces.map(face=>{
         const rotated=face.points.map(rotate), center=rotated[0].map((_,i)=>rotated.reduce((s,p)=>s+p[i],0)/rotated.length), n=normal(rotated);
@@ -339,19 +344,20 @@
         const key=point.join(',');
         if(visibleKeys.has(key)&&!demoPoints.has(key)) demoPoints.set(key,{screen:face.screen[i],index:demoPoints.size});
       });
-      const [backGrid,frontGrid]=toggle.checked?cage(toScreen):['',''];
+      const manualPoints=demoStep||!pointsToggle.checked?[]:[...chosen[selected]].map(key=>({key,screen:toScreen(projected(key.split(',').map(Number)))}));
+      const [backGrid,frontGrid]=toggle.checked?cage(toScreen,true,'#276b7c',true):['',''];
       model.innerHTML=backGrid+visible.map(f=>polygon(f.screen,f.shade,'#244c58',1.8)+(vertexKeys?f.points.map((p,i)=>{
         const key=p.join(',');
         if(!visibleKeys.has(key)) return '';
         const step=demoPoints.get(key)?.index;
         const pulse=step===undefined||demoStep!==2?'':` style="animation:pointPulse .5s ${(step*.32).toFixed(2)}s both;transform-box:fill-box;transform-origin:center"`;
         return `<circle class="fixed-point" cx="${num(f.screen[i][0])}" cy="${num(f.screen[i][1])}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"${pulse}/>`;
-      }).join(''):'')).join('')+frontGrid;
-      projection.innerHTML=demoStep?demoProjection(visible,edges,demoPoints,toScreen):projectionFaces(visible,edges);
+      }).join(''):'')).join('')+frontGrid+manualPoints.map(({key,screen:[x,y]})=>`<circle class="fixed-point manual-point" data-node="${key}" role="button" tabindex="0" aria-label="取消對齊點 ${key}" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"/>`).join('');
+      projection.innerHTML=demoStep?demoProjection(visible,edges,demoPoints,toScreen):projectionFaces(visible,edges)+cage(toScreen,false,'#849397').join('')+manualPoints.map(({screen:[x,y]})=>`<circle class="marked-point" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"/>`).join('');
       transferPoints(demoPoints);
       title.textContent=shape.name; desc.textContent=shape.description;
       [...picker.children].forEach((button,i)=>button.setAttribute('aria-pressed',String(i===selected)));
-      model.setAttribute('aria-label',`${shape.name}：${shape.description}，可用方向鍵上下左右旋轉`);
+      model.setAttribute('aria-label',`${shape.name}：${shape.description}，可用方向鍵旋轉，按橙色節點選擇對齊點`);
       projection.setAttribute('aria-label',demoStep?`${shape.name}投影示範，${stepText[demoStep]}`:`${shape.name}目前角度的 2D 投影`);
       demoButton.textContent=demoStep?'重新開始示範':'開始分步示範';
       nextButton.disabled=!demoStep||demoStep===4;
@@ -364,15 +370,34 @@
       button.setAttribute('aria-label',`選擇${shape.name}：${shape.description}`);
       button.addEventListener('click',()=>{stopDemo();selected=i; render();}); picker.append(button);
     });
-    model.addEventListener('pointerdown',e=>{if(demoStep){stopDemo();render();} dragging=[e.pointerId,e.clientX,e.clientY]; model.setPointerCapture(e.pointerId);});
+    function selectNode(key) {
+      if(demoStep) stopDemo();
+      const points=chosen[selected];
+      if(!pointsToggle.checked) points.add(key);
+      else if(points.has(key)) points.delete(key);
+      else points.add(key);
+      pointsToggle.checked=true;
+      render();
+    }
+    model.addEventListener('pointerdown',e=>{
+      const key=e.target?.getAttribute?.('data-node')||null;
+      if(demoStep){stopDemo();render();}
+      dragging=[e.pointerId,e.clientX,e.clientY,e.clientX,e.clientY,key];
+      model.setPointerCapture(e.pointerId);
+    });
     model.addEventListener('pointermove',e=>{
       if(!dragging||dragging[0]!==e.pointerId) return;
+      if(dragging[5]&&Math.hypot(e.clientX-dragging[3],e.clientY-dragging[4])<5) return;
+      dragging[5]=null;
       yaw+=(e.clientX-dragging[1])*0.008;
       pitch-=(e.clientY-dragging[2])*0.008;
-      dragging=[e.pointerId,e.clientX,e.clientY]; render();
+      dragging[1]=e.clientX; dragging[2]=e.clientY; render();
     });
-    for(const event of ['pointerup','pointercancel','lostpointercapture']) model.addEventListener(event,()=>dragging=null);
+    model.addEventListener('pointerup',e=>{if(dragging?.[5]&&dragging[0]===e.pointerId) selectNode(dragging[5]); dragging=null;});
+    for(const event of ['pointercancel','lostpointercapture']) model.addEventListener(event,()=>dragging=null);
     model.addEventListener('keydown',e=>{
+      const node=e.target?.getAttribute?.('data-node');
+      if(node&&(e.key==='Enter'||e.key===' ')) { e.preventDefault(); selectNode(node); model.querySelector?.(`[data-node="${node}"]`)?.focus(); return; }
       const step={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,.12],ArrowDown:[0,-.12]}[e.key];
       if(!step) return; e.preventDefault(); stopDemo();yaw+=step[0]; pitch+=step[1]; render();
     });
