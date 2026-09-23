@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>立體圖形觀察室｜中一 IEE</title>
+  <style>
+    :root { color-scheme:light; --ink:#15313b; --muted:#61777d; --blue:#126d83; --orange:#da7350; --line:#cbdde1; --paper:#eef5f5; --white:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--paper); color:var(--ink); font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif; }
+    button { font:inherit; cursor:pointer; }
+    button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+    .shell { max-width:1450px; margin:auto; padding:24px clamp(16px,3vw,42px) 36px; }
+    .topline { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:15px; border-bottom:1px solid var(--line); font-size:13px; font-weight:700; letter-spacing:.08em; }
+    .topline a { color:var(--blue); text-decoration:none; }
+    .topline a:hover { text-decoration:underline; }
+    .heading { display:flex; justify-content:space-between; align-items:end; gap:20px; margin:25px 0 24px; }
+    .eyebrow { color:var(--blue); font-size:12px; font-weight:800; letter-spacing:.14em; }
+    h1 { font-size:clamp(28px,3.4vw,48px); line-height:1.15; letter-spacing:-.055em; margin:7px 0 9px; }
+    .heading p { color:var(--muted); margin:0; line-height:1.55; }
+    .source { color:var(--muted); text-align:right; font-size:12px; line-height:1.5; flex-shrink:0; }
+    .layout { display:grid; grid-template-columns:188px minmax(0,1fr); gap:20px; }
+    .picker, .board { background:var(--white); border:1px solid var(--line); box-shadow:0 9px 26px #2454660a; }
+    .picker { padding:18px; border-radius:16px; align-self:start; }
+    .picker h2 { margin:0 0 3px; font-size:14px; }
+    .picker p { margin:0 0 16px; color:var(--muted); font-size:12px; line-height:1.5; }
+    .shapes { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .shape { min-height:62px; border:1px solid var(--line); border-radius:9px; background:#f8fbfb; color:var(--ink); text-align:left; padding:8px 10px; }
+    .shape span { display:block; font-size:19px; font-weight:800; line-height:1.2; }
+    .shape small { color:var(--muted); font-size:11px; }
+    .shape:hover { border-color:var(--blue); }
+    .shape[aria-pressed="true"] { color:#fff; background:var(--blue); border-color:var(--blue); }
+    .shape[aria-pressed="true"] small { color:#d6eef2; }
+    .board { border-radius:18px; overflow:hidden; }
+    .board-head { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:17px 24px; border-bottom:1px solid var(--line); }
+    .board-head h2 { margin:0; font-size:21px; }
+    .board-head p { color:var(--muted); margin:2px 0 0; font-size:12px; }
+    .badge { flex-shrink:0; color:var(--blue); background:#e5f4f5; border:1px solid #c8e5e9; border-radius:30px; padding:7px 12px; font-size:12px; font-weight:700; }
+    .views { position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .transfer { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:2; }
+    .view { min-width:0; padding:16px 18px 12px; }
+    .view + .view { border-left:1px solid var(--line); }
+    .view-title { display:flex; justify-content:space-between; gap:12px; align-items:baseline; font-size:13px; font-weight:800; }
+    .view-title small { color:var(--muted); font-size:11px; font-weight:500; }
+    .viewport { margin-top:10px; height:clamp(310px,34vw,510px); background:#f7fbfb; border:1px solid #e0ecee; border-radius:12px; overflow:hidden; }
+    .viewport svg { display:block; width:100%; height:100%; }
+    #model { touch-action:none; cursor:grab; }
+    #model:active { cursor:grabbing; }
+    .projection { background:#fff; }
+    .controls { display:flex; align-items:center; flex-wrap:wrap; gap:12px 20px; padding:17px 24px; border-top:1px solid var(--line); }
+    .switch { display:inline-flex; align-items:center; gap:10px; cursor:pointer; font-size:14px; font-weight:700; }
+    .switch input { position:absolute; opacity:0; width:1px; height:1px; }
+    .track { width:42px; height:24px; background:#a8bdc0; border-radius:20px; padding:3px; transition:background .15s; }
+    .track::after { content:""; display:block; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform .15s; box-shadow:0 1px 3px #1236; }
+    .switch input:checked + .track { background:var(--blue); }
+    .switch input:checked + .track::after { transform:translateX(18px); }
+    .switch input:focus-visible + .track { outline:3px solid var(--orange); outline-offset:3px; }
+    .reset { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:8px; padding:8px 12px; font-size:13px; font-weight:700; }
+    .reset:hover { border-color:var(--blue); color:var(--blue); }
+    .demo { background:var(--blue); border-color:var(--blue); color:#fff; }
+    .demo:hover { background:#0e5b6e; color:#fff; }
+    .reset:disabled { opacity:.45; cursor:not-allowed; }
+    .construction-enter { opacity:0; animation:appear .4s forwards; }
+    .instruction { color:var(--muted); font-size:12px; margin-left:auto; }
+    .note { color:var(--muted); font-size:12px; line-height:1.55; padding:0 24px 16px; }
+    .transfer-line { opacity:0; stroke-dasharray:var(--length); stroke-dashoffset:var(--length); animation:transfer .85s var(--delay) both; }
+    .demo-point { opacity:0; animation:appear .12s var(--delay) forwards, pointPulse .5s var(--delay) both; transform-box:fill-box; transform-origin:center; }
+    .trace-line { stroke-dasharray:var(--length); stroke-dashoffset:var(--length); animation:trace .55s var(--delay) forwards; }
+    @keyframes pointPulse { 50% { transform:scale(1.5); } }
+    @keyframes appear { to { opacity:1; } }
+    @keyframes transfer { 0% { opacity:.65; } 75% { opacity:.65; stroke-dashoffset:0; } 100% { opacity:0; stroke-dashoffset:0; } }
+    @keyframes trace { to { stroke-dashoffset:0; } }
+    @media(max-width:850px) { .layout { grid-template-columns:1fr; } .picker { padding:14px; } .picker p { margin-bottom:9px; } .shapes { grid-template-columns:repeat(5,1fr); } .shape { min-height:56px; } .viewport { height:44vw; min-height:280px; } }
+    @media(max-width:580px) { .heading { align-items:start; } .source { display:none; } .views { grid-template-columns:1fr; } .view + .view { border-left:0; border-top:1px solid var(--line); } .viewport { height:320px; } .instruction { margin-left:0; width:100%; } .board-head { padding:15px 16px; } .controls { padding:15px 16px; } .note { padding:0 16px 16px; } }
+    @media(prefers-reduced-motion:reduce) { .track, .track::after { transition:none; } .fixed-point, .construction-enter { animation:none!important; opacity:1; } .transfer-line { animation:none; opacity:0; } .trace-line { animation:none; stroke-dashoffset:0; } .demo-point { animation:none; opacity:1; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topline"><a href="../index.html">← STEAM 實驗室</a><span>F1 / IEE / 徒手圖</span></div>
+    <header class="heading">
+      <div><div class="eyebrow">工作紙 02 · 立體觀察</div><h1>旋轉立體，睇清投影。</h1><p>揀選圖形，上下左右拖動左邊模型；右邊會同步顯示固定鏡頭看到的 2D 線圖。</p></div>
+      <div class="source">依據「202627年度中一IEE_徒手圖工作紙02」<br>圖 1–10 建立</div>
+    </header>
+    <div class="layout">
+      <aside class="picker"><h2>工作紙圖形</h2><p>共 10 題，按圖號切換。</p><div id="shapes" class="shapes" role="group" aria-label="選擇工作紙圖形"></div></aside>
+      <section class="board" aria-label="立體模型與平面投影">
+        <div class="board-head"><div><h2 id="shapeTitle">圖 1</h2><p id="shapeDescription"></p></div><span class="badge">固定鏡頭 · 正投影</span></div>
+        <div class="views" id="views">
+          <div class="view"><div class="view-title"><span>3D 模型</span><small>上下左右拖動</small></div><div class="viewport"><svg id="model" viewBox="0 0 500 500" role="img" aria-label="可旋轉的立體模型" tabindex="0"></svg></div></div>
+          <div class="view"><div class="view-title"><span>2D 螢幕投影</span><small>與左邊角度同步</small></div><div class="viewport projection"><svg id="projection" viewBox="0 0 500 500" role="img" aria-label="目前模型的平面投影"></svg></div></div>
+          <svg id="transfer" class="transfer" aria-hidden="true" focusable="false"></svg>
+        </div>
+        <div class="controls"><label class="switch"><input id="gridToggle" type="checkbox" checked><span class="track" aria-hidden="true"></span>顯示方格框及節點</label><label class="switch"><input id="pointsToggle" type="checkbox"><span class="track" aria-hidden="true"></span>顯示模型對齊點</label><button id="demo" class="reset demo" type="button">開始分步示範</button><button id="nextStep" class="reset" type="button" disabled>下一步</button><button id="reset" class="reset" type="button">重設角度</button><span class="instruction">左右轉向 · 上下傾斜 · 方向鍵亦可操作</span></div>
+        <div class="note">紫色點標出模型頂點與橙色方格節點重合的位置；一般檢視時，右邊只畫物件輪廓與轉折邊。示範可按「下一步」逐段觀看。<span id="demoStatus" role="status" aria-live="polite"></span></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    // x、y 為工作紙底面 3 × 3 方格，z 為高度；每項是 [x,y,z] 小方塊。
+    const slab = (z = 0) => Array.from({length:9}, (_, i) => [i % 3, Math.floor(i / 3), z]);
+    const bar = (axis, fixed, from, to, zMax) => {
+      const out = [];
+      for (let a = from; a <= to; a++) for (let z = 0; z < zMax; z++) out.push(axis === 'x' ? [a, fixed, z] : [fixed, a, z]);
+      return out;
+    };
+    const shapes = [
+      {name:'圖 1', description:'底座與後方直立牆', blocks:[...slab(), ...bar('x',2,0,2,3)]},
+      {name:'圖 2', description:'由前方向後升高的斜面', profile:[1,2,3,3]},
+      {name:'圖 3', description:'前方平台、斜面與後方平台', profile:[2,2,3,3]},
+      {name:'圖 4', description:'左高右低的直角方柱', blocks:[...bar('y',2,1,2,3), ...bar('x',2,0,1,2)]},
+      {name:'圖 5', description:'七格上層與前角支柱', blocks:[[0,0,0],[0,0,1], ...[[0,0],[1,0],[0,1],[1,1],[2,1],[1,2],[2,2]].map(([x,y])=>[x,y,2])]},
+      {name:'圖 6', description:'由後方高柱向兩邊下降的階梯', blocks:[...[[2,2,3],[2,1,2],[1,2,2],[2,0,1],[0,2,1]].flatMap(([x,y,h])=>Array.from({length:h},(_,z)=>[x,y,z]))]},
+      {name:'圖 7', description:'底座、左方高牆與右後矮牆', blocks:[...slab(), ...bar('y',2,0,2,3), ...bar('x',2,0,1,2)]},
+      {name:'圖 8', description:'前角缺口、後方兩級方柱', blocks:[...slab().filter(([x,y])=>!(x===0&&y===0)), [2,2,1],[2,2,2],[1,2,1]]},
+      {name:'圖 9', description:'前方凹位與後方高橫條', blocks:[...slab(), ...slab(1).filter(([x,y])=>!(y===0&&x<2)), [1,2,2],[2,2,2]]},
+      {name:'圖 10', description:'底座與四角高柱', blocks:[...slab(), ...[[0,0],[2,0],[0,2],[2,2]].flatMap(([x,y])=>[[x,y,1],[x,y,2]])]}
+    ];
+    // 避免重複方塊造成內部面或多餘描邊。
+    for (const shape of shapes) if (shape.blocks) shape.blocks = [...new Map(shape.blocks.map(p=>[p.join(','),p])).values()];
+    const FACE = [
+      {delta:[-1,0,0], shade:'#8db8bd', corners:[[0,0,0],[0,0,1],[0,1,1],[0,1,0]]},
+      {delta:[1,0,0], shade:'#a8cbd0', corners:[[1,1,0],[1,1,1],[1,0,1],[1,0,0]]},
+      {delta:[0,-1,0], shade:'#83aeb6', corners:[[1,0,0],[1,0,1],[0,0,1],[0,0,0]]},
+      {delta:[0,1,0], shade:'#b7d5d7', corners:[[0,1,0],[0,1,1],[1,1,1],[1,1,0]]},
+      {delta:[0,0,-1], shade:'#6f9ca5', corners:[[0,1,0],[1,1,0],[1,0,0],[0,0,0]]},
+      {delta:[0,0,1], shade:'#d8e9e9', corners:[[0,0,1],[1,0,1],[1,1,1],[0,1,1]]}
+    ];
+    function cubeFaces(blocks) {
+      const occupied = new Set(blocks.map(p=>p.join(',')));
+      return blocks.flatMap(([x,y,z]) => FACE.filter(f=>!occupied.has([x+f.delta[0],y+f.delta[1],z+f.delta[2]].join(',')))
+        .map(f=>({points:f.corners.map(([a,b,c])=>[x+a,y+b,z+c]), shade:f.shade})));
+    }
+    function rampFaces(p) {
+      const a=p[0], b=p[1], c=p[2], d=p[3];
+      const side = [[0,0,0],[0,3,0],[0,3,d],[0,2,c],[0,1,b],[0,0,a]];
+      const other = side.map(([x,y,z])=>[3,y,z]).reverse();
+      const faces = [{points:side,shade:'#8db8bd'},{points:other,shade:'#a8cbd0'},
+        {points:[[0,0,0],[0,0,a],[3,0,a],[3,0,0]],shade:'#83aeb6'},
+        {points:[[3,3,0],[3,3,d],[0,3,d],[0,3,0]],shade:'#b7d5d7'},
+        {points:[[0,0,0],[3,0,0],[3,3,0],[0,3,0]],shade:'#6f9ca5'}];
+      for (let y=0;y<3;y++) faces.push({points:[[0,y,p[y]],[0,y+1,p[y+1]],[3,y+1,p[y+1]],[3,y,p[y]]],shade:'#d8e9e9'});
+      return faces.map(face=>({...face,points:face.points.reverse()}));
+    }
+    const model=document.getElementById('model'), projection=document.getElementById('projection'), transfer=document.getElementById('transfer'), views=document.getElementById('views');
+    const toggle=document.getElementById('gridToggle'), pointsToggle=document.getElementById('pointsToggle');
+    const title=document.getElementById('shapeTitle'), desc=document.getElementById('shapeDescription');
+    const picker=document.getElementById('shapes'), demoButton=document.getElementById('demo'), nextButton=document.getElementById('nextStep'), demoStatus=document.getElementById('demoStatus');
+    let selected=0, yaw=0, pitch=0, dragging=null, demoStep=0;
+    const camera=[-1,-1,1], camLength=Math.hypot(...camera), view=camera.map(v=>v/camLength);
+    const right=[-Math.SQRT1_2,Math.SQRT1_2,0];
+    const up=[view[2]*right[1],-view[2]*right[0],view[1]*right[0]-view[0]*right[1]];
+    const dot=(a,b)=>a.reduce((sum,v,i)=>sum+v*b[i],0);
+    const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+    function rotate(point) {
+      const [x,y,z]=point.map(v=>v-1.5), cy=Math.cos(yaw), sy=Math.sin(yaw);
+      const turned=[x*cy-y*sy,x*sy+y*cy,z], c=Math.cos(pitch), s=Math.sin(pitch);
+      const spin=cross(right,turned), along=dot(right,turned)*(1-c);
+      return turned.map((v,i)=>v*c+spin[i]*s+right[i]*along);
+    }
+    function projected(point) { const p=rotate(point); return [dot(p,right),-dot(p,up),dot(p,view)]; }
+    function normal(points) {
+      const n=[0,0,0];
+      points.forEach((a,i)=>{
+        const b=points[(i+1)%points.length];
+        n[0]+=(a[1]-b[1])*(a[2]+b[2]);
+        n[1]+=(a[2]-b[2])*(a[0]+b[0]);
+        n[2]+=(a[0]-b[0])*(a[1]+b[1]);
+      });
+      return n;
+    }
+    function modelVertices(faces) {
+      const incident=new Map();
+      for(const face of faces) {
+        const n=normal(face.points), length=Math.hypot(...n);
+        const direction=n.map(v=>Math.round(v/length*1000)).join(',');
+        for(const point of face.points) {
+          const key=point.join(',');
+          if(!incident.has(key)) incident.set(key,new Set());
+          incident.get(key).add(direction);
+        }
+      }
+      return new Set([...incident].filter(([,directions])=>directions.size>=3).map(([key])=>key));
+    }
+    const edgeKey=(a,b)=>[a.join(','),b.join(',')].sort().join('|');
+    function projectionEdges(faces) {
+      const edges=new Map();
+      for(const face of faces) {
+        const n=normal(face.points), length=Math.hypot(...n);
+        const direction=n.map(v=>Math.round(v/length*1000)).join(',');
+        face.points.forEach((point,i)=>{
+          const key=edgeKey(point,face.points[(i+1)%face.points.length]);
+          if(!edges.has(key)) edges.set(key,{count:0,directions:new Set()});
+          const edge=edges.get(key); edge.count++; edge.directions.add(direction);
+        });
+      }
+      return new Set([...edges].filter(([,edge])=>edge.count===1||edge.directions.size>1).map(([key])=>key));
+    }
+    function frame() {
+      return p=>[250+p[0]*80,250+p[1]*80];
+    }
+    const num=n=>n.toFixed(1);
+    const polygon=(points,fill,stroke,width)=>`<polygon points="${points.map(([x,y])=>`${num(x)},${num(y)}`).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width="${width}" stroke-linejoin="round"/>`;
+    function inside([x,y],polygon) {
+      let hit=false;
+      for(let i=0,j=polygon.length-1;i<polygon.length;j=i++) {
+        const [ax,ay]=polygon[j], [bx,by]=polygon[i];
+        if(Math.abs((bx-ax)*(y-ay)-(by-ay)*(x-ax))<1e-6&&x>=Math.min(ax,bx)-1e-6&&x<=Math.max(ax,bx)+1e-6&&y>=Math.min(ay,by)-1e-6&&y<=Math.max(ay,by)+1e-6) return true;
+        if((ay>y)!==(by>y) && x<(bx-ax)*(y-ay)/(by-ay)+ax) hit=!hit;
+      }
+      return hit;
+    }
+    function straightRuns(visible,edges) {
+      const gcd=(a,b)=>b?gcd(b,a%b):a, segments=new Map(), joined=new Map();
+      visible.forEach((face,fi)=>face.points.forEach((a,i)=>{
+        const b=face.points[(i+1)%face.points.length];
+        if(!edges.has(edgeKey(a,b))) return;
+        const delta=b.map((v,j)=>v-a[j]), parts=delta.reduce((n,d)=>gcd(n,Math.abs(d)),0);
+        for(let n=0;n<parts;n++) {
+          const p=a.map((v,j)=>v+delta[j]*n/parts), q=a.map((v,j)=>v+delta[j]*(n+1)/parts);
+          const fixed=p.filter((v,j)=>v===q[j]);
+          segments.set(edgeKey(p,q),{a:p,b:q,face:fi,onCubeLine:fixed.length===2&&fixed.some(v=>v===0||v===3)});
+        }
+      }));
+      for(const [key,{a,b}] of segments) for(const point of [a,b]) {
+        const node=point.join(',');
+        if(!joined.has(node)) joined.set(node,[]);
+        joined.get(node).push(key);
+      }
+      const used=new Set(), runs=[];
+      for(const [key,segment] of segments) {
+        if(used.has(key)) continue;
+        used.add(key);
+        const run={...segment};
+        const extend=(start,previous)=>{
+          let end=start;
+          while(true) {
+            const options=(joined.get(end.join(','))||[]).filter(id=>{
+              if(used.has(id)) return false;
+              const edge=segments.get(id);
+              if(edge.onCubeLine!==run.onCubeLine) return false;
+              const other=edge.a.join(',')===end.join(',')?edge.b:edge.a;
+              const before=end.map((v,i)=>v-previous[i]), after=other.map((v,i)=>v-end[i]);
+              return dot(before,after)>0&&Math.hypot(...cross(before,after))<1e-6;
+            });
+            if(options.length!==1) break;
+            const id=options[0], edge=segments.get(id);
+            used.add(id); run.face=Math.max(run.face,edge.face);
+            const other=edge.a.join(',')===end.join(',')?edge.b:edge.a;
+            previous=end; end=other;
+          }
+          return end;
+        };
+        run.a=extend(segment.a,segment.b);
+        run.b=extend(segment.b,segment.a);
+        runs.push(run);
+      }
+      return runs;
+    }
+    function projectionFaces(visible,edges,stage=0) {
+      if(stage>=3) {
+        const toScreen=frame(), runs=straightRuns(visible,edges);
+        let sequence=0;
+        return visible.map((face,fi)=>polygon(face.screen,'#fff','none',0)+runs.filter(run=>run.face===fi&&(stage===4||run.onCubeLine)).map(run=>{
+          const [x1,y1]=toScreen(projected(run.a)), [x2,y2]=toScreen(projected(run.b));
+          const animation=stage===3||!run.onCubeLine?` class="trace-line" style="--length:${Math.ceil(Math.hypot(x2-x1,y2-y1))};--delay:${(sequence++*.65).toFixed(2)}s"`:'';
+          return `<line${animation} x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#d82432" stroke-width="2.2" stroke-linecap="round"/>`;
+        }).join('')).join('');
+      }
+      const last=new Map();
+      visible.forEach((face,fi)=>face.points.forEach((point,i)=>{
+        const key=edgeKey(point,face.points[(i+1)%face.points.length]);
+        if(edges.has(key)) last.set(key,fi);
+      }));
+      return visible.map((face,fi)=>polygon(face.screen,'#fff','none',0)+face.points.map((point,i)=>{
+        const key=edgeKey(point,face.points[(i+1)%face.points.length]);
+        if(last.get(key)!==fi) return '';
+        const [x1,y1]=face.screen[i], [x2,y2]=face.screen[(i+1)%face.screen.length];
+        return `<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#193943" stroke-width="2.2" stroke-linecap="round"/>`;
+      }).join('')).join('');
+    }
+    function cage(toScreen,showNodes=true,color='#276b7c') {
+      const [cx,cy,cz]=[[2.5,1.5,1.5],[1.5,2.5,1.5],[1.5,1.5,2.5]].map(p=>dot(rotate(p),view));
+      const front=([x,y,z])=>(x===0&&cx<0)||(x===3&&cx>0)||(y===0&&cy<0)||(y===3&&cy>0)||(z===0&&cz<0)||(z===3&&cz>0);
+      const lines=[[],[]], dots=[[],[]];
+      for(let a=0;a<=3;a++) for(let b=0;b<=3;b++) for(let axis=0;axis<3;axis++) {
+        if(a>0&&a<3&&b>0&&b<3) continue;
+        const p=[a,b,0], q=[a,b,3];
+        if(axis===1) { p[1]=0; p[2]=b; q[1]=3; q[2]=b; }
+        if(axis===0) { p[0]=0; p[1]=a; p[2]=b; q[0]=3; q[1]=a; q[2]=b; }
+        const [x1,y1]=toScreen(projected(p)), [x2,y2]=toScreen(projected(q));
+        const outer=(a===0||a===3)&&(b===0||b===3);
+        lines[front(p)&&front(q)?1:0].push(`<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke-width="${outer?2.4:1.5}"/>`);
+      }
+      for(let x=0;showNodes&&x<=3;x++) for(let y=0;y<=3;y++) for(let z=0;z<=3;z++) {
+        const [sx,sy]=toScreen(projected([x,y,z]));
+        dots[front([x,y,z])?1:0].push(`<circle cx="${num(sx)}" cy="${num(sy)}" r="2.7"/>`);
+      }
+      return [0,1].map(i=>`<g stroke="${color}" stroke-linecap="round" stroke-dasharray="1 6" opacity="${i?.82:.36}">${lines[i].join('')}</g><g fill="#ce6747" opacity="${i?.9:.45}">${dots[i].join('')}</g>`);
+    }
+    function demoProjection(visible, edges, points, toScreen) {
+      const delay=.32;
+      const cube=`<g${demoStep===1?' class="construction-enter"':''}>${cage(toScreen,false,'#849397').join('')}</g>`;
+      if(demoStep===1) return cube;
+      const markers=[...points.values()].map(({screen:[x,y]},i)=>{
+        const arrive=(i*delay+.65).toFixed(2);
+        return `<circle class="${demoStep===2?'demo-point':'marked-point'}" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"${demoStep===2?` style="--delay:${arrive}s"`:''}/>`;
+      }).join('');
+      return demoStep===2?cube+markers:projectionFaces(visible,edges,demoStep)+cube+markers;
+    }
+    function transferPoints(points) {
+      if(demoStep!==2) { transfer.innerHTML=''; return; }
+      const area=views.getBoundingClientRect(), left=model.getBoundingClientRect(), right=projection.getBoundingClientRect();
+      const place=(rect,[x,y])=>{
+        const scale=Math.min(rect.width,rect.height)/500;
+        return [rect.left-area.left+(rect.width-500*scale)/2+x*scale,rect.top-area.top+(rect.height-500*scale)/2+y*scale];
+      };
+      transfer.setAttribute('viewBox',`0 0 ${area.width} ${area.height}`);
+      transfer.innerHTML=[...points.values()].map(({screen},i)=>{
+        const [x1,y1]=place(left,screen), [x2,y2]=place(right,screen);
+        return `<line class="transfer-line" x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#6941c6" stroke-width="1.5" style="--length:${Math.ceil(Math.hypot(x2-x1,y2-y1))};--delay:${(i*.32).toFixed(2)}s"/>`;
+      }).join('');
+    }
+    function render() {
+      const shape=shapes[selected], faces=shape.profile?rampFaces(shape.profile):cubeFaces(shape.blocks), toScreen=frame();
+      const vertexKeys=pointsToggle.checked?modelVertices(faces):null;
+      const edges=projectionEdges(faces);
+      const visible=faces.map(face=>{
+        const rotated=face.points.map(rotate), center=rotated[0].map((_,i)=>rotated.reduce((s,p)=>s+p[i],0)/rotated.length), n=normal(rotated);
+        return {...face,depth:dot(center,view),front:dot(n,view)>0,screen:face.points.map(p=>toScreen(projected(p))),planePoint:rotated[0],planeNormal:n};
+      }).filter(f=>f.front).sort((a,b)=>a.depth-b.depth);
+      const visibleKeys=vertexKeys&&new Set([...vertexKeys].filter(key=>{
+        if(selected!==9) return true;
+        const point=key.split(',').map(Number), rotated=rotate(point), screen=toScreen(projected(point));
+        return !visible.some(face=>dot(face.planeNormal,face.planePoint.map((v,i)=>v-rotated[i]))/dot(face.planeNormal,view)>1e-6&&inside(screen,face.screen));
+      }));
+      const demoPoints=new Map();
+      if(demoStep>=2) for(const face of visible) face.points.forEach((point,i)=>{
+        const key=point.join(',');
+        if(visibleKeys.has(key)&&!demoPoints.has(key)) demoPoints.set(key,{screen:face.screen[i],index:demoPoints.size});
+      });
+      const [backGrid,frontGrid]=toggle.checked?cage(toScreen):['',''];
+      model.innerHTML=backGrid+visible.map(f=>polygon(f.screen,f.shade,'#244c58',1.8)+(vertexKeys?f.points.map((p,i)=>{
+        const key=p.join(',');
+        if(!visibleKeys.has(key)) return '';
+        const step=demoPoints.get(key)?.index;
+        const pulse=step===undefined||demoStep!==2?'':` style="animation:pointPulse .5s ${(step*.32).toFixed(2)}s both;transform-box:fill-box;transform-origin:center"`;
+        return `<circle class="fixed-point" cx="${num(f.screen[i][0])}" cy="${num(f.screen[i][1])}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"${pulse}/>`;
+      }).join(''):'')).join('')+frontGrid;
+      projection.innerHTML=demoStep?demoProjection(visible,edges,demoPoints,toScreen):projectionFaces(visible,edges);
+      transferPoints(demoPoints);
+      title.textContent=shape.name; desc.textContent=shape.description;
+      [...picker.children].forEach((button,i)=>button.setAttribute('aria-pressed',String(i===selected)));
+      model.setAttribute('aria-label',`${shape.name}：${shape.description}，可用方向鍵上下左右旋轉`);
+      projection.setAttribute('aria-label',demoStep?`${shape.name}投影示範，${stepText[demoStep]}`:`${shape.name}目前角度的 2D 投影`);
+      demoButton.textContent=demoStep?'重新開始示範':'開始分步示範';
+      nextButton.disabled=!demoStep||demoStep===4;
+    }
+    function stopDemo() { demoStep=0; demoStatus.textContent=''; }
+    const stepText=['','步驟 1／4：先看右邊的虛線方格框。','步驟 2／4：沿紫線把左邊頂點逐點對到右邊。','步驟 3／4：畫出與虛線方格重疊的邊。','步驟 4／4：連接餘下的邊，完成投影。'];
+    shapes.forEach((shape,i)=>{
+      const button=document.createElement('button'); button.type='button'; button.className='shape';
+      button.innerHTML=`<span>${i+1}</span><small>圖 ${i+1}</small>`;
+      button.setAttribute('aria-label',`選擇${shape.name}：${shape.description}`);
+      button.addEventListener('click',()=>{stopDemo();selected=i; render();}); picker.append(button);
+    });
+    model.addEventListener('pointerdown',e=>{if(demoStep){stopDemo();render();} dragging=[e.pointerId,e.clientX,e.clientY]; model.setPointerCapture(e.pointerId);});
+    model.addEventListener('pointermove',e=>{
+      if(!dragging||dragging[0]!==e.pointerId) return;
+      yaw+=(e.clientX-dragging[1])*0.008;
+      pitch-=(e.clientY-dragging[2])*0.008;
+      dragging=[e.pointerId,e.clientX,e.clientY]; render();
+    });
+    for(const event of ['pointerup','pointercancel','lostpointercapture']) model.addEventListener(event,()=>dragging=null);
+    model.addEventListener('keydown',e=>{
+      const step={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,.12],ArrowDown:[0,-.12]}[e.key];
+      if(!step) return; e.preventDefault(); stopDemo();yaw+=step[0]; pitch+=step[1]; render();
+    });
+    for(const control of [toggle,pointsToggle]) control.addEventListener('change',()=>{stopDemo();render();});
+    demoButton.addEventListener('click',()=>{demoStep=1;pointsToggle.checked=false;demoStatus.textContent=' '+stepText[demoStep];render();});
+    nextButton.addEventListener('click',()=>{if(!demoStep||demoStep===4)return;demoStep++;if(demoStep===2)pointsToggle.checked=true;demoStatus.textContent=' '+stepText[demoStep];render();});
+    document.getElementById('reset').addEventListener('click',()=>{stopDemo();yaw=0;pitch=0;render();});
+    window.addEventListener('resize',render);
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+
+const html = fs.readFileSync(__dirname + '/freehand-3d.html', 'utf8');
+assert.doesNotMatch(html, /background-image:/);
+assert.doesNotMatch(html.match(/<input id="pointsToggle"[^>]*>/)[0], /\bchecked\b/);
+assert.match(html, /\.demo-point \{[^}]*pointPulse/);
+assert.match(html, /\.transfer-line \{[^}]*animation:transfer [^;]* both/);
+assert.match(html, /100% \{ opacity:0; stroke-dashoffset:0; \}/);
+const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+const elements = new Map();
+function element() {
+  return {
+    children: [], checked: true, innerHTML: '', attributes: {}, listeners: {},
+    append(child) { this.children.push(child); },
+    setAttribute(key, value) { this.attributes[key] = value; },
+    addEventListener(key, callback) { this.listeners[key] = callback; },
+    getBoundingClientRect() { return this.rect || {left:0, top:0, width:500, height:500}; },
+    setPointerCapture() {},
+  };
+}
+const document = {
+  getElementById(id) { if (!elements.has(id)) elements.set(id, element()); return elements.get(id); },
+  createElement: element,
+};
+document.getElementById('pointsToggle').checked = false;
+document.getElementById('views').rect = {left:0, top:0, width:1000, height:500};
+document.getElementById('projection').rect = {left:500, top:0, width:500, height:500};
+const window = {listeners:{}, addEventListener(name, callback) { this.listeners[name] = callback; }};
+vm.runInNewContext(script + `
+  const assert = globalThis.testAssert;
+  function assertProjectedPoints(distance=500) {
+    const left = new Set([...model.innerHTML.matchAll(/class="fixed-point" cx="([0-9.]+)" cy="([0-9.]+)"/g)].map(([,x,y]) => x + ',' + y));
+    const right = [...projection.innerHTML.matchAll(/class="demo-point" cx="([0-9.]+)" cy="([0-9.]+)"/g)];
+    assert.ok(right.length > 0);
+    for (const [,x,y] of right) assert.ok(left.has(x + ',' + y));
+    const lines = [...transfer.innerHTML.matchAll(/class="transfer-line" x1="([0-9.]+)" y1="([0-9.]+)" x2="([0-9.]+)" y2="([0-9.]+)"/g)];
+    assert.equal(lines.length, right.length);
+    for (const [,x1,y1,x2,y2] of lines) {
+      assert.ok(Math.abs(Number(x2) - Number(x1) - distance) < .2);
+      assert.equal(y2, y1);
+    }
+  }
+  function assertRedLinesJoinMarkers() {
+    const markers = new Set([...projection.innerHTML.matchAll(/class="marked-point" cx="([0-9.]+)" cy="([0-9.]+)"/g)].map(([,x,y]) => x + ',' + y));
+    const lines = [...projection.innerHTML.matchAll(/<line[^>]*x1="([0-9.]+)" y1="([0-9.]+)" x2="([0-9.]+)" y2="([0-9.]+)" stroke="#d82432"/g)];
+    assert.ok(lines.length > 0);
+    for (const [,x1,y1,x2,y2] of lines) {
+      assert.ok(markers.has(x1 + ',' + y1), '圖 ' + (selected + 1) + ' 步驟 ' + demoStep + ' 紅線起點沒有紫點：' + x1 + ',' + y1);
+      assert.ok(markers.has(x2 + ',' + y2), '圖 ' + (selected + 1) + ' 步驟 ' + demoStep + ' 紅線終點沒有紫點：' + x2 + ',' + y2);
+    }
+    return lines;
+  }
+  function assertSequentialLines() {
+    const times = [...projection.innerHTML.matchAll(/class="trace-line" style="--length:[0-9]+;--delay:([0-9.]+)s"/g)].map(([,time]) => Number(time));
+    assert.ok(times.length > 0, '圖 ' + (selected + 1) + ' 步驟 ' + demoStep + ' 沒有描線');
+    for (let i = 1; i < times.length; i++) assert.ok(times[i] > times[i - 1]);
+  }
+  assert.doesNotMatch(model.innerHTML, /fixed-point/);
+  assert.notEqual(demoButton.disabled, true);
+  assert.equal(nextButton.disabled, true);
+  const ordinary = projection.innerHTML;
+  nextButton.listeners.click();
+  assert.equal(projection.innerHTML, ordinary);
+  demoButton.listeners.click();
+  assert.equal(demoStep, 1);
+  assert.equal(pointsToggle.checked, false);
+  assert.equal(nextButton.disabled, false);
+  assert.match(projection.innerHTML, /construction-enter/);
+  assert.match(projection.innerHTML, /stroke-dasharray="1 6"/);
+  assert.doesNotMatch(projection.innerHTML, /<circle|<polygon|trace-line/);
+  assert.equal(transfer.innerHTML, '');
+  nextButton.listeners.click();
+  assert.equal(demoStep, 2);
+  assert.equal(pointsToggle.checked, true);
+  assert.match(model.innerHTML, /animation:pointPulse/);
+  assert.match(projection.innerHTML, /class="demo-point"[^>]*r="6.5"[^>]*fill="#6941c6"/);
+  assert.doesNotMatch(projection.innerHTML, /class="trace-line"|<polygon/);
+  assertProjectedPoints();
+  const markerCount = (projection.innerHTML.match(/class="demo-point"/g) || []).length;
+  projection.rect.left = 600;
+  views.rect.width = 1100;
+  window.listeners.resize();
+  assertProjectedPoints(600);
+  projection.rect.left = 500;
+  views.rect.width = 1000;
+  nextButton.listeners.click();
+  assert.equal(demoStep, 3);
+  assert.match(projection.innerHTML, /class="trace-line"/);
+  assert.match(projection.innerHTML, /<polygon[^>]*fill="#fff" stroke="none"/);
+  assert.equal(transfer.innerHTML, '');
+  assert.equal((projection.innerHTML.match(/class="marked-point"/g) || []).length, markerCount);
+  assert.ok(projection.innerHTML.lastIndexOf('stroke="#849397"') > projection.innerHTML.lastIndexOf('stroke="#d82432"'));
+  assertRedLinesJoinMarkers();
+  assertSequentialLines();
+  const firstEdges = (projection.innerHTML.match(/<line[^>]*stroke="#d82432"/g) || []).length;
+  nextButton.listeners.click();
+  assert.equal(demoStep, 4);
+  assert.equal(nextButton.disabled, true);
+  assert.ok((projection.innerHTML.match(/<line[^>]*stroke="#d82432"/g) || []).length > firstEdges);
+  assert.doesNotMatch(projection.innerHTML, /class="demo-point"/);
+  assert.equal((projection.innerHTML.match(/class="marked-point"/g) || []).length, markerCount);
+  assert.ok(assertRedLinesJoinMarkers().some(([,x1,y1,x2,y2]) => Math.hypot(x2-x1,y2-y1) > 100));
+  assertSequentialLines();
+  const completed = projection.innerHTML;
+  nextButton.listeners.click();
+  assert.equal(projection.innerHTML, completed);
+  demoButton.listeners.click();
+  assert.equal(demoStep, 1);
+  assert.equal(pointsToggle.checked, false);
+  assert.doesNotMatch(model.innerHTML, /fixed-point/);
+  picker.children[1].listeners.click();
+  assert.doesNotMatch(projection.innerHTML, /class="trace-line"/);
+  demoButton.listeners.click();
+  assert.equal(demoStep, 1);
+  nextButton.listeners.click();
+  assertProjectedPoints();
+  nextButton.listeners.click();
+  assert.match(projection.innerHTML, /class="trace-line"/);
+  const alignedCount = (projection.innerHTML.match(/class="trace-line"/g) || []).length;
+  nextButton.listeners.click();
+  assert.ok((projection.innerHTML.match(/class="trace-line"/g) || []).length > 0);
+  assert.ok((projection.innerHTML.match(/<line[^>]*stroke="#d82432"/g) || []).length > alignedCount);
+  assertRedLinesJoinMarkers();
+  assertSequentialLines();
+  for (let i = 2; i < shapes.length; i++) {
+    picker.children[i].listeners.click();
+    assert.equal(nextButton.disabled, true);
+    demoButton.listeners.click();
+    assert.equal(demoStep, 1);
+    nextButton.listeners.click();
+    assertProjectedPoints();
+    nextButton.listeners.click();
+    if(i!==9) assertRedLinesJoinMarkers();
+    const cubeEdges = (projection.innerHTML.match(/<line[^>]*stroke="#d82432"/g) || []).length;
+    nextButton.listeners.click();
+    if(i!==9) assertRedLinesJoinMarkers();
+    assert.ok((projection.innerHTML.match(/<line[^>]*stroke="#d82432"/g) || []).length > cubeEdges, '圖 ' + (i + 1) + ' 第四步沒有補畫線');
+    assert.equal(nextButton.disabled, true);
+  }
+  picker.children[9].listeners.click();
+  pointsToggle.checked=true;
+  render();
+  const hidden=frame()(projected([1,1,1])).map(num);
+  assert.doesNotMatch(model.innerHTML,new RegExp('class="fixed-point" cx="'+hidden[0]+'" cy="'+hidden[1]+'"'));
+  demoButton.listeners.click();
+  nextButton.listeners.click();
+  assert.equal((projection.innerHTML.match(/class="demo-point"/g)||[]).length,23);
+  assert.doesNotMatch(projection.innerHTML,new RegExp('class="demo-point" cx="'+hidden[0]+'" cy="'+hidden[1]+'"'));
+  picker.children[0].listeners.click();
+  pointsToggle.checked = true;
+  render();
+  assert.equal(shapes.length, 10);
+  assert.equal(shapes[0].blocks.length, 15);
+  const expectedLayers = [
+    ['000','003','223'], ['310','111','011'], ['001','002','123'],
+    ['113','113','223'], ['011','111','123'], ['112','222','233'], ['313','111','313']
+  ];
+  for (let i = 3; i < shapes.length; i++) {
+    const rows = Array.from({length:3},(_,y)=>Array.from({length:3},(_,x)=>
+      shapes[i].blocks.filter(([bx,by])=>bx===x&&by===y).length).join(''));
+    assert.deepEqual(rows, expectedLayers[i-3], '圖 ' + (i + 1) + ' 方塊位置與工作紙不符');
+  }
+  assert.deepEqual(shapes[4].blocks.map(p=>p.join(',')).sort(), [
+    '0,0,0','0,0,1','0,0,2','1,0,2','0,1,2','1,1,2','2,1,2','1,2,2','2,2,2'
+  ].sort());
+  assert.ok(!projectionEdges(cubeFaces(shapes[0].blocks)).has(edgeKey([1,0,1],[1,1,1])));
+  assert.ok(!projectionEdges(rampFaces(shapes[1].profile)).has(edgeKey([0,1,2],[3,1,2])));
+  assert.ok(rampFaces(shapes[1].profile).every(face => Math.hypot(...normal(face.points)) > 0));
+  assert.equal(rampFaces(shapes[2].profile).filter(face => dot(normal(face.points.map(rotate)),view) > 0).length, 5);
+  assert.equal(rotate([1.5, 1.5, 3])[2], 1.5);
+  const origin=projected([1.5,1.5,1.5]);
+  const axes=[[2.5,1.5,1.5],[1.5,2.5,1.5],[1.5,1.5,2.5]]
+    .map(point=>projected(point).slice(0,2).map((v,i)=>v-origin[i]));
+  assert.ok(Math.abs(Math.abs(axes[0][1]/axes[0][0])-1/Math.sqrt(3))<1e-12);
+  assert.ok(axes.every(axis=>Math.abs(Math.hypot(...axis)-Math.hypot(...axes[0]))<1e-12));
+  assert.equal((cage(frame()).join('').match(/<line /g) || []).length, 36);
+  assert.equal((cage(frame()).join('').match(/<circle /g) || []).length, 64);
+  assert.equal((cage(frame()).join('').match(/stroke-dasharray="1 6"/g) || []).length, 2);
+  assert.doesNotMatch(cage(frame()).join(''), /<line[^>]*stroke-dasharray/);
+  const cubeDots = new Set([...cage(frame()).join('').matchAll(/<circle cx="([0-9.]+)" cy="([0-9.]+)"/g)].map(([,x,y]) => x + ',' + y));
+  for (let i = 0; i < shapes.length; i++) {
+    selected = i;
+    render();
+    assert.match(model.innerHTML, /<polygon/);
+    assert.match(projection.innerHTML, /<polygon/);
+    assert.equal((model.innerHTML.match(/<polygon/g) || []).length, (projection.innerHTML.match(/<polygon/g) || []).length);
+    if (shapes[i].blocks) for (const cell of shapes[i].blocks) for (const n of cell) assert.ok(n >= 0 && n < 3);
+    const faces = shapes[i].profile ? rampFaces(shapes[i].profile) : cubeFaces(shapes[i].blocks);
+    const vertices = modelVertices(faces);
+    assert.ok(vertices.size > 0);
+    for (const key of vertices) for (const n of key.split(',').map(Number)) assert.ok(Number.isInteger(n) && n >= 0 && n <= 3);
+    const markers = [...model.innerHTML.matchAll(/class="fixed-point" cx="([0-9.]+)" cy="([0-9.]+)"/g)];
+    assert.ok(markers.length > 0, '圖 ' + (i + 1) + ' 沒有顯示對齊點；頂點數 ' + vertices.size);
+    assert.match(model.innerHTML, /class="fixed-point"[^>]*fill="#6941c6"/);
+    for (const [, x, y] of markers) assert.ok(cubeDots.has(x + ',' + y));
+  }
+  selected = 0;
+  toggle.checked = false;
+  render();
+  assert.match(model.innerHTML, /class="fixed-point"/);
+  assert.doesNotMatch(model.innerHTML, /<line/);
+  pointsToggle.checked = false;
+  render();
+  assert.doesNotMatch(model.innerHTML, /<circle/);
+  const before = projection.innerHTML;
+  const size = frame()([1, 0])[0] - frame()([0, 0])[0];
+  const initialYaw = yaw;
+  model.listeners.pointerdown({pointerId: 1, clientX: 10, clientY: 10});
+  model.listeners.pointermove({pointerId: 1, clientX: 10, clientY: 100});
+  assert.notEqual(projection.innerHTML, before);
+  assert.equal(yaw, initialYaw);
+  assert.notEqual(pitch, 0);
+  const vertical = projection.innerHTML;
+  const initialPitch = pitch;
+  model.listeners.pointermove({pointerId: 1, clientX: 50, clientY: 100});
+  assert.notEqual(projection.innerHTML, vertical);
+  assert.equal(pitch, initialPitch);
+  assert.equal(frame()([1, 0])[0] - frame()([0, 0])[0], size);
+  model.listeners.pointerup();
+  const keyView = projection.innerHTML;
+  model.listeners.keydown({key:'ArrowUp', preventDefault() {}});
+  assert.notEqual(projection.innerHTML, keyView);
+  pitch = Math.PI;
+  toggle.checked = true;
+  pointsToggle.checked = true;
+  for (let i = 0; i < shapes.length; i++) {
+    selected = i;
+    render();
+    assert.match(model.innerHTML, /<polygon/);
+    assert.match(model.innerHTML, /<line/);
+    assert.match(projection.innerHTML, /<polygon/);
+  }
+  document.getElementById('reset').listeners.click();
+  assert.equal(pitch, 0);
+  assert.equal(yaw, 0);
+  assert.ok(Math.abs(Math.abs((projected([2.5,1.5,1.5])[1]-origin[1])/(projected([2.5,1.5,1.5])[0]-origin[0]))-1/Math.sqrt(3))<1e-12);
+`, { document, window, testAssert: assert });
+console.log('圖 1–10 投影示範、模型座標與雙向旋轉檢查通過');
