@@ -216,6 +216,17 @@ assert.equal(model().joints.length,0);assert.equal(model().bars.length,2);
 click('join');operate({x:10,y:4});assert.equal(model().joints[0].kind,'pin','解除後仍可選用普通可轉動接合');
 const tap=(x,y)=>{pointer('pointerdown',x,y);pointer('pointerup',x+.06,y+.02);};
 for(const width of [349,929]) {
+  canvasWidth=width;click('clear');operate({x:7.1,y:5.9});operate({x:9,y:5.9});
+  tap(6,6);tap(7.12,5.92);
+  assert.ok(Bridge.distance(model().nodes[model().bars.at(-1).b],{x:7.1,y:5.9})<1e-10,'附近節點比水平對齊優先');
+  click('clear');tap(6,6);tap(8.24,6.13);
+  assert.ok(Bridge.distance(model().nodes[model().bars[0].b],{x:8.2,y:6})<1e-10,'點按畫水平木桿會拉平');
+  click('clear');tap(6,6);tap(6.12,3.74);
+  assert.ok(Bridge.distance(model().nodes[model().bars[0].b],{x:6,y:3.7})<1e-10,'點按畫垂直木桿會拉直');
+  click('clear');pointer('pointerdown',6,6);pointer('pointermove',8.24,6.13);pointer('pointerup',8.24,6.13);
+  assert.ok(Bridge.distance(model().nodes[model().bars[0].b],{x:8.2,y:6})<1e-10,'拖曳畫木桿亦會拉平');
+}
+for(const width of [349,929]) {
   canvasWidth=width;click('clear');operate({x:6,y:4});operate({x:10,y:4});
   const nearX=10+6*24/width,nearY=4+2*24/width;
   tap(nearX,nearY);

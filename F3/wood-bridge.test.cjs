@@ -36,6 +36,17 @@ assert.ok(farEnd.x===9.13 && farEnd.y===3.27,'同一條木桿的另一端也須�
 const crossingSnap=B.empty();B.addBar(crossingSnap,{x:8.13,y:3.1},{x:8.13,y:5.1});B.addBar(crossingSnap,{x:6,y:5},{x:10,y:5});
 const crossingEnd=input.buildPoint({x:8.1,y:5.06},crossingSnap);
 assert.ok(crossingEnd.x===8.13 && crossingEnd.y===5.1,'附近端點不能被更接近滑鼠的另一條木桿遮蔽');
+const drawDesign=B.empty();
+B.addBar(drawDesign,{x:7.13,y:5.87},{x:9,y:5.87});
+const drawOrigin={x:6,y:6};
+const nodeFirst=input.buildPoint({x:7.12,y:5.92},drawDesign,-1,.2,drawOrigin,.2);
+assert.ok(nodeFirst.x===7.13 && nodeFirst.y===5.87,'畫新木桿時，現有端點優先於水平對齊');
+const horizontalDraw=input.buildPoint({x:8.24,y:6.13},drawDesign,-1,.2,drawOrigin,.2);
+assert.ok(horizontalDraw.x===8.2 && horizontalDraw.y===6,'靠近水平方向時優先拉平');
+const verticalDraw=input.buildPoint({x:6.12,y:3.74},drawDesign,-1,.2,drawOrigin,.2);
+assert.ok(verticalDraw.x===6 && verticalDraw.y===3.7,'靠近垂直方向時優先拉直');
+const diagonalDraw=input.buildPoint({x:8.24,y:4.34},drawDesign,-1,.2,drawOrigin,.2);
+assert.ok(diagonalDraw.x===8.2 && diagonalDraw.y===4.3,'明顯的斜線仍保留 1 cm 方格落點');
 const snapPlaced=B.clone(snapDesign);
 assert.equal(B.addBar(snapPlaced,{x:8.73,y:6},snapped),'');
 assert.equal(snapPlaced.joints.length,0,'吸附桿身只決定位置，不自動接合');
