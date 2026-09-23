@@ -2,14 +2,16 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="description" content="用木桿搭橋，在河口中央線掛上重物，測試橋樑的變形與斷裂。">
   <title>木橋實驗室 · STEAM</title>
   <style>
     :root { color-scheme:light; --sky:#edf5f7; --ink:#183642; --muted:#526b76; --wood:#ba8450; --teal:#176b67; --red:#c34e3c; --line:#cfdee2; --white:#fff; }
-    * { box-sizing:border-box; }
+    * { box-sizing:border-box; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+    html { touch-action:pan-x pan-y; }
     body { margin:0; background:var(--sky); color:var(--ink); font-family:"Microsoft JhengHei","PingFang TC",system-ui,sans-serif; line-height:1.6; }
     button,input,select { font:inherit; }
+    input,select { font-size:16px; }
     [hidden] { display:none !important; }
     button,a,input { -webkit-tap-highlight-color:transparent; }
     button { min-height:44px; padding:9px 15px; border:1px solid var(--line); border-radius:7px; background:var(--white); color:var(--ink); cursor:pointer; font-weight:700; }
@@ -1024,7 +1026,7 @@ const Bridge = (() => {
   const model = () => simulation || design;
   function remember(snapshot = design) { history.push({design:Bridge.clone(snapshot),selectedLoad}); if (history.length > 50) history.shift(); }
   function cancelPointer() {
-    const active = pointerDown; pointerDown = null;
+    const active = pointerDown; pointerDown = null; start=null; hover=null;
     if (active?.before) design = active.before;
     if (active && canvas.hasPointerCapture(active.id)) canvas.releasePointerCapture(active.id);
   }
@@ -1140,11 +1142,11 @@ const Bridge = (() => {
   function snap(point) {
     return {x:Math.round(point.x*10)/10,y:Math.round(point.y*10)/10};
   }
-  function buildPoint(point, structure=design, excludedNode=-1) {
+  function buildPoint(point, structure=design, excludedNode=-1, endpointRadius=.08) {
     const grid=snap(point);
     // 修改時排除相連木桿，避免端點被自己的木桿吸住。
     const target=excludedNode<0 ? structure : {...structure,bars:structure.bars.filter(bar=>bar.a!==excludedNode && bar.b!==excludedNode)};
-    let endpoint=null,best=.08;
+    let endpoint=null,best=endpointRadius;
     for(const bar of target.bars) for(const index of [bar.a,bar.b]) {
       const node=target.nodes[index],distance=Bridge.distance(point,node);
       if(distance<best) {endpoint=node;best=distance;}
@@ -1157,10 +1159,11 @@ const Bridge = (() => {
     const projected=Bridge.barHit({nodes:target.nodes,bars:[bar]},grid,Infinity);
     return Bridge.barPoint(target,hit.bar,projected.t);
   }
-  function isDrag(from,to,width) {
-    return Bridge.distance(from,to)>Math.min(.05,8*24/width);
+  function isDrag(from,to,width,minimum=.05) {
+    return Bridge.distance(from,to)>Math.min(minimum,8*24/width);
   }
   // 指標幾何結束
+  const woodStartPoint=point=>buildPoint(point,design,-1,Math.max(.08,10*24/canvas.clientWidth));
   function operate(point) {
     if (!simulation && tool==='join') {
       const before=Bridge.clone(design),count=Bridge.connectTouching(design,point,Math.max(.3,14*24/canvas.clientWidth));
@@ -1313,7 +1316,7 @@ const Bridge = (() => {
     if(!simulation && selected?.kind==='load') {
       const p=current.nodes[selected.index];ctx.strokeStyle='#176b67';ctx.lineWidth=3;ctx.strokeRect(p.x*50-36,p.y*50+30,72,51);
     }
-    const previewStart = tool === 'wood' && (pointerDown && hover && isDrag(pointerDown.point,hover,canvasWidth) ? buildPoint(pointerDown.point) : start);
+    const previewStart = tool === 'wood' && (start || pointerDown?.woodStart);
     if(!simulation && previewStart) {
       const end = hover ? buildPoint(hover) : previewStart, length=Bridge.distance(previewStart,end);
       line(previewStart,end,length>Bridge.MAX_LENGTH?'#c34e3c':'#176b67',4,[7,5]);
@@ -1324,7 +1327,7 @@ const Bridge = (() => {
     let cursor=keyboardActive ? keyboard : hover && !simulation ? snap(hover) : null;
     if(tool==='load') cursor=target ? Bridge.barPoint(current,target.bar,target.t) : null;
     else if(!simulation && cursorPoint && (tool==='wood' || (tool==='edit' && !keyboardActive))) {
-      cursor=buildPoint(cursorPoint,design,tool==='edit'?editNode:-1);
+      cursor=tool==='wood' && !start && !pointerDown && !keyboardActive ? woodStartPoint(cursorPoint) : buildPoint(cursorPoint,design,tool==='edit'?editNode:-1);
     }
     if(cursor) {
       line({x:cursor.x-.18,y:cursor.y},{x:cursor.x+.18,y:cursor.y},'#176b67',2);
@@ -1411,20 +1414,27 @@ const Bridge = (() => {
   });
   $('reset').addEventListener('click',()=>{simulation=null;running=false;$('auto-load').checked=false;maxDrop=0;setTool('wood');tell('已還原橋形，可以修改木桿再測試。');update();draw();});
   const pointFrom = event => {const rect=canvas.getBoundingClientRect();return{x:(event.clientX-rect.left)/rect.width*24,y:(event.clientY-rect.top)/rect.height*14};};
+  const onCanvas=point=>point.x>=0 && point.x<=24 && point.y>=0 && point.y<=14;
   canvas.addEventListener('pointerdown',event=>{
     if(!event.isPrimary || event.button!==0) return;
+    if(pointerDown) cancelPointer();
     canvas.focus({preventScroll:true});keyboardActive=false;
     pointerDown={point:pointFrom(event),id:event.pointerId};
+    hover=pointerDown.point;
+    if(tool==='wood' && !simulation) pointerDown.woodStart=start || woodStartPoint(pointerDown.point);
     canvas.setPointerCapture(event.pointerId);
     if(tool==='edit' && !simulation && glueFirst<0) {
       const nearSelected=editNode>=0 && Bridge.distance(design.nodes[editNode],pointerDown.point)<=Math.max(.3,14*24/canvas.clientWidth);
       if(!nearSelected) editNode=nearestWeight(pointerDown.point)>=0?-1:nearestNode(pointerDown.point);
       if(editNode>=0) {pointerDown.before=Bridge.clone(design);tell('拖動端點；靠近另一木桿時吸附，放開即可膠合。');}
-      draw();
     }
+    draw();
   });
   canvas.addEventListener('pointermove',event=>{
+    if(!event.isPrimary || (pointerDown && event.pointerId!==pointerDown.id)) return;
+    if(pointerDown && event.buttons===0) {cancelPointer();update();}
     hover=pointFrom(event);keyboardActive=false;
+    if(!onCanvas(hover)) {cancelPointer();update();draw();return;}
     if(pointerDown?.before && (pointerDown.moved || isDrag(pointerDown.point,hover,canvas.clientWidth))) {
       if(!pointerDown.moved) {selected={kind:'node',index:editNode};targets=[selected];}
       pointerDown.moved=true;
@@ -1436,7 +1446,8 @@ const Bridge = (() => {
   });
   canvas.addEventListener('pointerup',event=>{
     if(!pointerDown || event.pointerId!==pointerDown.id) return;
-    const end=pointFrom(event),drag=isDrag(pointerDown.point,end,canvas.clientWidth);
+    const end=pointFrom(event),drag=isDrag(pointerDown.point,end,canvas.clientWidth,tool==='wood'?.25:.05);
+    if(!onCanvas(end)) {cancelPointer();update();draw();return;}
     if(pointerDown.before) {
       const before=pointerDown.before, moved=pointerDown.moved || drag;
       design=Bridge.clone(before);
@@ -1447,13 +1458,24 @@ const Bridge = (() => {
         keyboard={...design.nodes[editNode]};selected={kind:'node',index:editNode};targets=[selected];
         tell(error ? `${error}已還原這次修改。` : design.joints.length>before.joints.length ? '已膠合木桿接觸處，可按「復原」。' : '已更新端點及相連木桿，可按「復原」。');
       } else operate(end);
-    } else if(drag && tool==='wood' && !simulation) {start=null;operate(pointerDown.point);if(start) operate(end);}
+    } else if(tool==='wood' && !simulation) {
+      if(!start && drag && Bridge.distance(pointerDown.woodStart,buildPoint(end))>=.49) {
+        start=pointerDown.woodStart;operate(end);start=null;
+      } else operate(start ? pointerDown.point : pointerDown.woodStart);
+    }
     else operate(end);
-    pointerDown=null;canvas.releasePointerCapture(event.pointerId);update();draw();
+    pointerDown=null;if(canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);update();draw();
   });
-  canvas.addEventListener('pointercancel',()=>{cancelPointer();update();draw();});
-  canvas.addEventListener('lostpointercapture',()=>{if(pointerDown){cancelPointer();update();draw();}});
-  canvas.addEventListener('pointerleave',()=>{hover=null;draw();});
+  canvas.addEventListener('pointercancel',event=>{if(event.isPrimary || pointerDown?.id===event.pointerId){cancelPointer();update();draw();}});
+  canvas.addEventListener('lostpointercapture',event=>{if(pointerDown?.id===event.pointerId){cancelPointer();update();draw();}});
+  canvas.addEventListener('pointerleave',event=>{
+    if(!event.isPrimary || (pointerDown && event.pointerId!==pointerDown.id)) return;
+    hover=null;
+    // 抬筆離開感應範圍仍可保留兩點放置；真正越界或中斷拖拉才取消。
+    if(pointerDown || !onCanvas(pointFrom(event))) {cancelPointer();update();}
+    draw();
+  });
+  window.addEventListener('blur',()=>{cancelPointer();update();draw();});
   canvas.addEventListener('keydown',event=>{
     const movement={ArrowLeft:[-.1,0],ArrowRight:[.1,0],ArrowUp:[0,-.1],ArrowDown:[0,.1]}[event.key];
     if(movement) {
@@ -1468,7 +1490,12 @@ const Bridge = (() => {
     }
     if(event.key==='Enter' || event.key===' ') {event.preventDefault();keyboardActive=true;operate(keyboard);}
   });
-  document.addEventListener('keydown',event=>{if(event.key==='Escape'){cancelPointer();start=null;clearSelection();glueFirst=-1;tell('已取消進行中的操作。');update();draw();}});
+  document.addEventListener('wheel',event=>{if(event.ctrlKey) event.preventDefault();},{passive:false});
+  for(const name of ['gesturestart','gesturechange','dblclick','selectstart']) document.addEventListener(name,event=>event.preventDefault(),{passive:false});
+  document.addEventListener('keydown',event=>{
+    if((event.ctrlKey || event.metaKey) && ['+','=','-','0'].includes(event.key)) event.preventDefault();
+    if(event.key==='Escape'){cancelPointer();clearSelection();glueFirst=-1;tell('已取消進行中的操作。');update();draw();}
+  });
   canvas.addEventListener('blur',()=>{keyboardActive=false;draw();});
   function scheduleFrame() {
     if(running && !document.hidden) {

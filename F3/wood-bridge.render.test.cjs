@@ -13,7 +13,8 @@ function element() {
     addEventListener(name,fn){this.listeners[name]=fn;},checkValidity(){return true;},classList:{toggle(){}},setAttribute(k,v){attributes.set(k,v);},getAttribute(k){return attributes.get(k);}};
   e.context=new Proxy(calls,{get(target,key){return target[key]??((...args)=>{target['count:'+key]=(target['count:'+key]||0)+1;if(key==='stroke') (target.strokes||=[]).push(target.strokeStyle);});}});
   e.getContext=()=>e.context;e.width=300;e.height=150;
-  e.focus=()=>{};e.setPointerCapture=()=>{};e.releasePointerCapture=()=>{};e.hasPointerCapture=()=>false;
+  const captures=new Set();
+  e.focus=()=>{};e.setPointerCapture=id=>captures.add(id);e.releasePointerCapture=id=>captures.delete(id);e.hasPointerCapture=id=>captures.has(id);
   e.getBoundingClientRect=()=>({left:0,top:0,width:canvasWidth,height:canvasWidth*7/12});
   Object.defineProperty(e,'clientWidth',{get(){layoutReads++;return canvasWidth;}});
   return e;
@@ -22,7 +23,7 @@ const document={hidden:false,listeners:{},getElementById(id){if(!elements.has(id
 const frames=new Map();let nextFrame=0,cpuTime=0,steps=0;
 const step=Bridge.step;
 Bridge.step=(sim,dt)=>{steps++;cpuTime+=5;step(sim,dt);};
-const context={Bridge,document,window:{devicePixelRatio:1,matchMedia:()=>({matches:true})},ResizeObserver:class {observe(){}},performance:{now:()=>cpuTime},
+const context={Bridge,document,window:{devicePixelRatio:1,matchMedia:()=>({matches:true}),listeners:{},addEventListener(name,fn){this.listeners[name]=fn;}},ResizeObserver:class {observe(){}},performance:{now:()=>cpuTime},
   requestAnimationFrame(fn){const id=++nextFrame;frames.set(id,fn);return id;},cancelAnimationFrame(id){frames.delete(id);}};
 vm.runInNewContext(scripts[1].replace('  update();draw();\n})();','  globalThis.renderer={draw,model,operate};update();draw();\n})();'),context);
 const canvas=elements.get('bridge'),calls=canvas.context;
@@ -131,7 +132,7 @@ click('load');operate({x:12,y:6});
 click('edit');operate({x:12,y:7});click('erase');
 assert.equal(model().nodes.reduce((sum,n)=>sum+n.load,0),0);assert.equal(model().bars.length,1,'卸重保留木桿');
 click('undo');assert.equal(model().nodes.reduce((sum,n)=>sum+n.load,0),2);
-const pointer=(name,x,y)=>canvas.listeners[name]({isPrimary:true,button:0,pointerId:1,clientX:x*canvasWidth/24,clientY:y*canvasWidth/24});
+const pointer=(name,x,y,extra={})=>canvas.listeners[name]({isPrimary:true,button:0,buttons:name==='pointerup'||name==='pointerleave'?0:1,pointerType:'pen',pointerId:1,clientX:x*canvasWidth/24,clientY:y*canvasWidth/24,...extra});
 pointer('pointerdown',10,6);pointer('pointermove',10,5.5);pointer('pointerup',10,5.5);
 assert.equal(model().nodes[0].y,5.5,'選取模式仍可直接拖動端點');
 const moved=JSON.stringify(model());
@@ -213,4 +214,51 @@ assert.match(elements.get('message').textContent,/自動膠合/);
 click('edit');operate({x:10,y:4});choose('膠合 1');click('erase');
 assert.equal(model().joints.length,0);assert.equal(model().bars.length,2);
 click('join');operate({x:10,y:4});assert.equal(model().joints[0].kind,'pin','解除後仍可選用普通可轉動接合');
-console.log('通過：繪製快取與排程、單一測試入口、加重／暫停／首斷／上限、重疊選取、加固／膠合／刪除／卸重、復原及滑鼠／鍵盤修改。');
+const tap=(x,y)=>{pointer('pointerdown',x,y);pointer('pointerup',x+.06,y+.02);};
+for(const width of [349,929]) {
+  canvasWidth=width;click('clear');operate({x:6,y:4});operate({x:10,y:4});
+  const nearX=10+6*24/width,nearY=4+2*24/width;
+  tap(nearX,nearY);
+  assert.equal(model().bars.length,1,'筆尖小幅晃動只選起點，不誤放短木桿');
+  pointer('pointerleave',nearX,nearY); // 筆尖抬離感應範圍，但座標仍在畫布內。
+  tap(12,6);
+  assert.equal(model().bars.length,2,'抬筆後仍可點第二個位置完成木桿');
+  assert.ok(Bridge.distance(model().nodes[model().bars[1].a],{x:10,y:4})<1e-10,'起筆容許數個像素偏差，仍精確選中現有節點');
+  assert.ok(Bridge.distance(model().nodes[model().bars[1].b],{x:12,y:6})<1e-10,'點按採用落筆位置，不受抬筆晃動影響');
+  tap(6,6);pointer('pointerleave',25,6);tap(12,6);tap(14,5);
+  assert.ok(Bridge.distance(model().nodes[model().bars.at(-1).a],{x:12,y:6})<1e-10,'離開畫布後清除舊起點，可從另一節點重新起筆');
+  const beforeOutside=JSON.stringify(model());
+  pointer('pointerdown',10,4);pointer('pointermove',25,5);pointer('pointerup',25,5);
+  assert.equal(JSON.stringify(model()),beforeOutside,'拖出畫布後放筆不新增木桿');
+  assert.equal(canvas.hasPointerCapture(1),false,'越界取消後釋放指標捕捉');
+  tap(14,5);tap(16,4);
+  assert.ok(Bridge.distance(model().nodes[model().bars.at(-1).a],{x:14,y:5})<1e-10,'取消越界拖拉後不殘留舊起點');
+  click('clear');operate({x:6,y:4});operate({x:10,y:4});
+  pointer('pointerdown',nearX,nearY);pointer('pointermove',12.1,6);pointer('pointerup',12.1,6);
+  assert.ok(Bridge.distance(model().nodes[model().bars[1].a],{x:10,y:4})<1e-10,'拖拉放木桿也從落筆時吸附的節點開始');
+  assert.ok(Bridge.distance(model().nodes[model().bars[1].b],{x:12.1,y:6})<1e-10,'終點仍保留 1 cm 精度');
+}
+for(const interrupt of ['pointercancel','lostpointercapture','blur','hover']) {
+  click('clear');operate({x:6,y:4});operate({x:10,y:4});
+  tap(6,6);pointer('pointerdown',8,7);
+  if(interrupt==='blur') context.window.listeners.blur();
+  else if(interrupt==='hover') pointer('pointermove',8,7,{buttons:0});
+  else pointer(interrupt,8,7);
+  tap(10,4);tap(12,6);
+  assert.equal(model().bars.length,2,`${interrupt} 後可重新放置木桿`);
+  assert.ok(Bridge.distance(model().nodes[model().bars[1].a],{x:10,y:4})<1e-10,`${interrupt} 不留下舊起點`);
+}
+let prevented=0;
+const preventDefault=()=>prevented++;
+document.listeners.wheel({ctrlKey:false,preventDefault});
+assert.equal(prevented,0,'保留一般捲動');
+document.listeners.wheel({ctrlKey:true,preventDefault});
+assert.equal(prevented,1,'攔截 Ctrl 滾輪與觸控板縮放');
+for(const name of ['gesturestart','gesturechange','dblclick','selectstart']) document.listeners[name]({preventDefault});
+assert.equal(prevented,5,'攔截縮放手勢、雙擊及文字選取');
+for(const key of ['+','=','-','0']) document.listeners.keydown({key,ctrlKey:true,preventDefault});
+document.listeners.keydown({key:'+',metaKey:true,preventDefault});
+assert.equal(prevented,10,'攔截 Ctrl／Command 縮放快捷鍵');
+document.listeners.keydown({key:'a',ctrlKey:false,preventDefault});
+assert.equal(prevented,10,'保留一般鍵盤輸入');
+console.log('通過：繪製快取與排程、測試控制、編輯復原、膠合及觸控筆起筆／抬筆／離開畫布。');
