@@ -49,6 +49,10 @@
     .cube-node { cursor:pointer; }
     .cube-node:focus-visible { outline:none; stroke:#6941c6; stroke-width:8; }
     .manual-point { cursor:pointer; }
+    #projection.sandbox { touch-action:none; cursor:crosshair; }
+    .sandbox-stroke { stroke:#d82432; stroke-width:3.5; stroke-linecap:round; }
+    .mode-controls { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+    .mode-controls .reset { padding:5px 8px; font-size:11px; }
     .projection { background:#fff; }
     .controls { display:flex; align-items:center; flex-wrap:wrap; gap:12px 20px; padding:17px 24px; border-top:1px solid var(--line); }
     .switch { display:inline-flex; align-items:center; gap:10px; cursor:pointer; font-size:14px; font-weight:700; }
@@ -74,7 +78,7 @@
     @keyframes transfer { 0% { opacity:.65; } 75% { opacity:.65; stroke-dashoffset:0; } 100% { opacity:0; stroke-dashoffset:0; } }
     @keyframes trace { to { stroke-dashoffset:0; } }
     @media(max-width:850px) { .layout { grid-template-columns:1fr; } .picker { padding:14px; } .picker p { margin-bottom:9px; } .shapes { grid-template-columns:repeat(5,1fr); } .shape { min-height:56px; } .viewport { height:44vw; min-height:280px; } }
-    @media(max-width:580px) { .heading { align-items:start; } .source { display:none; } .views { grid-template-columns:1fr; } .view + .view { border-left:0; border-top:1px solid var(--line); } .viewport { height:320px; } .instruction { margin-left:0; width:100%; } .board-head { padding:15px 16px; } .controls { padding:15px 16px; } .note { padding:0 16px 16px; } }
+    @media(max-width:580px) { .heading { align-items:start; } .source { display:none; } .views { grid-template-columns:1fr; } .view + .view { border-left:0; border-top:1px solid var(--line); } .viewport { height:320px; } .mode-controls small { display:none; } .instruction { margin-left:0; width:100%; } .board-head { padding:15px 16px; } .controls { padding:15px 16px; } .note { padding:0 16px 16px; } }
     @media(prefers-reduced-motion:reduce) { .track, .track::after { transition:none; } .fixed-point, .construction-enter { animation:none!important; opacity:1; } .transfer-line { animation:none; opacity:0; } .trace-line { animation:none; stroke-dashoffset:0; } .demo-point { animation:none; opacity:1; } }
   </style>
 </head>
@@ -82,7 +86,7 @@
   <main class="shell">
     <div class="topline"><a href="../index.html">← STEAM 實驗室</a><span>F1 / IEE / 徒手圖</span></div>
     <header class="heading">
-      <div><div class="eyebrow">工作紙 02 · 立體觀察</div><h1>旋轉立體，睇清投影。</h1><p>揀選圖形，上下左右拖動左邊模型；右邊會同步顯示固定鏡頭看到的 2D 線圖。</p></div>
+      <div><div class="eyebrow">工作紙 02 · 立體觀察</div><h1>旋轉立體，睇清投影。</h1><p>投影模式可旋轉模型；練習模式鎖定工作紙角度，沿虛線描畫。</p></div>
       <div class="source">依據「202627年度中一IEE_徒手圖工作紙02」<br>圖 1–10 建立</div>
     </header>
     <div class="layout">
@@ -90,12 +94,12 @@
       <section class="board" aria-label="立體模型與平面投影">
         <div class="board-head"><div><h2 id="shapeTitle">圖 1</h2><p id="shapeDescription"></p></div><span class="badge">固定鏡頭 · 正投影</span></div>
         <div class="views" id="views">
-          <div class="view"><div class="view-title"><span>3D 模型</span><small>拖動旋轉 · 按橙點選取</small></div><div class="viewport"><svg id="model" viewBox="0 0 500 500" role="group" aria-label="可旋轉及選點的立體模型" tabindex="0"></svg></div></div>
-          <div class="view"><div class="view-title"><span>2D 螢幕投影</span><small>與左邊角度同步</small></div><div class="viewport projection"><svg id="projection" viewBox="0 0 500 500" role="img" aria-label="目前模型的平面投影"></svg></div></div>
+          <div class="view"><div class="view-title"><span>3D 模型</span><small id="modelHint">拖動旋轉 · 按橙點選取</small></div><div class="viewport"><svg id="model" viewBox="0 0 500 500" role="group" aria-label="可旋轉及選點的立體模型" tabindex="0"></svg></div></div>
+          <div class="view"><div class="view-title"><span id="rightTitle">2D 螢幕投影</span><span class="mode-controls"><small id="rightHint">與左邊角度同步</small><button id="undoStroke" class="reset" type="button" hidden>復原畫線</button><button id="modeButton" class="reset" type="button" aria-pressed="false">練習畫布</button></span></div><div class="viewport projection"><svg id="projection" viewBox="0 0 500 500" role="group" aria-label="目前模型的平面投影"></svg></div></div>
           <svg id="transfer" class="transfer" aria-hidden="true" focusable="false"></svg>
         </div>
         <div class="controls"><label class="switch"><input id="gridToggle" type="checkbox" checked><span class="track" aria-hidden="true"></span>顯示方格框及節點</label><label class="switch"><input id="pointsToggle" type="checkbox"><span class="track" aria-hidden="true"></span>顯示已選對齊點</label><button id="demo" class="reset demo" type="button">開始分步示範</button><button id="nextStep" class="reset" type="button" disabled>下一步</button><button id="reset" class="reset" type="button">重設角度</button><span class="instruction">左右轉向 · 上下傾斜 · 方向鍵亦可操作</span></div>
-        <div class="note">按左邊橙色節點可選擇或取消紫色對齊點，右邊會即時同步；開關可暫時隱藏已選點。示範可按「下一步」逐段觀看。<span id="demoStatus" role="status" aria-live="polite"></span></div>
+        <div class="note">按左邊橙色節點可選擇或取消紫色對齊點。練習畫布會鎖定左右兩邊於工作紙角度；用滑鼠或手指沿一條虛線描畫，轉彎時放開再畫。已選點和畫線會按題目保留。<span id="demoStatus" role="status" aria-live="polite"></span></div>
       </section>
     </div>
   </main>
@@ -149,8 +153,11 @@
     const toggle=document.getElementById('gridToggle'), pointsToggle=document.getElementById('pointsToggle');
     const title=document.getElementById('shapeTitle'), desc=document.getElementById('shapeDescription');
     const picker=document.getElementById('shapes'), demoButton=document.getElementById('demo'), nextButton=document.getElementById('nextStep'), demoStatus=document.getElementById('demoStatus');
+    const modeButton=document.getElementById('modeButton'), undoStroke=document.getElementById('undoStroke'), rightTitle=document.getElementById('rightTitle'), rightHint=document.getElementById('rightHint'), modelHint=document.getElementById('modelHint');
     let selected=0, yaw=0, pitch=0, dragging=null, demoStep=0;
     const chosen=shapes.map(()=>new Set());
+    const strokes=shapes.map(()=>[]);
+    let sandbox=false, drawing=null;
     const camera=[-1,-1,1], camLength=Math.hypot(...camera), view=camera.map(v=>v/camLength);
     const right=[-Math.SQRT1_2,Math.SQRT1_2,0];
     const up=[view[2]*right[1],-view[2]*right[0],view[1]*right[0]-view[0]*right[1]];
@@ -283,29 +290,44 @@
         return `<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#193943" stroke-width="2.2" stroke-linecap="round"/>`;
       }).join('')).join('');
     }
-    function cage(toScreen,showNodes=true,color='#276b7c',interactive=false) {
-      const [cx,cy,cz]=[[2.5,1.5,1.5],[1.5,2.5,1.5],[1.5,1.5,2.5]].map(p=>dot(rotate(p),view));
-      const front=([x,y,z])=>(x===0&&cx<0)||(x===3&&cx>0)||(y===0&&cy<0)||(y===3&&cy>0)||(z===0&&cz<0)||(z===3&&cz>0);
-      const lines=[[],[]], dots=[[],[]];
+    function cubeLines() {
+      const lines=[];
       for(let a=0;a<=3;a++) for(let b=0;b<=3;b++) for(let axis=0;axis<3;axis++) {
         if(a>0&&a<3&&b>0&&b<3) continue;
         const p=[a,b,0], q=[a,b,3];
         if(axis===1) { p[1]=0; p[2]=b; q[1]=3; q[2]=b; }
         if(axis===0) { p[0]=0; p[1]=a; p[2]=b; q[0]=3; q[1]=a; q[2]=b; }
+        lines.push({p,q});
+      }
+      return lines;
+    }
+    function cage(toScreen,showNodes=true,color='#276b7c',interactive=false,showLines=true) {
+      const [cx,cy,cz]=[[2.5,1.5,1.5],[1.5,2.5,1.5],[1.5,1.5,2.5]].map(p=>dot(rotate(p),view));
+      const front=([x,y,z])=>(x===0&&cx<0)||(x===3&&cx>0)||(y===0&&cy<0)||(y===3&&cy>0)||(z===0&&cz<0)||(z===3&&cz>0);
+      const lines=[[],[]], dots=[[],[]];
+      for(const {p,q} of showLines?cubeLines():[]) {
         const [x1,y1]=toScreen(projected(p)), [x2,y2]=toScreen(projected(q));
-        const outer=(a===0||a===3)&&(b===0||b===3);
-        lines[front(p)&&front(q)?1:0].push(`<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke-width="${outer?2.4:1.5}"/>`);
+        lines[front(p)&&front(q)?1:0].push(`<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke-width="3"/>`);
       }
       for(let x=0;showNodes&&x<=3;x++) for(let y=0;y<=3;y++) for(let z=0;z<=3;z++) {
         const [sx,sy]=toScreen(projected([x,y,z]));
         const key=[x,y,z].join(','), hit=interactive?` class="cube-node" data-node="${key}" role="button" tabindex="0" aria-label="方格節點 ${key}" aria-pressed="${chosen[selected].has(key)}" stroke="transparent" stroke-width="16" pointer-events="all"`:'';
         dots[front([x,y,z])?1:0].push(`<circle cx="${num(sx)}" cy="${num(sy)}" r="2.7"${hit}/>`);
       }
-      return [0,1].map(i=>`<g stroke="${color}" stroke-linecap="round" stroke-dasharray="1 6" opacity="${i?.82:.36}">${lines[i].join('')}</g><g fill="#ce6747" opacity="${i?.9:.45}">${dots[i].join('')}</g>`);
+      return [0,1].map(i=>`<g stroke="${color}" stroke-linecap="round" stroke-dasharray="4 9">${lines[i].join('')}</g><g fill="#ce6747" opacity="${i?.9:.45}">${dots[i].join('')}</g>`);
     }
+    const worksheetFrame=frame();
+    // 工作紙原圖 Image27.png：格心 (263,300) 對齊 SVG (250,250)，比例約 0.692。
+    const worksheetCube='<image href="worksheet-dotted-cube.png" x="67.9" y="42.3" width="362.8" height="423.1"/>';
+    // 模型來自工作紙 Image23、25、38、40、42、46、48、50、56、54；移除原圖內的背景虛線後疊在方格框上。
+    const worksheetModel=i=>`<image href="worksheet-model-${String(i+1).padStart(2,'0')}.png" x="${i?75.7:59.7}" y="${i?48.7:42.8}" width="${i?348.5:381.4}" height="${i?401.8:415.1}"/>`;
+    const referenceCube=toScreen=>yaw===0&&pitch===0?worksheetCube:cage(toScreen,false,'#d5d5d5').join('');
+    const sandboxLines=cubeLines().map(({p,q})=>[worksheetFrame(projected(p)),worksheetFrame(projected(q))]);
+    const sandboxNodes=new Map();
+    for(let x=0;x<=3;x++) for(let y=0;y<=3;y++) for(let z=0;z<=3;z++) sandboxNodes.set([x,y,z].join(','),worksheetFrame(projected([x,y,z])));
     function demoProjection(visible, edges, points, toScreen) {
       const delay=.32;
-      const cube=`<g${demoStep===1?' class="construction-enter"':''}>${cage(toScreen,false,'#849397').join('')}</g>`;
+      const cube=`<g${demoStep===1?' class="construction-enter"':''}>${referenceCube(toScreen)}</g>`;
       if(demoStep===1) return cube;
       const markers=[...points.values()].map(({screen:[x,y]},i)=>{
         const arrive=(i*delay+.65).toFixed(2);
@@ -326,6 +348,42 @@
         return `<line class="transfer-line" x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#6941c6" stroke-width="1.5" style="--length:${Math.ceil(Math.hypot(x2-x1,y2-y1))};--delay:${(i*.32).toFixed(2)}s"/>`;
       }).join('');
     }
+    function canvasPoint(e) {
+      const rect=projection.getBoundingClientRect(), scale=Math.min(rect.width,rect.height)/500;
+      return [(e.clientX-rect.left-(rect.width-500*scale)/2)/scale,(e.clientY-rect.top-(rect.height-500*scale)/2)/scale];
+    }
+    function nearestOnLine([a,b],[x,y]) {
+      const dx=b[0]-a[0], dy=b[1]-a[1], t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));
+      return {t,distance:Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)};
+    }
+    function extendDrawing(e) {
+      if(!drawing||drawing.pointerId!==e.pointerId) return;
+      const point=canvasPoint(e);
+      if(drawing.line===null) {
+        if(Math.hypot(point[0]-drawing.origin[0],point[1]-drawing.origin[1])<6) return;
+        const best=drawing.candidates.map(i=>({i,...nearestOnLine(sandboxLines[i],point)})).sort((a,b)=>a.distance-b.distance)[0];
+        if(best.distance>14) return;
+        drawing.line=best.i;
+        drawing.start=nearestOnLine(sandboxLines[best.i],drawing.origin).t;
+        drawing.end=drawing.start;
+      }
+      const hit=nearestOnLine(sandboxLines[drawing.line],point);
+      if(hit.distance<=14) { drawing.start=Math.min(drawing.start,hit.t); drawing.end=Math.max(drawing.end,hit.t); }
+      renderSandbox();
+    }
+    function renderSandbox() {
+      const draw=({line,start,end})=>{
+        const [a,b]=sandboxLines[line], p=t=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+        const [x1,y1]=p(start), [x2,y2]=p(end);
+        return `<line class="sandbox-stroke" x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}"/>`;
+      };
+      const points=pointsToggle.checked?[...chosen[selected]]:[];
+      projection.innerHTML=strokes[selected].map(draw).join('')+(drawing&&drawing.line!==null?draw(drawing):'')+worksheetCube+points.map(key=>{
+        const [x,y]=sandboxNodes.get(key);
+        return `<circle class="marked-point" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"/>`;
+      }).join('');
+      undoStroke.disabled=!strokes[selected].length;
+    }
     function render() {
       const shape=shapes[selected], faces=shape.profile?rampFaces(shape.profile):cubeFaces(shape.blocks), toScreen=frame();
       const vertexKeys=demoStep>=2&&pointsToggle.checked?modelVertices(faces):null;
@@ -345,20 +403,32 @@
         if(visibleKeys.has(key)&&!demoPoints.has(key)) demoPoints.set(key,{screen:face.screen[i],index:demoPoints.size});
       });
       const manualPoints=demoStep||!pointsToggle.checked?[]:[...chosen[selected]].map(key=>({key,screen:toScreen(projected(key.split(',').map(Number)))}));
-      const [backGrid,frontGrid]=toggle.checked?cage(toScreen,true,'#276b7c',true):['',''];
-      model.innerHTML=backGrid+visible.map(f=>polygon(f.screen,f.shade,'#244c58',1.8)+(vertexKeys?f.points.map((p,i)=>{
+      const worksheetAngle=yaw===0&&pitch===0;
+      const [backDots,frontGrid]=toggle.checked?cage(toScreen,true,'#d5d5d5',true,!worksheetAngle):['',''];
+      const backGrid=toggle.checked&&worksheetAngle?worksheetCube+backDots:backDots;
+      const drawnModel=worksheetAngle?worksheetModel(selected):visible.map(f=>polygon(f.screen,f.shade,'#244c58',1.8)+(vertexKeys?f.points.map((p,i)=>{
         const key=p.join(',');
         if(!visibleKeys.has(key)) return '';
         const step=demoPoints.get(key)?.index;
         const pulse=step===undefined||demoStep!==2?'':` style="animation:pointPulse .5s ${(step*.32).toFixed(2)}s both;transform-box:fill-box;transform-origin:center"`;
         return `<circle class="fixed-point" cx="${num(f.screen[i][0])}" cy="${num(f.screen[i][1])}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"${pulse}/>`;
-      }).join(''):'')).join('')+frontGrid+manualPoints.map(({key,screen:[x,y]})=>`<circle class="fixed-point manual-point" data-node="${key}" role="button" tabindex="0" aria-label="取消對齊點 ${key}" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"/>`).join('');
-      projection.innerHTML=demoStep?demoProjection(visible,edges,demoPoints,toScreen):projectionFaces(visible,edges)+cage(toScreen,false,'#849397').join('')+manualPoints.map(({screen:[x,y]})=>`<circle class="marked-point" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"/>`).join('');
+      }).join(''):'')).join('');
+      const fixedMarkers=worksheetAngle?[...demoPoints.values()].map(({screen:[x,y],index})=>`<circle class="fixed-point" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"${demoStep===2?` style="animation:pointPulse .5s ${(index*.32).toFixed(2)}s both;transform-box:fill-box;transform-origin:center"`:''}/>`).join(''):'';
+      model.innerHTML=backGrid+drawnModel+frontGrid+fixedMarkers+manualPoints.map(({key,screen:[x,y]})=>`<circle class="fixed-point manual-point" data-node="${key}" role="button" tabindex="0" aria-label="取消對齊點 ${key}" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"/>`).join('');
+      if(sandbox) renderSandbox();
+      else projection.innerHTML=demoStep?demoProjection(visible,edges,demoPoints,toScreen):projectionFaces(visible,edges)+referenceCube(toScreen)+manualPoints.map(({screen:[x,y]})=>`<circle class="marked-point" cx="${num(x)}" cy="${num(y)}" r="6.5" fill="#6941c6" stroke="#fff" stroke-width="1.5"/>`).join('');
       transferPoints(demoPoints);
       title.textContent=shape.name; desc.textContent=shape.description;
       [...picker.children].forEach((button,i)=>button.setAttribute('aria-pressed',String(i===selected)));
-      model.setAttribute('aria-label',`${shape.name}：${shape.description}，可用方向鍵旋轉，按橙色節點選擇對齊點`);
-      projection.setAttribute('aria-label',demoStep?`${shape.name}投影示範，${stepText[demoStep]}`:`${shape.name}目前角度的 2D 投影`);
+      model.setAttribute('aria-label',sandbox?`${shape.name}：${shape.description}，固定工作紙角度，按橙色節點選擇對齊點`:`${shape.name}：${shape.description}，可用方向鍵旋轉，按橙色節點選擇對齊點`);
+      modelHint.textContent=sandbox?'固定工作紙角度 · 按橙點選取':'拖動旋轉 · 按橙點選取';
+      projection.setAttribute('class',sandbox?'sandbox':'');
+      projection.setAttribute('aria-label',sandbox?`${shape.name}練習畫布，沿虛線格線描畫`:demoStep?`${shape.name}投影示範，${stepText[demoStep]}`:`${shape.name}目前角度的 2D 投影`);
+      rightTitle.textContent=sandbox?'練習畫布':'2D 螢幕投影';
+      rightHint.textContent=sandbox?'固定工作紙角度 · 沿虛線描畫':'與左邊角度同步';
+      modeButton.textContent=sandbox?'查看自動投影':'練習畫布';
+      modeButton.setAttribute('aria-pressed',String(sandbox));
+      undoStroke.hidden=!sandbox;
       demoButton.textContent=demoStep?'重新開始示範':'開始分步示範';
       nextButton.disabled=!demoStep||demoStep===4;
     }
@@ -368,8 +438,28 @@
       const button=document.createElement('button'); button.type='button'; button.className='shape';
       button.innerHTML=`<span>${i+1}</span><small>圖 ${i+1}</small>`;
       button.setAttribute('aria-label',`選擇${shape.name}：${shape.description}`);
-      button.addEventListener('click',()=>{stopDemo();selected=i; render();}); picker.append(button);
+      button.addEventListener('click',()=>{stopDemo();drawing=null;selected=i;render();}); picker.append(button);
     });
+    modeButton.addEventListener('click',()=>{sandbox=!sandbox;drawing=null;dragging=null;stopDemo();if(sandbox){yaw=0;pitch=0;pointsToggle.checked=true;}render();});
+    undoStroke.addEventListener('click',()=>{if(strokes[selected].length)strokes[selected].pop();drawing=null;renderSandbox();});
+    projection.addEventListener('pointerdown',e=>{
+      if(!sandbox||drawing||e.button>0) return;
+      const origin=canvasPoint(e), candidates=sandboxLines.map((line,i)=>({i,distance:nearestOnLine(line,origin).distance})).filter(hit=>hit.distance<=12).map(hit=>hit.i);
+      if(!candidates.length) return;
+      drawing={pointerId:e.pointerId,origin,candidates,line:null,start:0,end:0};
+      projection.setPointerCapture(e.pointerId);
+    });
+    projection.addEventListener('pointermove',e=>{if(sandbox)extendDrawing(e);});
+    projection.addEventListener('pointerup',e=>{
+      if(!sandbox||!drawing||drawing.pointerId!==e.pointerId) return;
+      extendDrawing(e);
+      if(drawing.line!==null) {
+        const [a,b]=sandboxLines[drawing.line];
+        if(Math.abs(drawing.end-drawing.start)*Math.hypot(b[0]-a[0],b[1]-a[1])>=4) strokes[selected].push({line:drawing.line,start:drawing.start,end:drawing.end});
+      }
+      drawing=null;renderSandbox();
+    });
+    for(const event of ['pointercancel','lostpointercapture']) projection.addEventListener(event,()=>{if(drawing){drawing=null;renderSandbox();}});
     function selectNode(key) {
       if(demoStep) stopDemo();
       const points=chosen[selected];
@@ -381,12 +471,14 @@
     }
     model.addEventListener('pointerdown',e=>{
       const key=e.target?.getAttribute?.('data-node')||null;
+      if(sandbox&&!key) return;
       if(demoStep){stopDemo();render();}
       dragging=[e.pointerId,e.clientX,e.clientY,e.clientX,e.clientY,key];
       model.setPointerCapture(e.pointerId);
     });
     model.addEventListener('pointermove',e=>{
       if(!dragging||dragging[0]!==e.pointerId) return;
+      if(sandbox) { if(Math.hypot(e.clientX-dragging[3],e.clientY-dragging[4])>=5) dragging[5]=null; return; }
       if(dragging[5]&&Math.hypot(e.clientX-dragging[3],e.clientY-dragging[4])<5) return;
       dragging[5]=null;
       yaw+=(e.clientX-dragging[1])*0.008;
@@ -399,10 +491,10 @@
       const node=e.target?.getAttribute?.('data-node');
       if(node&&(e.key==='Enter'||e.key===' ')) { e.preventDefault(); selectNode(node); model.querySelector?.(`[data-node="${node}"]`)?.focus(); return; }
       const step={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,.12],ArrowDown:[0,-.12]}[e.key];
-      if(!step) return; e.preventDefault(); stopDemo();yaw+=step[0]; pitch+=step[1]; render();
+      if(!step) return; e.preventDefault(); if(sandbox)return; stopDemo();yaw+=step[0]; pitch+=step[1]; render();
     });
     for(const control of [toggle,pointsToggle]) control.addEventListener('change',()=>{stopDemo();render();});
-    demoButton.addEventListener('click',()=>{demoStep=1;pointsToggle.checked=false;demoStatus.textContent=' '+stepText[demoStep];render();});
+    demoButton.addEventListener('click',()=>{sandbox=false;drawing=null;demoStep=1;pointsToggle.checked=false;demoStatus.textContent=' '+stepText[demoStep];render();});
     nextButton.addEventListener('click',()=>{if(!demoStep||demoStep===4)return;demoStep++;if(demoStep===2)pointsToggle.checked=true;demoStatus.textContent=' '+stepText[demoStep];render();});
     document.getElementById('reset').addEventListener('click',()=>{stopDemo();yaw=0;pitch=0;render();});
     window.addEventListener('resize',render);
