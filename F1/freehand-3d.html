@@ -79,7 +79,7 @@
     @keyframes trace { to { stroke-dashoffset:0; } }
     @media(max-width:850px) { .layout { grid-template-columns:1fr; } .picker { padding:14px; } .picker p { margin-bottom:9px; } .shapes { grid-template-columns:repeat(5,1fr); } .shape { min-height:56px; } .viewport { height:44vw; min-height:280px; } }
     @media(max-width:580px) { .heading { align-items:start; } .source { display:none; } .views { grid-template-columns:1fr; } .view + .view { border-left:0; border-top:1px solid var(--line); } .viewport { height:320px; } .mode-controls small { display:none; } .instruction { margin-left:0; width:100%; } .board-head { padding:15px 16px; } .controls { padding:15px 16px; } .note { padding:0 16px 16px; } }
-    @media(prefers-reduced-motion:reduce) { .track, .track::after { transition:none; } .fixed-point, .construction-enter { animation:none!important; opacity:1; } .transfer-line { animation:none; opacity:0; } .trace-line { animation:none; stroke-dashoffset:0; } .demo-point { animation:none; opacity:1; } }
+    @media(prefers-reduced-motion:reduce) { .track, .track::after { transition:none; } .fixed-point, .construction-enter { animation:none!important; opacity:1; } .transfer-line { animation:none; opacity:0; } .sandbox-guide { opacity:.65; stroke-dasharray:none; } .trace-line { animation:none; stroke-dashoffset:0; } .demo-point { animation:none; opacity:1; } }
   </style>
 </head>
 <body>
@@ -99,7 +99,7 @@
           <svg id="transfer" class="transfer" aria-hidden="true" focusable="false"></svg>
         </div>
         <div class="controls"><label class="switch"><input id="gridToggle" type="checkbox" checked><span class="track" aria-hidden="true"></span>顯示方格框及節點</label><label class="switch"><input id="pointsToggle" type="checkbox"><span class="track" aria-hidden="true"></span>顯示已選對齊點</label><button id="demo" class="reset demo" type="button">開始分步示範</button><button id="nextStep" class="reset" type="button" disabled>下一步</button><button id="reset" class="reset" type="button">重設角度</button><span class="instruction">左右轉向 · 上下傾斜 · 方向鍵亦可操作</span></div>
-        <div class="note">按左邊橙色節點可選擇或取消紫色對齊點。練習畫布會鎖定左右兩邊於工作紙角度；用滑鼠或手指沿一條虛線描畫，轉彎時放開再畫。已選點和畫線會按題目保留。<span id="demoStatus" role="status" aria-live="polite"></span></div>
+        <div class="note">按左邊橙色節點可選擇或取消紫色對齊點；練習模式會用紫色引導線連到右邊對應點。練習畫布會鎖定左右兩邊於工作紙角度；用滑鼠或手指沿一條虛線描畫，轉彎時放開再畫。已選點和畫線會按題目保留。<span id="demoStatus" role="status" aria-live="polite"></span></div>
       </section>
     </div>
   </main>
@@ -157,7 +157,7 @@
     let selected=0, yaw=0, pitch=0, dragging=null, demoStep=0;
     const chosen=shapes.map(()=>new Set());
     const strokes=shapes.map(()=>[]);
-    let sandbox=false, drawing=null;
+    let sandbox=false, drawing=null, guidePoint=null;
     const camera=[-1,-1,1], camLength=Math.hypot(...camera), view=camera.map(v=>v/camLength);
     const right=[-Math.SQRT1_2,Math.SQRT1_2,0];
     const up=[view[2]*right[1],-view[2]*right[0],view[1]*right[0]-view[0]*right[1]];
@@ -336,16 +336,18 @@
       return demoStep===2?cube+markers:projectionFaces(visible,edges,demoStep)+cube+markers;
     }
     function transferPoints(points) {
-      if(demoStep!==2) { transfer.innerHTML=''; return; }
+      const guide=sandbox&&guidePoint&&pointsToggle.checked&&chosen[selected].has(guidePoint);
+      if(!guide&&demoStep!==2) { transfer.innerHTML=''; return; }
       const area=views.getBoundingClientRect(), left=model.getBoundingClientRect(), right=projection.getBoundingClientRect();
       const place=(rect,[x,y])=>{
         const scale=Math.min(rect.width,rect.height)/500;
         return [rect.left-area.left+(rect.width-500*scale)/2+x*scale,rect.top-area.top+(rect.height-500*scale)/2+y*scale];
       };
       transfer.setAttribute('viewBox',`0 0 ${area.width} ${area.height}`);
-      transfer.innerHTML=[...points.values()].map(({screen},i)=>{
+      const screens=guide?[sandboxNodes.get(guidePoint)]:[...points.values()].map(point=>point.screen);
+      transfer.innerHTML=screens.map((screen,i)=>{
         const [x1,y1]=place(left,screen), [x2,y2]=place(right,screen);
-        return `<line class="transfer-line" x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#6941c6" stroke-width="1.5" style="--length:${Math.ceil(Math.hypot(x2-x1,y2-y1))};--delay:${(i*.32).toFixed(2)}s"/>`;
+        return `<line class="transfer-line${guide?' sandbox-guide':''}" x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" stroke="#6941c6" stroke-width="1.5" style="--length:${Math.ceil(Math.hypot(x2-x1,y2-y1))};--delay:${(i*.32).toFixed(2)}s"/>`;
       }).join('');
     }
     function canvasPoint(e) {
@@ -438,9 +440,9 @@
       const button=document.createElement('button'); button.type='button'; button.className='shape';
       button.innerHTML=`<span>${i+1}</span><small>圖 ${i+1}</small>`;
       button.setAttribute('aria-label',`選擇${shape.name}：${shape.description}`);
-      button.addEventListener('click',()=>{stopDemo();drawing=null;selected=i;render();}); picker.append(button);
+      button.addEventListener('click',()=>{stopDemo();drawing=null;guidePoint=null;selected=i;render();}); picker.append(button);
     });
-    modeButton.addEventListener('click',()=>{sandbox=!sandbox;drawing=null;dragging=null;stopDemo();if(sandbox){yaw=0;pitch=0;pointsToggle.checked=true;}render();});
+    modeButton.addEventListener('click',()=>{sandbox=!sandbox;drawing=null;dragging=null;guidePoint=null;stopDemo();if(sandbox){yaw=0;pitch=0;pointsToggle.checked=true;}render();});
     undoStroke.addEventListener('click',()=>{if(strokes[selected].length)strokes[selected].pop();drawing=null;renderSandbox();});
     projection.addEventListener('pointerdown',e=>{
       if(!sandbox||drawing||e.button>0) return;
@@ -467,6 +469,7 @@
       else if(points.has(key)) points.delete(key);
       else points.add(key);
       pointsToggle.checked=true;
+      guidePoint=sandbox&&points.has(key)?key:null;
       render();
     }
     model.addEventListener('pointerdown',e=>{
@@ -493,10 +496,10 @@
       const step={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,.12],ArrowDown:[0,-.12]}[e.key];
       if(!step) return; e.preventDefault(); if(sandbox)return; stopDemo();yaw+=step[0]; pitch+=step[1]; render();
     });
-    for(const control of [toggle,pointsToggle]) control.addEventListener('change',()=>{stopDemo();render();});
+    for(const control of [toggle,pointsToggle]) control.addEventListener('change',()=>{guidePoint=null;stopDemo();render();});
     demoButton.addEventListener('click',()=>{sandbox=false;drawing=null;demoStep=1;pointsToggle.checked=false;demoStatus.textContent=' '+stepText[demoStep];render();});
     nextButton.addEventListener('click',()=>{if(!demoStep||demoStep===4)return;demoStep++;if(demoStep===2)pointsToggle.checked=true;demoStatus.textContent=' '+stepText[demoStep];render();});
-    document.getElementById('reset').addEventListener('click',()=>{stopDemo();yaw=0;pitch=0;render();});
+    document.getElementById('reset').addEventListener('click',()=>{guidePoint=null;stopDemo();yaw=0;pitch=0;render();});
     window.addEventListener('resize',render);
     render();
   </script>

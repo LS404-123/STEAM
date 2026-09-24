@@ -311,6 +311,18 @@ vm.runInNewContext(script + `
   model.listeners.pointerup({pointerId:14});
   assert.equal(chosen[0].size,beforeSandboxPoints+1);
   assert.equal((projection.innerHTML.match(/class="marked-point"/g)||[]).length,beforeSandboxPoints+1);
+  const guide=transfer.innerHTML.match(/class="transfer-line sandbox-guide" x1="([0-9.]+)" y1="([0-9.]+)" x2="([0-9.]+)" y2="([0-9.]+)"/);
+  assert.ok(guide);
+  const aligned=sandboxNodes.get('0,0,0').map(num);
+  assert.equal(guide[1],aligned[0]);
+  assert.equal(guide[2],aligned[1]);
+  assert.ok(Math.abs(Number(guide[3])-Number(guide[1])-500)<.2);
+  assert.equal(guide[4],aligned[1]);
+  model.listeners.pointerdown({pointerId:14,clientX:20,clientY:20,target:nodeTarget('0,0,0')});
+  model.listeners.pointerup({pointerId:14});
+  assert.equal(transfer.innerHTML,'');
+  model.listeners.pointerdown({pointerId:14,clientX:20,clientY:20,target:nodeTarget('0,0,0')});
+  model.listeners.pointerup({pointerId:14});
   const [a,b]=sandboxLines[0], along=t=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
   const [sx,sy]=along(.2), [ex,ey]=along(.8);
   projection.listeners.pointerdown({pointerId:11,clientX:500+sx,clientY:sy});
@@ -344,6 +356,7 @@ vm.runInNewContext(script + `
   assert.equal(projection.innerHTML,practice);
   picker.children[1].listeners.click();
   assert.doesNotMatch(projection.innerHTML,/class="sandbox-stroke"/);
+  assert.equal(transfer.innerHTML,'');
   picker.children[0].listeners.click();
   assert.match(projection.innerHTML,/class="sandbox-stroke"/);
   modeButton.listeners.click();
